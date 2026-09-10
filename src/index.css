@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    min-height: 100vh;
+    background: radial-gradient(circle at 30% 20%, #6b8cc4 0%, #4a6fa0 35%, #3d5a8a 70%, #2d4570 100%) fixed;
+    color: #1E293B;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1 {
+    @apply text-[28px] sm:text-[32px] font-bold text-slate-900 tracking-tight leading-tight;
+  }
+  h2 {
+    @apply text-[22px] sm:text-[24px] font-bold text-slate-900 tracking-tight leading-snug;
+  }
+  h3 {
+    @apply text-[17px] sm:text-[18px] font-bold text-slate-800 tracking-tight;
+  }
+  p {
+    @apply text-[15px] text-slate-600 leading-relaxed;
+  }
+  small {
+    @apply text-[13px] text-slate-500;
+  }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   EXACT LIGHT GLASSMORPHISM DESIGN SYSTEM (Matches reference image)
+   ========================================================================== */
+
+/* The primary page background gradient */
+.bg-cly-gradient {
+  background: radial-gradient(circle at 30% 20%, #6b8cc4 0%, #4a6fa0 35%, #3d5a8a 70%, #2d4570 100%) fixed;
+}
+
+/* Primary Glass Card: Light frosted glass floating on the blue gradient */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65); /* lower opacity than current, let gradient show through more */
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(30, 41, 82, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  color: #1E293B;
+}
+
+.glass-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Nested Sub-Cards: Inside a glass panel, more opaque white with sharp delineation */
+.glass-subcard {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  color: #1E293B;
+}
+
+/* Top Stat Strip Pattern (matches reference header exactly) */
+.stat-strip {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+  color: #1E293B;
+}
+
+/* Callout Badge (matches the white pill callout on top right) */
+.callout-badge {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  color: #1E293B;
+}
+
+/* Risk Gradient Bar (smooth Green -> Yellow -> Orange -> Red) */
+.risk-gradient-bar {
+  background: linear-gradient(90deg, #10B981 0%, #F59E0B 45%, #F97316 75%, #EF4444 100%);
+}
+
+/* Brand Button: Teal gradient with soft shadow */
+.btn-brand-primary {
+  background: linear-gradient(135deg, #76C7C0 0%, #4AA8A0 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(74, 168, 160, 0.35);
+  transition: all 0.2s ease;
+}
+.btn-brand-primary:hover {
+  background: linear-gradient(135deg, #65B8B1 0%, #3D968E 100%);
+  box-shadow: 0 6px 20px rgba(74, 168, 160, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Subtle background texture overlay (Faint abstract wave/helix lines in white at ~7% opacity) */
+.bg-texture-curves {
+  background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 45%);
+}
+
+/* Print Stylesheet for Official AYUSH Clinical Slips & Prescriptions */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  nav,
+  aside,
+  header,
+  footer,
+  .no-print,
+  button:not(.print-include) {
+    display: none !important;
+  }
+
+  .printable-dossier,
+  .printable-area {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid;
+  }
+}
