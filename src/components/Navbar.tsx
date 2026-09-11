@@ -82,7 +82,7 @@ export const Navbar: React.FC = () => {
             <img
               src={ayucarezLogo}
               alt="Ayucarez"
-              className="h-8 w-auto object-contain"
+              className="h-11 w-auto object-contain"
             />
           </div>
 
