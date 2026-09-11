@@ -190,6 +190,7 @@ export interface Patient {
   ayurvedaHistory?: Consultation[];
   allopathyHistory?: Consultation[];
   ayurvedaIntake?: AyurvedaIntakeData;
+  prescriptionUploadRequested?: boolean;
 }
 
 export interface AyurvedaIntakeData {

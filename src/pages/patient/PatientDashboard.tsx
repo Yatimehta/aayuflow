@@ -1,19 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Sparkles, 
-  ShieldCheck, 
-  Upload, 
-  ArrowRight, 
-  FileText, 
-  History, 
-  Clock, 
+import {
+  Sparkles,
+  ShieldCheck,
+  Upload,
+  ArrowRight,
+  FileText,
+  History,
+  Clock,
   ChevronRight
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { useState, useEffect } from 'react';
-import { Modal } from '../../components/Modal';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -21,36 +19,35 @@ export const PatientDashboard: React.FC = () => {
   const { t } = useTranslation();
 
   const patient = activePatient || patients[0];
-  
+
   const [showUploadReminder, setShowUploadReminder] = useState(false);
-  
+
   useEffect(() => {
     if (patient?.status === 'Completed' && !patient.prescriptionUploadRequested) {
         setShowUploadReminder(true);
     }
   }, [patient]);
 
-
   return (
     <div className="min-h-[85vh] py-16 px-4 sm:px-6 flex items-center justify-center relative z-10">
       <div className="max-w-xl w-full space-y-10 text-center">
-        
+
         {/* Google-Style Minimalist Greeting Header */}
         <div className="space-y-2">
 
 
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
-            {t('greeting', { name: patient?.name?.split(' ')[0] || 'Patient' })}
+            {t('pd_greeting', { name: patient?.name?.split(' ')[0] || 'Patient' })}
           </h1>
-          
+
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            {selectedHospital.name} • Kayachikitsa OPD
+            {t('pd_subtitle', { hospital: selectedHospital.name })}
           </p>
         </div>
 
         {/* EXACTLY TWO PRIMARY ACTION OPTIONS: EQUALLY-WEIGHTED CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-          
+
           {/* Option 1: Start Intake */}
           <div
             id="patient-start-intake-btn"
@@ -63,16 +60,16 @@ export const PatientDashboard: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                  Start Intake
+                  {t('pd_start_title')}
                 </h2>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  Answer a few questions to describe your symptoms and generate your OPD token.
+                  {t('pd_start_desc')}
                 </p>
               </div>
             </div>
 
             <div className="pt-2 flex items-center gap-1.5 text-xs font-semibold text-teal-700 group-hover:underline">
-              <span>Begin questionnaire</span>
+              <span>{t('pd_start_cta')}</span>
               <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
             </div>
           </div>
@@ -88,16 +85,16 @@ export const PatientDashboard: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                  Upload Document
+                  {t('pd_upload_title')}
                 </h2>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  Submit a lab report, scan, or prescription ahead of your clinical visit.
+                  {t('pd_upload_desc')}
                 </p>
               </div>
             </div>
 
             <div className="pt-2 flex items-center gap-1.5 text-xs font-semibold text-teal-700 group-hover:underline">
-              <span>Choose report file</span>
+              <span>{t('pd_upload_cta')}</span>
               <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
             </div>
           </div>
@@ -112,7 +109,7 @@ export const PatientDashboard: React.FC = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-white/80 border border-transparent hover:border-slate-200 transition-all"
           >
             <History className="w-4 h-4 text-slate-400" />
-            <span>My Records & Past Visits</span>
+            <span>{t('pd_records_link')}</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
           </button>
         </div>
@@ -133,7 +130,7 @@ export const PatientDashboard: React.FC = () => {
               className="text-[11px] text-slate-500 hover:text-teal-700 transition-colors inline-flex items-center gap-1.5"
             >
               <Clock className="w-3.5 h-3.5 text-teal-600" />
-              <span>Active Token: <strong className="font-mono text-slate-800">{patient.tokenNumber}</strong> (View Slip)</span>
+              <span>{t('pd_active_token_label')} <strong className="font-mono text-slate-800">{patient.tokenNumber}</strong> {t('pd_view_slip')}</span>
             </button>
           </div>
         )}
@@ -150,9 +147,9 @@ export const PatientDashboard: React.FC = () => {
               </div>
             </div>
             <div className="text-center space-y-2">
-              <h3 className="font-bold text-slate-900 text-lg">{t('consultationCompleted')}</h3>
+              <h3 className="font-bold text-slate-900 text-lg">{t('pd_upload_reminder_title')}</h3>
               <p className="text-sm text-slate-500">
-                {t('pleaseUpload')}
+                {t('pd_upload_reminder_desc')}
               </p>
             </div>
             <div className="pt-4 space-y-2">
@@ -163,13 +160,13 @@ export const PatientDashboard: React.FC = () => {
                 }}
                 className="w-full py-2.5 rounded-xl bg-teal-600 text-white font-bold shadow-sm hover:bg-teal-700 transition-colors"
               >
-                Upload Prescription
+                {t('pd_upload_cta')}
               </button>
               <button
                 onClick={() => setShowUploadReminder(false)}
                 className="w-full py-2.5 rounded-xl text-slate-500 font-semibold hover:bg-slate-50 transition-colors"
               >
-                Later
+                {t('pd_later_btn')}
               </button>
             </div>
           </div>
@@ -178,4 +175,3 @@ export const PatientDashboard: React.FC = () => {
     </div>
   );
 };
-
