@@ -21,7 +21,6 @@ import {
   Scale,
   Layers,
   FlaskConical,
-  Languages,
   Leaf,
   AlertTriangle,
   ShieldCheck,
@@ -55,7 +54,6 @@ export const DoctorPatientProfile: React.FC = () => {
   }, [paramPatientId, patient, activePatient, setActivePatientId]);
 
   const [activeTab, setActiveTab] = useState<'summary' | 'ayurveda_history' | 'allopathy_history' | 'reports' | 'prescriptions'>('summary');
-  const [summaryLanguage, setSummaryLanguage] = useState<'en' | 'hi'>('en');
 
   // Editable summary state
   const [isEditingSummary, setIsEditingSummary] = useState(false);
@@ -115,60 +113,34 @@ export const DoctorPatientProfile: React.FC = () => {
 
   const hasSafetyFlags = displayedAbnormalLabs.length > 0 || displayedInteractions.length > 0;
 
-  const isHi = summaryLanguage === 'hi';
+  const chiefComplaintText = patient.chiefComplaint;
 
-  const chiefComplaintText = isHi
-    ? 'द्विपक्षीय जानु संधि शूल एवं प्रातःकालीन स्तब्धता (संधिवात), 8 माह से'
-    : patient.chiefComplaint;
+  const durationText = patient.clinicalSummary.duration || '6 months';
 
-  const durationText = isHi
-    ? '8 माह निरंतर (शीत ऋतु में प्रकोप)'
-    : (patient.clinicalSummary.duration || '6 months');
+  const severityText = patient.clinicalSummary.severity || 'Moderate';
 
-  const severityText = isHi
-    ? (patient.clinicalSummary.severity === 'Severe' ? 'तीव्र (Severe)' : 'मध्यम (Moderate)')
-    : (patient.clinicalSummary.severity || 'Moderate');
+  const siteText = patient.chiefComplaint.toLowerCase().includes('knee') ? 'Bilateral knee joints & patellar margins' :
+    patient.chiefComplaint.toLowerCase().includes('back') ? 'Lumbosacral region (L4-S1)' :
+    patient.chiefComplaint.toLowerCase().includes('acid') ? 'Epigastric & retrosternal zone' :
+    'Primary presenting anatomical region';
 
-  const siteText = isHi
-    ? 'द्विपक्षीय जानु संधि एवं पटेला परिधि'
-    : (patient.chiefComplaint.toLowerCase().includes('knee') ? 'Bilateral knee joints & patellar margins' :
-       patient.chiefComplaint.toLowerCase().includes('back') ? 'Lumbosacral region (L4-S1)' :
-       patient.chiefComplaint.toLowerCase().includes('acid') ? 'Epigastric & retrosternal zone' :
-       'Primary presenting anatomical region');
+  const onsetText = `Gradual & progressive, noted ~${patient.clinicalSummary.duration || '6 months ago'}`;
 
-  const onsetText = isHi
-    ? 'क्रमिक एवं निरंतर प्रगतिशील, लगभग 8 माह पूर्व प्रारंभ'
-    : `Gradual & progressive, noted ~${patient.clinicalSummary.duration || '6 months ago'}`;
+  const characterText = patient.chiefComplaint.toLowerCase().includes('pain') ? 'Dull aching, mechanical stiffness with joint crepitus' :
+    patient.chiefComplaint.toLowerCase().includes('acid') ? 'Burning retrosternal distress and sour eructation' :
+    'Persistent throbbing with functional limitation';
 
-  const characterText = isHi
-    ? 'सुस्त गंभीर वेदना, जानु मोड़ने पर चटकने की आवाज (क्रेपिटस) एवं स्तब्धता'
-    : (patient.chiefComplaint.toLowerCase().includes('pain') ? 'Dull aching, mechanical stiffness with joint crepitus' :
-       patient.chiefComplaint.toLowerCase().includes('acid') ? 'Burning retrosternal distress and sour eructation' :
-       'Persistent throbbing with functional limitation');
+  const radiationText = 'Non-radiating; localized to primary articulation / zone';
 
-  const radiationText = isHi
-    ? 'अ-प्रसारी; मुख्य जानु जोड़ एवं पटेला परिधि तक सीमित'
-    : 'Non-radiating; localized to primary articulation / zone';
+  const associationsText = 'Morning stiffness >45 mins, fatigue on climbing stairs, mild sleep disturbance';
 
-  const associationsText = isHi
-    ? 'प्रातःकालीन जकड़न >45 मिनट, सीढ़ियां चढ़ने में कठिनाई, फर्श से उठने में असमर्थता'
-    : 'Morning stiffness >45 mins, fatigue on climbing stairs, mild sleep disturbance';
+  const timeCourseText = `Chronicity: ${patient.clinicalSummary.duration}; worsens towards evening after physical load`;
 
-  const timeCourseText = isHi
-    ? `कालक्रम: ${patient.clinicalSummary.duration}; शाम को श्रम के पश्चात दर्द में वृद्धि`
-    : `Chronicity: ${patient.clinicalSummary.duration}; worsens towards evening after physical load`;
+  const exacerbatingText = 'Worse: Cold damp weather, prolonged walking; Better: Rest & warm application';
 
-  const exacerbatingText = isHi
-    ? 'प्रकोपक: शीतल नम मौसम, अधिक चलना | उपशामक: विश्राम एवं उष्ण स्वेदन'
-    : 'Worse: Cold damp weather, prolonged walking; Better: Rest & warm application';
+  const severityScoreText = `VAS 6/10 (${patient.clinicalSummary.severity || 'Moderate'}); interferes with daily mobility`;
 
-  const severityScoreText = isHi
-    ? `VAS 6/10 (${severityText}); दैनिक गतिशीलता में बाधा`
-    : `VAS 6/10 (${patient.clinicalSummary.severity || 'Moderate'}); interferes with daily mobility`;
-
-  const clinicalNotesText = isHi
-    ? 'एआई नैदानिक सारांश: रोगी में शास्त्रीय संधिवात (ऑस्टियोआर्थराइटिस) के लक्षण प्रमाणित हैं। क्रेपिटस एवं प्रातःकालीन जकड़न वात प्रकोप से संबंधित हैं जो ठंड में बढ़ते हैं। रेडियोग्राफी में मीडियल कम्पार्टमेंट संकुचन देखा गया है। वात-शामक जानु बस्ति (मुरिवेन्ना तैल) एवं पत्र पिंड स्वेद चिकित्सा अनुशंसित है।'
-    : (editableNotes || patient.clinicalSummary.aiGeneratedNotes);
+  const clinicalNotesText = editableNotes || patient.clinicalSummary.aiGeneratedNotes;
 
   const handleSaveSummary = () => {
     updatePatientClinicalSummary(patient.id, {
@@ -230,14 +202,10 @@ export const DoctorPatientProfile: React.FC = () => {
               {patient.name.charAt(0)}
             </div>
             <div>
-              {/* Name & Max 2 Badges: Priority + OTP Verified */}
+              {/* Name & Priority Badge */}
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl font-bold text-[#0D2B3E]">{patient.name}</h1>
                 {patient.priorityFlag && <PriorityFlag size="sm" />}
-                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#E4EFEC] text-[#146356] border border-[#9FDCD1]">
-                  <span>🔒</span>
-                  <span>OTP Verified</span>
-                </span>
                 <button
                   type="button"
                   onClick={() => setShowPatientDetails(!showPatientDetails)}
@@ -258,7 +226,7 @@ export const DoctorPatientProfile: React.FC = () => {
                 <div className="p-2.5 mt-2 bg-[#F4FBF9] border border-[#DCEAE7] rounded-xl text-xs space-y-1 text-slate-600 animate-in fade-in duration-150">
                   <div className="flex flex-wrap gap-x-4 gap-y-1">
                     <div>ABHA ID: <span className="font-mono text-slate-800 font-semibold">{patient.abhaId || 'N/A'}</span></div>
-                    <div>Workflow Status: <span className="font-semibold text-slate-800">{patient.status}</span> (OTP {patient.otp || '4829'})</div>
+                    <div>Workflow Status: <span className="font-semibold text-slate-800">{patient.status}</span></div>
                     <div>Care Stream: <span className="font-semibold text-slate-800">{isAyurvedicRecord(patient) ? 'AYUSH / Ayurvedic OPD' : 'Conventional / Allopathic OPD'}</span></div>
                   </div>
                 </div>
@@ -270,35 +238,8 @@ export const DoctorPatientProfile: React.FC = () => {
             </div>
           </div>
 
-          {/* Distinct Right-Aligned Block: Global Language Toggle & Vitals Strip */}
+          {/* Vitals Strip */}
           <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-2.5 pt-2 lg:pt-0">
-            {/* Global Screen-Wide Language Toggle */}
-            <div className="inline-flex items-center p-1 rounded-xl bg-[#F4FBF9] border border-[#DCEAE7] text-xs shadow-2xs">
-              <button
-                type="button"
-                onClick={() => setSummaryLanguage('en')}
-                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                  summaryLanguage === 'en'
-                    ? 'bg-white text-[#146356] shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                English
-              </button>
-              <button
-                type="button"
-                onClick={() => setSummaryLanguage('hi')}
-                className={`px-3 py-1 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                  summaryLanguage === 'hi'
-                    ? 'bg-white text-[#146356] shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Languages className="w-3.5 h-3.5 text-[#146356]" />
-                <span>हिन्दी</span>
-              </button>
-            </div>
-
             {/* Dedicated Vitals Strip Card */}
             <div className="flex items-center gap-2 p-1.5 bg-[#F4FBF9] border border-[#DCEAE7] rounded-2xl shadow-2xs">
               <div className="px-2.5 py-1 text-center border-r border-[#DCEAE7] min-w-[58px]">
@@ -567,16 +508,16 @@ export const DoctorPatientProfile: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
               <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">1</span>
-              <span>{isHi ? 'मुख्य शिकायत (Chief Complaint)' : 'Chief Complaint'}</span>
+              <span>{'Chief Complaint'}</span>
             </div>
             <div className="p-4 rounded-2xl bg-teal-50/50 border border-teal-200/60">
               <p className="text-base font-bold text-slate-900">{chiefComplaintText}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="text-xs text-slate-600 font-medium">{isHi ? 'अवधि:' : 'Duration:'}</span>
+                <span className="text-xs text-slate-600 font-medium">{'Duration:'}</span>
                 <span className="text-xs font-bold text-teal-800 bg-white px-2.5 py-0.5 rounded-md border border-teal-200">
                   {durationText}
                 </span>
-                <span className="text-xs text-slate-600 font-medium ml-2">{isHi ? 'तीव्रता:' : 'Severity:'}</span>
+                <span className="text-xs text-slate-600 font-medium ml-2">{'Severity:'}</span>
                 <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md border ${
                   patient.clinicalSummary.severity === 'Severe'
                     ? 'bg-rose-50 text-rose-800 border-rose-200'
@@ -586,7 +527,7 @@ export const DoctorPatientProfile: React.FC = () => {
                 </span>
                 {patient.vitals?.weight && (
                   <>
-                    <span className="text-xs text-slate-600 font-medium ml-2">{isHi ? 'भार:' : 'Weight:'}</span>
+                    <span className="text-xs text-slate-600 font-medium ml-2">{'Weight:'}</span>
                     <span className="text-xs font-bold text-slate-800 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                       {patient.vitals.weight}
                     </span>
@@ -608,14 +549,14 @@ export const DoctorPatientProfile: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-base font-bold text-[#0D2B3E]">
-                        {isHi ? 'दशविध परीक्षा मूल्यांकन (Dashavidha Pariksha)' : 'Dashavidha Pariksha Assessment (10-Point AYUSH Diagnostic)'}
+                        {'Dashavidha Pariksha Assessment (10-Point AYUSH Diagnostic)'}
                       </h3>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#CEF3ED] text-[#146356] border border-[#9FDCD1]">
                         AIIA Standard
                       </span>
                     </div>
                     <p className="text-xs text-slate-600">
-                      {isHi ? 'शास्त्रीय त्रिदोष, अग्नि, कोष्ठ एवं धातु सारता का मानकीकृत विश्लेषण' : 'Standardized Ayurvedic clinical framework assessing constitutional temperament & systemic resilience'}
+                      {'Standardized Ayurvedic clinical framework assessing constitutional temperament & systemic resilience'}
                     </p>
                   </div>
                 </div>
@@ -742,7 +683,7 @@ export const DoctorPatientProfile: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                 <div className="p-2.5 rounded-xl bg-white/90 border border-amber-200/80 space-y-1 text-xs shadow-2xs">
                   <span className="font-bold text-amber-900 text-[11px] block">
-                    {isHi ? 'आहारज हेतु (Ahara Hetu - Dietary Triggers):' : 'Dietary Etiological Factors (Ahara Hetu):'}
+                    {'Dietary Etiological Factors (Ahara Hetu):'}
                   </span>
                   <p className="text-amber-950 text-xs leading-relaxed">
                     Ruksha (dry) and Shita (cold) food intake, irregular meal intervals, excess astringent pulses, dry snacks.
@@ -751,7 +692,7 @@ export const DoctorPatientProfile: React.FC = () => {
 
                 <div className="p-2.5 rounded-xl bg-white/90 border border-[#9FDCD1] space-y-1 text-xs shadow-2xs">
                   <span className="font-bold text-[#146356] text-[11px] block">
-                    {isHi ? 'विहारज हेतु (Vihara Hetu - Lifestyle Triggers):' : 'Lifestyle Etiological Factors (Vihara Hetu):'}
+                    {'Lifestyle Etiological Factors (Vihara Hetu):'}
                   </span>
                   <p className="text-teal-950 text-xs leading-relaxed">
                     Prajagarana (late nights), excessive prolonged standing/stair-climbing, sedentary exposure to cold draft / AC.
@@ -762,7 +703,7 @@ export const DoctorPatientProfile: React.FC = () => {
               {/* Physician Synthesis & Case Assessment */}
               <div className="space-y-1.5 pt-2">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  {isHi ? 'चिकित्सक संश्लेषण एवं केस मूल्यांकन:' : 'Physician Synthesis & Case Assessment:'}
+                  {'Physician Synthesis & Case Assessment:'}
                 </label>
                 {isEditingSummary ? (
                   <textarea
@@ -784,66 +725,66 @@ export const DoctorPatientProfile: React.FC = () => {
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                   <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">2</span>
-                  <span>{isHi ? 'वर्तमान बीमारी का इतिहास · सोक्रेटीस विश्लेषण (SOCRATES)' : 'History of Presenting Illness (HPI) · SOCRATES Analysis'}</span>
+                  <span>{'History of Presenting Illness (HPI) · SOCRATES Analysis'}</span>
                 </div>
                 <span className="text-[11px] text-teal-700 font-bold bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
-                  {isHi ? 'मानक नैदानिक ढांचा' : 'Standard Clinical Framework'}
+                  {'Standard Clinical Framework'}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'स्थान (Site)' : 'Site (Location)'}
+                    {'Site (Location)'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{siteText}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'प्रारंभ (Onset)' : 'Onset'}
+                    {'Onset'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{onsetText}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'लक्षण स्वरूप (Character)' : 'Character'}
+                    {'Character'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{characterText}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'प्रसार (Radiation)' : 'Radiation'}
+                    {'Radiation'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{radiationText}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'सहयोगी लक्षण (Associations)' : 'Associations'}
+                    {'Associations'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{associationsText}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'समय चक्र (Time / Course)' : 'Time / Course'}
+                    {'Time / Course'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{timeCourseText}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'प्रकोपक / उपशामक (Exacerbating & Relieving)' : 'Exacerbating & Relieving'}
+                    {'Exacerbating & Relieving'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{exacerbatingText}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
                   <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    {isHi ? 'तीव्रता स्कोर (Severity)' : 'Severity'}
+                    {'Severity'}
                   </span>
                   <p className="font-bold text-slate-900 mt-1">{severityScoreText}</p>
                 </div>
@@ -852,7 +793,7 @@ export const DoctorPatientProfile: React.FC = () => {
               {/* Physician Synthesis & Case Assessment */}
               <div className="space-y-1.5 pt-2">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  {isHi ? 'चिकित्सक संश्लेषण एवं केस मूल्यांकन:' : 'Physician Synthesis & Case Assessment:'}
+                  {'Physician Synthesis & Case Assessment:'}
                 </label>
                 {isEditingSummary ? (
                   <textarea

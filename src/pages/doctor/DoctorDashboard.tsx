@@ -88,6 +88,7 @@ export const DoctorDashboard: React.FC = () => {
         onSelectPatient={handleStartConsultation}
         onStartConsultation={handleStartConsultation}
         title="Consultation Queue"
+        showLanguage={false}
       />
 
       {/* 3. DOCTOR ACCESS OTP MODAL */}

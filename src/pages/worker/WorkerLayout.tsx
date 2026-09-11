@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../../components/Sidebar';
 import { Menu, Hospital, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -9,13 +9,7 @@ export const WorkerLayout: React.FC = () => {
   const { selectedHospital } = useApp();
   const location = useLocation();
 
-  // If worker login is desired or authenticated
-  const isLoginPage = location.pathname === '/worker/login';
   const isAssistIntakeFlow = location.pathname === '/worker' || location.pathname === '/worker/' || location.pathname.startsWith('/worker/assist');
-
-  if (isLoginPage) {
-    return <Outlet />;
-  }
 
   // Sidebar-free focused flow for Worker Assist Intake
   if (isAssistIntakeFlow) {

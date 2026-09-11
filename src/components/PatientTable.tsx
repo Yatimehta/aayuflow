@@ -21,6 +21,10 @@ interface PatientTableProps {
   onNewPatient?: () => void;
   title?: string;
   subtitle?: string;
+  /** Front-desk staff benefit from seeing a patient's language before they walk up to
+   * assist them; a doctor reviewing the queue doesn't need it, so DoctorDashboard turns
+   * this off. */
+  showLanguage?: boolean;
 }
 
 export const PatientTable: React.FC<PatientTableProps> = ({
@@ -29,7 +33,8 @@ export const PatientTable: React.FC<PatientTableProps> = ({
   onStartConsultation,
   onNewPatient,
   title = "Consultation Queue",
-  subtitle
+  subtitle,
+  showLanguage = true
 }) => {
   const { globalSearchQuery, unlockedPatientIds } = useApp();
 
@@ -348,15 +353,9 @@ export const PatientTable: React.FC<PatientTableProps> = ({
                               </p>
                             </>
                           ) : (
-                            <>
-                              <p className="font-semibold text-[#0D2B3E] text-xs">
-                                {patient.age} yrs • {patient.gender}{patient.vitals?.weight ? ` • ${patient.vitals.weight}` : ''}
-                              </p>
-                              <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-                                <Lock className="w-2.5 h-2.5 text-amber-600" />
-                                <span>Identity Protected · Verify OTP to Reveal</span>
-                              </p>
-                            </>
+                            <p className="font-semibold text-[#0D2B3E] text-xs">
+                              {patient.age} yrs • {patient.gender}{patient.vitals?.weight ? ` • ${patient.vitals.weight}` : ''}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -382,9 +381,11 @@ export const PatientTable: React.FC<PatientTableProps> = ({
                       <p className="text-xs text-[#0D2B3E] font-medium truncate" title={patient.chiefComplaint}>
                         {patient.chiefComplaint}
                       </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5">
-                        <span>Language: {patient.preferredLanguage}</span>
-                      </p>
+                      {showLanguage && (
+                        <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                          <span>Language: {patient.preferredLanguage}</span>
+                        </p>
+                      )}
                     </td>
 
                     {/* 5. SAFETY FLAGS */}

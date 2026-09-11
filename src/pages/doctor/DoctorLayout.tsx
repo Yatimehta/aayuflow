@@ -9,21 +9,14 @@ export const DoctorLayout: React.FC = () => {
   const { selectedHospital } = useApp();
   const location = useLocation();
 
-  const isLoginPage = location.pathname === '/doctor/login';
-
-  if (isLoginPage) {
-    return <Outlet />;
-  }
-
   // Remove left sidebar entirely for Doctor OPD Queue, Medical Dossier, and in-flow doctor views
-  const hideSidebar = 
+  const hideSidebar =
     location.pathname === '/doctor' ||
     location.pathname === '/doctor/' ||
     location.pathname === '/doctor/queue' ||
     location.pathname.startsWith('/doctor/patient') ||
     location.pathname.startsWith('/doctor/consultation') ||
-    location.pathname.startsWith('/doctor/profile') ||
-    location.pathname.startsWith('/doctor/verify');
+    location.pathname.startsWith('/doctor/profile');
 
   if (hideSidebar) {
     return (

@@ -10,9 +10,6 @@ import { HomePage } from './pages/auth/HomePage';
 import { RoleSelectPage } from './pages/auth/RoleSelectPage';
 import { LoginPage } from './pages/auth/LoginPage';
 
-// Legacy full-form login (kept at /login-full)
-import { UniversalLogin } from './pages/auth/UniversalLogin';
-
 // Landing Page (Moved to /about)
 import { LandingPage } from './pages/LandingPage';
 
@@ -27,12 +24,10 @@ import { PatientIntake } from './pages/patient/PatientIntake';
 import { PatientUploadDocument } from './pages/patient/PatientUploadDocument';
 import { PatientRecords } from './pages/patient/PatientRecords';
 import { PatientTokenConfirmation } from './pages/patient/PatientTokenConfirmation';
-import { PatientPortal } from './pages/patient/PatientPortal';
 
 // Worker Portal Pages
 import { WorkerLayout } from './pages/worker/WorkerLayout';
 import { WorkerDashboard } from './pages/worker/WorkerDashboard';
-import { WorkerLogin } from './pages/worker/WorkerLogin';
 import { WorkerAssistIntake } from './pages/worker/WorkerAssistIntake';
 import { WorkerPatients } from './pages/worker/WorkerPatients';
 import { WorkerDocuments } from './pages/worker/WorkerDocuments';
@@ -42,9 +37,7 @@ import { WorkerSettings } from './pages/worker/WorkerSettings';
 // Doctor Portal Pages
 import { DoctorLayout } from './pages/doctor/DoctorLayout';
 import { DoctorDashboard } from './pages/doctor/DoctorDashboard';
-import { DoctorLogin } from './pages/doctor/DoctorLogin';
 import { DoctorPatientProfile } from './pages/doctor/DoctorPatientProfile';
-import { DoctorVerify } from './pages/doctor/DoctorVerify';
 import { DoctorConsultation } from './pages/doctor/DoctorConsultation';
 import { DoctorSettings } from './pages/doctor/DoctorSettings';
 import { AyurvedicDashboard } from './pages/doctor/AyurvedicDashboard';
@@ -120,9 +113,6 @@ const AppRoutes: React.FC = () => {
               <Route path="/role-select" element={<RoleSelectPage />} />
               <Route path="/login" element={<LoginPage />} />
 
-              {/* Legacy full-form login (all 5 roles) */}
-              <Route path="/login-full" element={<UniversalLogin />} />
-
               {/* Marketing / Hero */}
               <Route path="/about" element={<LandingPage />} />
 
@@ -143,7 +133,6 @@ const AppRoutes: React.FC = () => {
               <Route path="/worker" element={<WorkerLayout />}>
                 <Route index element={<WorkerAssistIntake />} />
                 <Route path="dashboard" element={<WorkerDashboard />} />
-                <Route path="login" element={<WorkerLogin />} />
                 <Route path="assist" element={<WorkerAssistIntake />} />
                 <Route path="patients" element={<WorkerPatients />} />
                 <Route path="documents" element={<WorkerDocuments />} />
@@ -154,10 +143,8 @@ const AppRoutes: React.FC = () => {
               {/* Doctor Portal */}
               <Route path="/doctor" element={<DoctorLayout />}>
                 <Route index element={<DoctorDashboard />} />
-                <Route path="login" element={<DoctorLogin />} />
                 <Route path="queue" element={<DoctorDashboard />} />
                 <Route path="patient" element={<DoctorPatientProfile />} />
-                <Route path="verify" element={<DoctorVerify />} />
                 <Route path="consultation" element={<DoctorConsultation />} />
                 <Route path="ayurveda-view" element={<AyurvedicDashboard />} />
                 <Route path="profile" element={<DoctorProfile />} />

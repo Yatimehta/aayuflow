@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Upload, 
-  FileText, 
-  Check, 
-  FileCheck, 
-  Clock, 
+import {
+  ArrowLeft,
+  Upload,
+  FileText,
+  Check,
+  FileCheck,
+  Clock,
+  Loader2,
+  AlertTriangle,
   X
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DocumentLabResults } from '../../components/DocumentLabResults';
 import { DocumentItem } from '../../types';
+import { extractDocument, ExtractionResult } from '../../utils/ocrExtraction';
 
 export const PatientUploadDocument: React.FC = () => {
   const navigate = useNavigate();
-  const { 
-    activePatient, 
-    patients, 
-    selectedHospital, 
-    showToast 
+  const {
+    activePatient,
+    patients,
+    selectedHospital,
+    showToast
   } = useApp();
 
   const patient = activePatient || patients[0];
@@ -28,6 +31,39 @@ export const PatientUploadDocument: React.FC = () => {
   const [docType, setDocType] = useState<DocumentItem['type']>('Lab Report');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [extractionError, setExtractionError] = useState<string | null>(null);
+
+  // Runs the document through the real OCR/extraction backend as soon as a file
+  // is chosen, so the preview below reflects what's actually on the page.
+  useEffect(() => {
+    if (!docFile) {
+      setExtraction(null);
+      setExtractionError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsExtracting(true);
+    setExtractionError(null);
+
+    extractDocument(docFile, docType)
+      .then((result) => {
+        if (!cancelled) setExtraction(result);
+      })
+      .catch((err) => {
+        if (!cancelled) setExtractionError(err instanceof Error ? err.message : 'Extraction failed.');
+      })
+      .finally(() => {
+        if (!cancelled) setIsExtracting(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [docFile, docType]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,24 +88,9 @@ export const PatientUploadDocument: React.FC = () => {
       uploadDate: 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       size: `${(docFile.size / (1024 * 1024)).toFixed(1)} MB`,
       status: 'Verified',
-      ocrExtractedSummary: notes || 'Diagnostic extraction complete. Clinical metrics and values parsed.',
-      labResults: docType === 'Lab Report'
-        ? [
-            { parameter: 'Hemoglobin', value: '8.2', unit: 'g/dL', referenceRange: '13.5 - 17.5 g/dL', isAbnormal: true },
-            { parameter: 'Blood Pressure', value: '160/100', unit: 'mmHg', referenceRange: '90-120/60-80', isAbnormal: true },
-            { parameter: 'Blood Sugar (Fasting)', value: '220', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true },
-            { parameter: 'Serum Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: false }
-          ]
-        : undefined,
-      drugInteractions: docType === 'Prescription'
-        ? [
-            {
-              drugs: ['Aceclofenac 100mg', 'Telmisartan 40mg'],
-              warning: 'Potential interaction — flag for physician review (risk of reduced BP efficacy and kidney stress)',
-              severity: 'Moderate'
-            }
-          ]
-        : undefined
+      ocrExtractedSummary: notes || extraction?.ocrExtractedSummary || 'No text could be read from this document.',
+      labResults: extraction?.labResults,
+      drugInteractions: extraction?.drugInteractions
     };
 
     // Attach to patient documents
@@ -185,34 +206,39 @@ export const PatientUploadDocument: React.FC = () => {
               )}
             </div>
 
-            {/* Extracted Values Live Preview (PS Module B) */}
+            {/* Extracted Values Live Preview — reads the actual document via the
+                character-recognition backend (ocr-service/); nothing here is fabricated. */}
             {docFile && (
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-800">AI OCR Clinical Entity Preview:</span>
-                  <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full font-bold border border-teal-200">
-                    PS Module B Active
-                  </span>
+                  <span className="font-bold text-slate-800">AI Extraction Preview:</span>
+                  {!isExtracting && !extractionError && (
+                    <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full font-bold border border-teal-200">
+                      Read from your document
+                    </span>
+                  )}
                 </div>
-                {docType === 'Lab Report' ? (
-                  <DocumentLabResults
-                    labResults={[
-                      { parameter: 'Hemoglobin', value: '8.2', unit: 'g/dL', referenceRange: '13.5 - 17.5 g/dL', isAbnormal: true },
-                      { parameter: 'Blood Pressure', value: '160/100', unit: 'mmHg', referenceRange: '90-120/60-80', isAbnormal: true },
-                      { parameter: 'Blood Sugar (Fasting)', value: '220', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true },
-                      { parameter: 'Serum Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: false }
-                    ]}
-                  />
-                ) : (
-                  <DocumentLabResults
-                    drugInteractions={[
-                      {
-                        drugs: ['Aceclofenac 100mg', 'Telmisartan 40mg'],
-                        warning: 'Potential interaction — flag for physician review (reduced antihypertensive efficacy and increased renal stress)',
-                        severity: 'Moderate'
-                      }
-                    ]}
-                  />
+
+                {isExtracting && (
+                  <div className="flex items-center gap-2 text-slate-500 py-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
+                    <span>Reading document with AI...</span>
+                  </div>
+                )}
+
+                {!isExtracting && extractionError && (
+                  <div className="flex items-start gap-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <span>Couldn't read this document automatically ({extractionError}). You can still submit it — a staff member can review it manually.</span>
+                  </div>
+                )}
+
+                {!isExtracting && !extractionError && extraction && (
+                  extraction.labResults?.length || extraction.drugInteractions?.length ? (
+                    <DocumentLabResults labResults={extraction.labResults} drugInteractions={extraction.drugInteractions} />
+                  ) : (
+                    <p className="text-slate-600 leading-relaxed">{extraction.ocrExtractedSummary}</p>
+                  )
                 )}
               </div>
             )}
@@ -244,11 +270,11 @@ export const PatientUploadDocument: React.FC = () => {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isExtracting}
               className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs disabled:opacity-50"
             >
               <Check className="w-4 h-4 stroke-[2.5]" />
-              <span>{isSubmitting ? 'Uploading...' : 'Submit Document'}</span>
+              <span>{isSubmitting ? 'Uploading...' : isExtracting ? 'Reading document...' : 'Submit Document'}</span>
             </button>
           </div>
 

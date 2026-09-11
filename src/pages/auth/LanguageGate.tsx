@@ -5,7 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { MOCK_LANGUAGES } from '../../data/mockData';
 import { useTranslation } from '../../utils/translations';
 import ayucarezLogo from '../../assets/images/logo-ayucarez.png';
-import ministryOfAyushEmblem from '../../assets/images/ministry-of-ayush-emblem.png';
+import ministryOfAyushEmblem from '../../assets/images/ministry-of-ayush-emblem.jpg';
 
 /** Shown right after Home, before Role-Select/Login or any other destination — visiting
  * anything else while unconfirmed redirects here (see App.tsx). Selecting a language

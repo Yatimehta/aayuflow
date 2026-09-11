@@ -10,7 +10,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import ayucarezLogo from '../../assets/images/logo.png';
-import ministryOfAyushEmblem from '../../assets/images/ministry-of-ayush-emblem.png';
+import ministryOfAyushEmblem from '../../assets/images/ministry-of-ayush-emblem.jpg';
 
 /* ─── Decorative corner leaf cluster (shared with RoleSelectPage) ─────────── */
 const LeafCluster = ({
@@ -168,7 +168,7 @@ export const HomePage: React.FC = () => {
             style={{ fontSize: 'clamp(2.6rem, 5.5vw, 4.2rem)' }}
           >
             <span style={{ color: '#0f172a', display: 'block' }}>Accessible Care</span>
-            <span style={{ color: '#0d9488', display: 'block' }}>Rooted in Ayurveda</span>
+            <span style={{ color: '#0d9488', display: 'block' }}>Made for Everyone</span>
           </h1>
 
           {/* Subtext */}

@@ -32,7 +32,7 @@ import { useClickOutside } from '../hooks/useClickOutside';
 
 import ayucarezLogo from '../assets/images/logo-ayucarez.png';
 import rameshwarAvatar from '../assets/images/rameshwar-avatar.jpg';
-import ministryOfAyushEmblem from '../assets/images/ministry-of-ayush-emblem.png';
+import ministryOfAyushEmblem from '../assets/images/ministry-of-ayush-emblem.jpg';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();

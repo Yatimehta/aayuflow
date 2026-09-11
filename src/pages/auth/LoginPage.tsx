@@ -11,9 +11,17 @@ import {
   Users,
   ShieldAlert,
   FlaskConical,
+  Hospital as HospitalIcon,
+  GraduationCap,
+  UploadCloud,
+  CreditCard,
+  FileCheck2,
+  Leaf,
+  User,
+  Check,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { UserRole } from '../../types';
+import { UserRole, DoctorDiscipline } from '../../types';
 import consultationIllustration from '../../assets/images/consultation-illustration.png';
 
 type AuthRole = 'patient' | 'worker' | 'doctor' | 'admin' | 'lab';
@@ -29,7 +37,7 @@ const ROLE_META: Record<AuthRole, { label: string; icon: React.FC<{ className?: 
 const demoProfiles: Record<Exclude<UserRole, 'guest'>, { identifier: string; pass: string; title: string; dest: string }> = {
   patient: { identifier: '45-9821-4321-7890',       pass: 'patient2026',  title: 'Rameshwar Sharma (Patient)',            dest: '/patient/dashboard' },
   worker:  { identifier: 'worker.desk@aiia.gov.in',  pass: 'worker2026',   title: 'Priya Narayanan (OPD Assistant)',       dest: '/worker' },
-  doctor:  { identifier: 'dr.alok.verma@aiia.gov.in',pass: 'vaidya2026',  title: 'Dr. Alok Verma, MD (Ayu)',              dest: '/doctor' },
+  doctor:  { identifier: 'AYU-MED-DEL-2014-889',      pass: 'vaidya2026',  title: 'Dr. Alok Verma, MD (Ayu)',              dest: '/doctor' },
   admin:   { identifier: 'admin.director@aiia.gov.in',pass: 'admin2026',   title: 'Col. Rajesh Bakshi (Medical Sup.)',     dest: '/admin' },
   lab:     { identifier: 'lab.staff@aiia.gov.in',    pass: 'ayushlab2026', title: 'Ananya Deshmukh (Lab Staff)',           dest: '/lab'   },
 };
@@ -84,11 +92,47 @@ const OrganicBlob = () => (
   </div>
 );
 
+/* ─── Compact file-upload field, used for the doctor's verification documents ── */
+const FileField: React.FC<{ id: string; label: string; file: File | null; onChange: (f: File | null) => void }> = ({ id, label, file, onChange }) => (
+  <div>
+    <label className="block text-sm font-semibold text-slate-700 mb-1.5">{label}</label>
+    <input
+      id={id}
+      type="file"
+      accept=".pdf,.jpg,.jpeg,.png"
+      className="hidden"
+      onChange={e => onChange(e.target.files?.[0] || null)}
+    />
+    <label
+      htmlFor={id}
+      className="flex items-center gap-2.5 px-4 py-3 rounded-xl border border-dashed border-slate-300 bg-white
+                 hover:border-teal-400 hover:bg-teal-50/40 cursor-pointer transition-colors text-sm"
+    >
+      {file ? (
+        <>
+          <FileCheck2 className="w-4 h-4 text-teal-600 flex-shrink-0" />
+          <span className="text-slate-700 font-medium truncate">{file.name}</span>
+        </>
+      ) : (
+        <>
+          <UploadCloud className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <span className="text-slate-400">Click to upload (PDF, JPG, PNG)</span>
+        </>
+      )}
+    </label>
+  </div>
+);
+
 /* ─── Component ─────────────────────────────────────────────────────────── */
+const DOCTOR_DEPARTMENTS_BY_DISCIPLINE: Record<DoctorDiscipline, string[]> = {
+  Ayurveda: ['Kayachikitsa (Internal Medicine)', 'Panchakarma', 'Shalya Tantra (Surgery / Marma)', 'Swasthavritta & Yoga', 'Kaumarbhritya (Pediatrics)'],
+  Allopathy: ['General Medicine & OPD', 'Orthopaedics', 'Pediatrics', 'Gynaecology', 'ENT'],
+};
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { patients, selectedHospital, loginAsPatient, loginAsStaff, showToast } = useApp();
+  const { patients, hospitals, selectedHospital, setSelectedHospital, loginAsPatient, loginAsStaff, showToast } = useApp();
 
   const rawRole = searchParams.get('role') as AuthRole | null;
   const activeTab: AuthRole = (rawRole && ROLE_META[rawRole]) ? rawRole : 'patient';
@@ -97,12 +141,47 @@ export const LoginPage: React.FC = () => {
   const [loginPassword, setLoginPassword]     = useState(demoProfiles[activeTab].pass);
   const [loading, setLoading]                 = useState(false);
 
+  // Doctor-only credential/registration fields — a doctor's account represents a real
+  // license to practice, so signing in verifies who they are and what they're licensed
+  // to do, not just a password.
+  const [doctorName, setDoctorName] = useState('');
+  const [doctorDiscipline, setDoctorDiscipline] = useState<DoctorDiscipline>('Ayurveda');
+  const [doctorDepartment, setDoctorDepartment] = useState(DOCTOR_DEPARTMENTS_BY_DISCIPLINE.Ayurveda[0]);
+  const [doctorDegree, setDoctorDegree] = useState('');
+  const [doctorDegreeFile, setDoctorDegreeFile] = useState<File | null>(null);
+  const [doctorAadhaar, setDoctorAadhaar] = useState('');
+  const [doctorRegProofFile, setDoctorRegProofFile] = useState<File | null>(null);
+
   const meta    = ROLE_META[activeTab];
   const RoleIcon = meta.icon;
 
-  /* ── Auth handlers (logic unchanged from UniversalLogin) ── */
+  const isStaffRole = activeTab !== 'patient';
+  // Every staff role operates out of a specific hospital, so it belongs on every
+  // staff sign-in — not just doctor's.
+  const showHospitalPicker = isStaffRole;
+
+  const doctorFormValid =
+    doctorName.trim().length > 0 &&
+    doctorDegree.trim().length > 0 &&
+    !!doctorDegreeFile &&
+    /^\d{12}$/.test(doctorAadhaar.replace(/\s+/g, '')) &&
+    !!doctorRegProofFile &&
+    loginIdentifier.trim().length > 0 &&
+    loginPassword.trim().length > 0;
+
+  /* ── Auth handlers (logic unchanged from UniversalLogin, extended for doctor) ── */
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (activeTab === 'doctor' && !doctorFormValid) {
+      showToast({
+        type: 'error',
+        title: 'Missing Details',
+        message: 'Please fill in every field, including your degree certificate, Aadhaar number, and registration proof — these confirm you\'re a licensed doctor.'
+      });
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -117,6 +196,18 @@ export const LoginPage: React.FC = () => {
         loginAsPatient(matched);
         showToast({ type: 'success', title: 'Welcome Back', message: `Signed in as ${matched.name}.` });
         navigate('/patient/dashboard');
+      } else if (activeTab === 'doctor') {
+        loginAsStaff('doctor', doctorName, doctorDepartment, doctorDiscipline, {
+          qualification: doctorDegree,
+          licenseId: loginIdentifier,
+          hospitalName: selectedHospital.name,
+        });
+        showToast({
+          type: 'success',
+          title: 'Credentials Verified',
+          message: `Welcome, Dr. ${doctorName} — signed in as a ${doctorDiscipline} practitioner at ${selectedHospital.name}.`
+        });
+        navigate('/doctor');
       } else {
         const demo = demoProfiles[activeTab];
         loginAsStaff(activeTab, demo.title, selectedHospital.name);
@@ -130,6 +221,15 @@ export const LoginPage: React.FC = () => {
     const demo = demoProfiles[activeTab];
     setLoginIdentifier(demo.identifier);
     setLoginPassword(demo.pass);
+    if (activeTab === 'doctor') {
+      setDoctorName('Alok Verma');
+      setDoctorDiscipline('Ayurveda');
+      setDoctorDepartment(DOCTOR_DEPARTMENTS_BY_DISCIPLINE.Ayurveda[0]);
+      setDoctorDegree('BAMS, MD (Ayurveda)');
+      setDoctorDegreeFile(new File(['demo'], 'bams-degree-certificate.pdf', { type: 'application/pdf' }));
+      setDoctorAadhaar('491023487615');
+      setDoctorRegProofFile(new File(['demo'], 'ayush-council-registration.pdf', { type: 'application/pdf' }));
+    }
     showToast({ type: 'info', title: 'Demo Credentials Loaded', message: `Populated demo profile for ${demo.title}.` });
   };
 
@@ -205,6 +305,8 @@ export const LoginPage: React.FC = () => {
           <p className="mt-2 text-slate-500 text-base leading-relaxed max-w-sm">
             {activeTab === 'patient'
               ? 'Sign in with your ABHA Number, Mobile, or Token ID.'
+              : activeTab === 'doctor'
+              ? "We verify every doctor's registration before granting access to patient records."
               : 'Sign in with your institutional credentials.'}
           </p>
         </div>
@@ -218,17 +320,173 @@ export const LoginPage: React.FC = () => {
           Signing in as {meta.label}
         </div>
 
-        {/* Login form — max-width matches right panel feel */}
-        <form onSubmit={handleLoginSubmit} className="space-y-4 max-w-sm w-full">
+        {/* Login form — max-width relaxes for the doctor role, which asks for more */}
+        <form onSubmit={handleLoginSubmit} className={`space-y-4 w-full ${activeTab === 'doctor' ? 'max-w-md' : 'max-w-sm'}`}>
+
+          {/* Hospital / Facility — every staff role operates out of a specific hospital */}
+          {showHospitalPicker && (
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Hospital / Institute (Location)
+              </label>
+              <div className="relative">
+                <HospitalIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <select
+                  id="login-hospital"
+                  value={selectedHospital.id}
+                  onChange={e => {
+                    const found = hospitals.find(h => h.id === e.target.value);
+                    if (found) setSelectedHospital(found);
+                  }}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
+                             focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
+                             text-sm text-slate-800 shadow-sm appearance-none"
+                >
+                  {hospitals.map(h => (
+                    <option key={h.id} value={h.id}>{h.name} — {h.city}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'doctor' && (
+            <>
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="doctor-name"
+                    type="text"
+                    required
+                    value={doctorName}
+                    onChange={e => setDoctorName(e.target.value)}
+                    placeholder="e.g. Alok Verma"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
+                               focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
+                               text-sm text-slate-800 shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* System of medicine practised */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">What do you practise?</label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {(['Ayurveda', 'Allopathy'] as DoctorDiscipline[]).map(d => (
+                    <button
+                      key={d}
+                      type="button"
+                      id={`doctor-discipline-${d.toLowerCase()}`}
+                      onClick={() => {
+                        setDoctorDiscipline(d);
+                        setDoctorDepartment(DOCTOR_DEPARTMENTS_BY_DISCIPLINE[d][0]);
+                      }}
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition-all ${
+                        doctorDiscipline === d
+                          ? 'border-teal-400 bg-teal-50 text-teal-800 shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                      }`}
+                    >
+                      {d === 'Ayurveda' ? <Leaf className="w-4 h-4" /> : <Stethoscope className="w-4 h-4" />}
+                      <span>{d}</span>
+                      {doctorDiscipline === d && <Check className="w-3.5 h-3.5" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Department */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Department / OPD</label>
+                <select
+                  id="doctor-department"
+                  value={doctorDepartment}
+                  onChange={e => setDoctorDepartment(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white
+                             focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
+                             text-sm text-slate-800 shadow-sm appearance-none"
+                >
+                  {DOCTOR_DEPARTMENTS_BY_DISCIPLINE[doctorDiscipline].map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Degree / Qualification */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Medical Degree / Qualification</label>
+                <div className="relative">
+                  <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="doctor-degree"
+                    type="text"
+                    required
+                    value={doctorDegree}
+                    onChange={e => setDoctorDegree(e.target.value)}
+                    placeholder={doctorDiscipline === 'Ayurveda' ? 'e.g. BAMS, MD (Ayurveda)' : 'e.g. MBBS, MD (General Medicine)'}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
+                               focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
+                               text-sm text-slate-800 shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Degree Certificate upload */}
+              <FileField
+                id="doctor-degree-file"
+                label="Degree Certificate"
+                file={doctorDegreeFile}
+                onChange={setDoctorDegreeFile}
+              />
+
+              {/* Aadhaar */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Aadhaar Number</label>
+                <div className="relative">
+                  <CreditCard className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="doctor-aadhaar"
+                    type="text"
+                    required
+                    inputMode="numeric"
+                    maxLength={14}
+                    value={doctorAadhaar}
+                    onChange={e => setDoctorAadhaar(e.target.value.replace(/[^\d\s]/g, ''))}
+                    placeholder="12-digit Aadhaar number"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
+                               focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
+                               text-sm text-slate-800 shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Registration / Council proof upload */}
+              <FileField
+                id="doctor-regproof-file"
+                label="Medical Council / AYUSH Registration Proof"
+                file={doctorRegProofFile}
+                onChange={setDoctorRegProofFile}
+              />
+            </>
+          )}
 
           {/* Identifier */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-              {activeTab === 'patient' ? 'ABHA Number, Mobile, or Token ID' : 'Official Email / Employee ID'}
+              {activeTab === 'patient'
+                ? 'ABHA Number, Mobile, or Token ID'
+                : activeTab === 'doctor'
+                ? 'National Medical / AYUSH Registration No.'
+                : 'Official Email / Employee ID'}
             </label>
             <div className="relative">
               {activeTab === 'patient'
                 ? <Fingerprint className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                : activeTab === 'doctor'
+                ? <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 : <Mail        className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               }
               <input
@@ -237,7 +495,7 @@ export const LoginPage: React.FC = () => {
                 required
                 value={loginIdentifier}
                 onChange={e => setLoginIdentifier(e.target.value)}
-                placeholder={activeTab === 'patient' ? 'e.g. 45-9821-4321-7890' : 'e.g. staff@aiia.gov.in'}
+                placeholder={activeTab === 'patient' ? 'e.g. 45-9821-4321-7890' : activeTab === 'doctor' ? 'e.g. AYU-MED-DEL-2014-889' : 'e.g. staff@aiia.gov.in'}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
                            focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
                            text-sm text-slate-800 shadow-sm"
@@ -277,7 +535,7 @@ export const LoginPage: React.FC = () => {
           <button
             id="login-submit-btn"
             type="submit"
-            disabled={loading}
+            disabled={loading || (activeTab === 'doctor' && !doctorFormValid)}
             className="w-full py-3 rounded-xl font-bold text-sm text-white
                        transition-all flex items-center justify-center gap-2 mt-1
                        disabled:opacity-70"

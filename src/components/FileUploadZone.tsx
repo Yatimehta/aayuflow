@@ -3,6 +3,14 @@ import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, X, Eye, Spar
 import { DocumentItem } from '../types';
 import { StatusBadge } from './StatusBadge';
 import { DocumentLabResults } from './DocumentLabResults';
+import { extractDocument } from '../utils/ocrExtraction';
+
+const inferDocType = (fileName: string): DocumentItem['type'] => {
+  const lower = fileName.toLowerCase();
+  if (lower.includes('presc')) return 'Prescription';
+  if (lower.includes('blood') || lower.includes('lab')) return 'Lab Report';
+  return 'Ayurvedic Case Sheet';
+};
 
 interface FileUploadZoneProps {
   onFilesUploaded?: (files: DocumentItem[]) => void;
@@ -24,62 +32,48 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const simulateUpload = (fileNames: string[]) => {
+  const processFiles = async (files: File[]) => {
     setUploading(true);
-    setUploadProgress(10);
+    setUploadProgress(15);
 
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(interval);
-          return 90;
+    const newDocs: DocumentItem[] = await Promise.all(
+      files.map(async (file, idx) => {
+        const type = inferDocType(file.name);
+        const base: DocumentItem = {
+          id: 'doc-' + Date.now() + '-' + idx,
+          patientId: 'current',
+          name: file.name,
+          type,
+          size: (file.size / (1024 * 1024)).toFixed(1) + ' MB',
+          uploadDate: new Date().toISOString().split('T')[0],
+          status: 'Verified'
+        };
+
+        try {
+          const result = await extractDocument(file, type);
+          setUploadProgress((prev) => Math.min(90, prev + Math.round(70 / files.length)));
+          return {
+            ...base,
+            ocrExtractedSummary: result.ocrExtractedSummary,
+            labResults: result.labResults,
+            drugInteractions: result.drugInteractions
+          };
+        } catch (err) {
+          setUploadProgress((prev) => Math.min(90, prev + Math.round(70 / files.length)));
+          return {
+            ...base,
+            ocrExtractedSummary: `Couldn't read this document automatically (${err instanceof Error ? err.message : 'extraction failed'}). It's still attached for manual review.`
+          };
         }
-        return prev + 25;
-      });
-    }, 250);
+      })
+    );
 
-    setTimeout(() => {
-      clearInterval(interval);
-      setUploadProgress(100);
-
-      const newDocs: DocumentItem[] = fileNames.map((name, idx) => ({
-        id: 'doc-' + Date.now() + '-' + idx,
-        patientId: 'current',
-        name,
-        type: name.toLowerCase().includes('presc')
-          ? 'Prescription'
-          : name.toLowerCase().includes('blood') || name.toLowerCase().includes('lab')
-          ? 'Lab Report'
-          : 'Ayurvedic Case Sheet',
-        size: (1.2 + Math.random() * 2).toFixed(1) + ' MB',
-        uploadDate: new Date().toISOString().split('T')[0],
-        status: 'Verified',
-        ocrExtractedSummary: 'AI OCR extracted text successfully. Extracted diagnostic values and clinical entities parsed.',
-        labResults: (name.toLowerCase().includes('blood') || name.toLowerCase().includes('lab') || idx % 2 === 0)
-          ? [
-              { parameter: 'Hemoglobin', value: '8.2', unit: 'g/dL', referenceRange: '13.5 - 17.5 g/dL', isAbnormal: true },
-              { parameter: 'Blood Pressure', value: '160/100', unit: 'mmHg', referenceRange: '90-120/60-80', isAbnormal: true },
-              { parameter: 'Blood Sugar (Fasting)', value: '220', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true },
-              { parameter: 'Serum Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: false }
-            ]
-          : undefined,
-        drugInteractions: name.toLowerCase().includes('presc')
-          ? [
-              {
-                drugs: ['Aceclofenac 100mg', 'Telmisartan 40mg'],
-                warning: 'Potential interaction — flag for physician review (risk of reduced BP efficacy and kidney stress)',
-                severity: 'Moderate'
-              }
-            ]
-          : undefined
-      }));
-
-      const updated = [...documents, ...newDocs];
-      setDocuments(updated);
-      setUploading(false);
-      setUploadProgress(0);
-      if (onFilesUploaded) onFilesUploaded(updated);
-    }, 1200);
+    setUploadProgress(100);
+    const updated = [...documents, ...newDocs];
+    setDocuments(updated);
+    setUploading(false);
+    setUploadProgress(0);
+    if (onFilesUploaded) onFilesUploaded(updated);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -95,15 +89,13 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const names = Array.from(e.dataTransfer.files).map(f => f.name);
-      simulateUpload(names);
+      processFiles(Array.from(e.dataTransfer.files));
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const names = Array.from(e.target.files).map(f => f.name);
-      simulateUpload(names);
+      processFiles(Array.from(e.target.files));
     }
   };
 
