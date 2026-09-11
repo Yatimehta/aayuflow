@@ -1,4 +1,4 @@
-import { Hospital, Patient, ClinicalQuestion, StaffMember, AuditLog, AdminStats, Consultation } from '../types';
+import { Hospital, Patient, ClinicalQuestion, StaffMember, AuditLog, AdminStats, Consultation, Doctor } from '../types';
 
 export const MOCK_HOSPITALS: Hospital[] = [
   {
@@ -1331,4 +1331,38 @@ export const MOCK_ADMIN_STATS: AdminStats = {
   activeCounters: 6,
   criticalWaitAlerts: 1
 };
+
+export const MOCK_DOCTORS: Doctor[] = [
+  {
+    id: 'doc-1',
+    name: 'Dr. Alok Verma',
+    discipline: 'Ayurveda',
+    qualification: 'BAMS, MD (Ayurveda) Kayachikitsa',
+    licenseId: 'AYU-MED-DEL-2014-889',
+    department: 'Kayachikitsa (Internal Medicine)',
+    hospitalId: 'hosp-1',
+    hospitalName: 'All India Institute of Ayurveda (AIIA)',
+    yearsOfPractice: 14,
+    contactNumber: '+91 98101 23456',
+    email: 'dr.alok.verma@aiia.gov.in',
+    opdCounter: 'OPD Room 104',
+    avatarUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'doc-2',
+    name: 'Dr. Priya Nair',
+    discipline: 'Allopathy',
+    qualification: 'MBBS, MD (General Medicine), DNB',
+    licenseId: 'MCI-DEL-2016-55421',
+    department: 'General Medicine & OPD Triage',
+    hospitalId: 'hosp-1',
+    hospitalName: 'All India Institute of Ayurveda (AIIA) - Integrative Wing',
+    yearsOfPractice: 10,
+    contactNumber: '+91 98203 76543',
+    email: 'dr.priya.nair@aiia.gov.in',
+    opdCounter: 'OPD Room 102',
+    avatarUrl: 'https://images.unsplash.com/photo-1594824813873-ab0514a38f71?w=200&auto=format&fit=crop&q=80'
+  }
+];
+
 

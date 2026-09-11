@@ -124,7 +124,7 @@ export const PatientTable: React.FC<PatientTableProps> = ({
               <th className="py-3 px-4">Queue / Token</th>
               <th className="py-3 px-4">Patient Information</th>
               <th className="py-3 px-4">Presenting Complaint</th>
-              <th className="py-3 px-4">Primary Dosha</th>
+              <th className="py-3 px-4">Care Stream</th>
               <th className="py-3 px-4">AI Intake Status</th>
               <th className="py-3 px-4 text-right">Actions</th>
             </tr>
@@ -201,11 +201,14 @@ export const PatientTable: React.FC<PatientTableProps> = ({
                     </p>
                   </td>
 
-                  {/* Dosha */}
+                  {/* Care Stream */}
                   <td className="py-3 px-4">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-brand-mint text-[#2E7D32] border border-[#A7D7B5]/40">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      {patient.doshaPrimary}
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border ${
+                      patient.careSystem === 'AYURVEDA'
+                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                        : 'bg-blue-50 text-blue-800 border-blue-200'
+                    }`}>
+                      {patient.careSystem === 'AYURVEDA' ? 'AYUSH · Ayurveda' : 'Allopathy · General'}
                     </span>
                   </td>
 

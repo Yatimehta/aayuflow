@@ -13,7 +13,9 @@ import {
   Hospital,
   ShieldAlert,
   BarChart3,
-  Activity
+  Activity,
+  Layers,
+  User
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -24,7 +26,10 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }) => {
-  const { selectedHospital, patients, staff, auditLogs } = useApp();
+  const { selectedHospital, patients, staff, auditLogs, currentUser, activePatient } = useApp();
+
+  const isAyurvedaDoctor = (currentUser?.discipline || 'Ayurveda') === 'Ayurveda';
+  const isAyushPatient = (activePatient?.careSystem || 'AYURVEDA') === 'AYURVEDA';
 
   const workerNavItems = [
     { label: 'Dashboard', path: '/worker', icon: LayoutDashboard, exact: true },
@@ -39,10 +44,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
     { label: 'OPD Dashboard', path: '/doctor', icon: LayoutDashboard, exact: true },
     { label: 'Patient Queue', path: '/doctor/queue', icon: Users, badge: patients.length },
     { label: 'Clinical Dossier', path: '/doctor/patient', icon: FileCheck2 },
+    // Only show Ayurvedic Assessment for Ayurveda doctors with an AYUSH patient
+    ...(isAyurvedaDoctor && isAyushPatient ? [
+      { label: 'Ayurvedic Assessment', path: '/doctor/ayurveda-view', icon: Layers }
+    ] : []),
     { label: 'Verify AI Summary', path: '/doctor/verify', icon: Stethoscope, badge: patients.filter(p => p.status === 'Processing').length },
     { label: 'Consultation & Rx', path: '/doctor/consultation', icon: FileSpreadsheet },
-    { label: 'OPD Preferences', path: '/doctor/settings', icon: Settings }
+    { label: 'Doctor Profile', path: '/doctor/profile', icon: User }
   ];
+
 
   const adminNavItems = [
     { label: 'Directorate Overview', path: '/admin', icon: LayoutDashboard, exact: true },
@@ -89,7 +99,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
               <span className="truncate">{selectedHospital.name}</span>
             </div>
             <div className="mt-1 flex items-center justify-between text-[11px] text-brand-muted">
-              <span>{role === 'worker' ? 'Desk: AYUSH-A1' : 'OPD: Kayachikitsa'}</span>
+              <span>
+                {role === 'worker' 
+                  ? 'Desk: AYUSH-A1' 
+                  : (currentUser?.discipline === 'Allopathy' ? 'OPD: General Med' : 'OPD: Kayachikitsa')}
+              </span>
               <span className="text-brand-teal-dark font-medium">{selectedHospital.currentWaitMinutes}m wait</span>
             </div>
           </div>

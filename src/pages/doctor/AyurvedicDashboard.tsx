@@ -48,9 +48,9 @@ export const AyurvedicDashboard: React.FC = () => {
   return (
     <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8 relative z-10 max-w-7xl mx-auto space-y-5">
       
-      {/* Top Breadcrumb & Navigation Bar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-semibold text-white/90">
+      {/* Top Breadcrumb & Navigation Bar with AYURVEDA MODE Badge */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-amber-900/60 via-teal-900/50 to-emerald-900/60 p-3.5 rounded-2xl border border-amber-400/40 backdrop-blur-md shadow-soft">
+        <div className="flex items-center gap-2 text-xs font-semibold text-white/90 flex-wrap">
           <button 
             onClick={() => navigate('/doctor')}
             className="hover:underline flex items-center gap-1 text-white hover:text-white/80 transition-colors"
@@ -61,7 +61,10 @@ export const AyurvedicDashboard: React.FC = () => {
           <span className="opacity-60">/</span>
           <span className="text-white/70">Clinical Dossier</span>
           <span className="opacity-60">/</span>
-          <span className="text-white font-bold">Ayurvedic Digital Twin & Risk Score</span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400 text-amber-950 font-extrabold text-[10px] uppercase tracking-wider shadow-sm border border-amber-300">
+            <Sparkles className="w-3 h-3 text-amber-950" />
+            AYURVEDA MODE · EXTENDED ASSESSMENT
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -88,6 +91,7 @@ export const AyurvedicDashboard: React.FC = () => {
           )}
         </div>
       </div>
+
 
       {/* TOP STAT STRIP + CALLOUT BADGE (Exact Reference Pattern) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">

@@ -39,7 +39,8 @@ export const DoctorDashboard: React.FC = () => {
     setActivePatientId, 
     completeIntake,
     unreadReportCount, 
-    showToast 
+    showToast,
+    currentUser
   } = useApp();
 
   // Active Flow: null (default dashboard) | 'existing' | 'new'
@@ -207,7 +208,7 @@ export const DoctorDashboard: React.FC = () => {
       },
       {
         'q-1': intakeProblem.trim(),
-        'q-2': `Clinical intake recorded by Dr. Alok Verma: Weight ${intakeWeight} kg, Age ${intakeAge}y.`,
+        'q-2': `Clinical intake recorded by ${currentUser?.name || 'Attending Physician'}: Weight ${intakeWeight} kg, Age ${intakeAge}y.`,
         'q-3': 'OPD Encounter'
       },
       `Intake performed by Doctor/Worker desk. Patient: ${targetName}, Problem: ${intakeProblem.trim()}`,
@@ -295,88 +296,82 @@ export const DoctorDashboard: React.FC = () => {
   return (
     <div className="space-y-5 relative z-10">
       
-      {/* 1. TOP STAT STRIP */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-        <div className="lg:col-span-8 stat-strip px-5 py-3 flex flex-wrap items-center justify-between gap-y-2 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-teal-500 flex-shrink-0" />
-            <span className="text-slate-500">OPD Queue</span>
-            <span className="font-extrabold text-slate-900 text-sm font-sans">{totalPatients}</span>
-            <span className="text-slate-400 font-normal">registered</span>
-          </div>
-
-          <div className="hidden sm:block h-4 w-px bg-slate-300" />
-
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0" />
-            <span className="text-slate-500">Waiting</span>
-            <span className="font-extrabold text-slate-900 text-sm font-sans">{waitingPatients.length}</span>
-            <span className="text-amber-700 font-semibold text-[11px]">in line</span>
-          </div>
-
-          <div className="hidden sm:block h-4 w-px bg-slate-300" />
-
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />
-            <span className="text-slate-500">Consulted Today</span>
-            <span className="font-extrabold text-slate-900 text-sm font-sans">{completedPatients.length}</span>
-            <span className="text-emerald-700 font-semibold text-[11px]">verified</span>
-          </div>
-
-          <div className="hidden md:block h-4 w-px bg-slate-300" />
-
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-sky-500 flex-shrink-0" />
-            <span className="text-slate-500">Avg Wait</span>
-            <span className="font-extrabold text-slate-900 text-sm font-sans">{selectedHospital.currentWaitMinutes}</span>
-            <span className="text-slate-500">min</span>
-          </div>
-        </div>
-
-        {/* Callout Badge */}
-        <div className="lg:col-span-4 callout-badge px-4 py-2.5 flex items-center justify-between gap-3 text-xs leading-snug">
-          <p className="text-slate-700">
-            <strong className="text-amber-700 font-bold">{waitingPatients.length} patients</strong> need clinical review right now.
-          </p>
-          <button
-            onClick={() => navigate('/doctor/ayurveda-view')}
-            className="text-[11px] font-bold text-teal-700 hover:underline flex-shrink-0 flex items-center gap-0.5"
-          >
-            <span>Digital Twin</span>
-            <Compass className="w-3.5 h-3.5 text-teal-600" />
-          </button>
-        </div>
-      </div>
-
-      {/* 2. GREETING & CONTEXT HEADER CARD */}
+      {/* 1. DISCIPLINE-NEUTRAL MINIMAL HEADER */}
       <div className="glass-card p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Good morning, Dr. Alok Verma
+              {currentUser?.name || 'Dr. Alok Verma'}
             </h1>
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
+              (currentUser?.discipline || 'Ayurveda') === 'Ayurveda'
+                ? 'bg-amber-50 text-amber-900 border-amber-300'
+                : 'bg-blue-50 text-blue-900 border-blue-300'
+            }`}>
+              {currentUser?.name || 'Dr. Alok Verma'} · {currentUser?.discipline || 'Ayurveda'}
+            </span>
             {unreadReportCount > 0 && (
               <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200 shadow-xs">
                 <Sparkles className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
-                <span>{unreadReportCount} AI Clinical Summaries Ready</span>
+                <span>{unreadReportCount} AI Summaries Ready</span>
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Kayachikitsa OPD • {selectedHospital.name} • Room 104 • Consultations synced to ABDM Gateway.
+          <p className="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-slate-700">{selectedHospital.name}</span>
+            <span>•</span>
+            <span>{currentUser?.department || (currentUser?.discipline === 'Allopathy' ? 'General Medicine OPD Room 102' : 'Kayachikitsa OPD Room 104')}</span>
+            <span>•</span>
+            <span className="font-semibold text-slate-600">
+              {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
           </p>
         </div>
 
         {activeFlow && (
           <button
             onClick={resetFlow}
-            className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-xs"
+            className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-xs self-start md:self-auto"
           >
             <X className="w-3.5 h-3.5" />
             <span>Close Flow / Back to Queue</span>
           </button>
         )}
       </div>
+
+      {/* 2. 3-4 KEY STAT NUMBERS MAX (Discipline-Neutral) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Waiting in Queue"
+          value={waitingPatients.length}
+          subtitle="Awaiting physician consult"
+          icon={Clock}
+          variant="amber"
+          trend="Action required"
+        />
+        <StatCard
+          title="Completed Today"
+          value={completedPatients.length}
+          subtitle="Signed off & verified"
+          icon={CheckCircle2}
+          variant="mint"
+        />
+        <StatCard
+          title="AI Summaries Ready"
+          value={unreadReportCount}
+          subtitle="Pre-consultation dossiers"
+          icon={Sparkles}
+          variant="teal"
+        />
+        <StatCard
+          title="Average Wait Time"
+          value={`${selectedHospital.currentWaitMinutes} min`}
+          subtitle="Current OPD throughput"
+          icon={Users}
+          variant="blue"
+        />
+      </div>
+
 
       {/* 3. STEP 1: ENTRY POINT — TWO CLEAR ACTION CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -532,10 +527,13 @@ export const DoctorDashboard: React.FC = () => {
                 <Stethoscope className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-bold text-slate-900 text-sm">Dr. Alok Verma, MD (Ayu)</p>
-                <p className="text-slate-600 text-xs mt-0.5">
-                  Attending Vaidya • Kayachikitsa OPD • Room 104
+                <p className="font-bold text-slate-900 text-sm">
+                  {currentUser?.name || 'Dr. Alok Verma'}{currentUser?.qualification ? `, ${currentUser.qualification.split(',')[0]}` : ''}
                 </p>
+                <p className="text-slate-600 text-xs mt-0.5">
+                  Attending Physician • {currentUser?.discipline || 'Ayurveda'} • {currentUser?.department || 'OPD Room 104'}
+                </p>
+
               </div>
             </div>
 
@@ -1132,49 +1130,17 @@ export const DoctorDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* 7. ROW OF 4 KEY STAT CARDS */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Waiting in Queue"
-          value={waitingPatients.length}
-          subtitle="Ready for doctor consultation"
-          icon={Clock}
-          variant="amber"
-          trend="Action required"
-        />
-        <StatCard
-          title="AI Summaries Ready"
-          value={unreadReportCount}
-          subtitle="Pre-consultation dossiers"
-          icon={Sparkles}
-          variant="teal"
-        />
-        <StatCard
-          title="Completed Today"
-          value={completedPatients.length}
-          subtitle="Consulted & verified"
-          icon={CheckCircle2}
-          variant="mint"
-        />
-        <StatCard
-          title="Average Wait Time"
-          value={`${selectedHospital.currentWaitMinutes} min`}
-          subtitle="Kayachikitsa throughput"
-          icon={Users}
-          variant="blue"
-        />
-      </div>
-
-      {/* 8. PRIMARY DOMINANT FOCUS AREA: Patient Queue */}
+      {/* PRIMARY DOMINANT FOCUS AREA: Patient Queue */}
       <div className="space-y-4">
         <PatientTable
           patients={patients}
           onSelectPatient={handlePatientSelect}
           title="Today's Consultation Queue"
-          subtitle="Select a patient to open their comprehensive clinical dossier, review Prakriti, and sign off."
+          subtitle="Select a patient to open their standard clinical dossier and sign off."
         />
       </div>
 
     </div>
   );
 };
+

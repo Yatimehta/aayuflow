@@ -38,6 +38,7 @@ import { DoctorVerify } from './pages/doctor/DoctorVerify';
 import { DoctorConsultation } from './pages/doctor/DoctorConsultation';
 import { DoctorSettings } from './pages/doctor/DoctorSettings';
 import { AyurvedicDashboard } from './pages/doctor/AyurvedicDashboard';
+import { DoctorProfile } from './pages/doctor/DoctorProfile';
 
 export const App: React.FC = () => {
   return (
@@ -111,6 +112,7 @@ export const App: React.FC = () => {
                 <Route path="verify" element={<DoctorVerify />} />
                 <Route path="consultation" element={<DoctorConsultation />} />
                 <Route path="ayurveda-view" element={<AyurvedicDashboard />} />
+                <Route path="profile" element={<DoctorProfile />} />
                 <Route path="settings" element={<DoctorSettings />} />
               </Route>
 

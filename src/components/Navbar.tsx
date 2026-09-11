@@ -247,6 +247,7 @@ export const Navbar: React.FC = () => {
                           onClick={() => {
                             setShowProfileDropdown(false);
                             if (currentRole === 'patient') navigate('/patient/dashboard');
+                            else if (currentRole === 'doctor') navigate('/doctor/profile');
                             else navigate('/doctor');
                           }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors text-left"
@@ -254,6 +255,7 @@ export const Navbar: React.FC = () => {
                           <User className="w-4 h-4 text-slate-400" />
                           <span>My Profile & Records</span>
                         </button>
+
 
                         <button
                           onClick={() => {

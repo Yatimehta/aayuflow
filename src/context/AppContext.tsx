@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Hospital, Patient, UserRole, PatientStatus, StaffMember, AuditLog, AdminStats, EvidenceReport, CareSystem, Consultation, DocumentItem } from '../types';
-import { MOCK_HOSPITALS, MOCK_PATIENTS, MOCK_STAFF, MOCK_AUDIT_LOGS, MOCK_ADMIN_STATS, MOCK_CONSULTATIONS } from '../data/mockData';
+import { Hospital, Patient, UserRole, PatientStatus, StaffMember, AuditLog, AdminStats, EvidenceReport, CareSystem, Consultation, DocumentItem, Doctor, DoctorDiscipline } from '../types';
+import { MOCK_HOSPITALS, MOCK_PATIENTS, MOCK_STAFF, MOCK_AUDIT_LOGS, MOCK_ADMIN_STATS, MOCK_CONSULTATIONS, MOCK_DOCTORS } from '../data/mockData';
 import { generateAIClinicalReport } from '../utils/aiReportGenerator';
 
 export interface ToastItem {
@@ -27,14 +27,27 @@ export interface CurrentUser {
   email?: string;
   department?: string;
   counter?: string;
+  discipline?: DoctorDiscipline;
+  qualification?: string;
+  licenseId?: string;
+  hospitalName?: string;
+  yearsOfPractice?: number;
+  avatarUrl?: string;
 }
 
 interface AppContextType {
   currentRole: UserRole;
   setRole: (role: UserRole) => void;
   currentUser: CurrentUser | null;
+  doctors: Doctor[];
   loginAsPatient: (p: Patient) => void;
-  loginAsStaff: (role: UserRole, name: string, department?: string) => void;
+  loginAsStaff: (
+    role: UserRole, 
+    name: string, 
+    department?: string, 
+    discipline?: DoctorDiscipline,
+    extra?: Partial<CurrentUser>
+  ) => void;
   logout: () => void;
   hospitals: Hospital[];
   selectedHospital: Hospital;
@@ -306,19 +319,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
-  const loginAsStaff = (role: UserRole, name: string, department?: string) => {
+  const loginAsStaff = (
+    role: UserRole, 
+    name: string, 
+    department?: string,
+    discipline?: DoctorDiscipline,
+    extra?: Partial<CurrentUser>
+  ) => {
     setRoleState(role);
-    setCurrentUser({
+
+    const matchedDoctor = role === 'doctor'
+      ? MOCK_DOCTORS.find(d => 
+          (name && d.name.toLowerCase().includes(name.toLowerCase())) || 
+          (discipline && d.discipline === discipline)
+        ) || MOCK_DOCTORS[0]
+      : null;
+
+    const assignedDiscipline = discipline || matchedDoctor?.discipline || (role === 'doctor' ? 'Ayurveda' : undefined);
+
+    const updatedUser: CurrentUser = {
       name,
       role,
-      department: department || (role === 'doctor' ? 'Kayachikitsa' : role === 'admin' ? 'Hospital Administration' : 'Intake Desk')
-    });
+      department: department || matchedDoctor?.department || (role === 'doctor' ? (assignedDiscipline === 'Allopathy' ? 'General Medicine & OPD' : 'Kayachikitsa (Internal Medicine)') : role === 'admin' ? 'Hospital Administration' : 'Intake Desk'),
+      counter: matchedDoctor?.opdCounter || (role === 'doctor' ? 'OPD Room 104' : 'Desk AYUSH-A1'),
+      discipline: assignedDiscipline,
+      qualification: extra?.qualification || matchedDoctor?.qualification || (assignedDiscipline === 'Allopathy' ? 'MBBS, MD (General Medicine)' : 'BAMS, MD (Ayurveda)'),
+      licenseId: extra?.licenseId || matchedDoctor?.licenseId || (assignedDiscipline === 'Allopathy' ? 'MCI-DEL-2016-55421' : 'AYU-MED-DEL-2014-889'),
+      yearsOfPractice: extra?.yearsOfPractice || matchedDoctor?.yearsOfPractice || (assignedDiscipline === 'Allopathy' ? 10 : 14),
+      hospitalName: selectedHospital.name,
+      email: extra?.email || matchedDoctor?.email || `${name.toLowerCase().replace(/[^a-z]/g, '.')}@aiia.gov.in`,
+      phone: extra?.phone || matchedDoctor?.contactNumber || '+91 98101 23456',
+      avatarUrl: extra?.avatarUrl || matchedDoctor?.avatarUrl,
+      ...extra
+    };
+
+    setCurrentUser(updatedUser);
     showToast({
       type: 'success',
       title: 'Authenticated',
-      message: `Signed in as ${name} (${role.toUpperCase()})`
+      message: `Signed in as ${name} (${role.toUpperCase()}${assignedDiscipline ? ` · ${assignedDiscipline}` : ''})`
     });
   };
+
 
   const logout = () => {
     setRoleState('guest');
@@ -640,6 +682,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         currentRole,
         setRole,
         currentUser,
+        doctors: MOCK_DOCTORS,
         loginAsPatient,
         loginAsStaff,
         logout,

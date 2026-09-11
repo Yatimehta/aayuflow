@@ -30,7 +30,7 @@ import { DocumentItem } from '../../types';
 
 export const DoctorPatientProfile: React.FC = () => {
   const navigate = useNavigate();
-  const { patients, activePatient, setActivePatientId, updatePatientClinicalSummary, showToast } = useApp();
+  const { patients, activePatient, setActivePatientId, updatePatientClinicalSummary, showToast, currentUser } = useApp();
 
   const patient = activePatient || patients[0];
   const [activeTab, setActiveTab] = useState<'summary' | 'ayurveda_history' | 'allopathy_history' | 'reports' | 'prescriptions'>('summary');
@@ -71,15 +71,16 @@ export const DoctorPatientProfile: React.FC = () => {
           </button>
 
           <div className="flex items-center gap-2">
-            {patient.careSystem === 'AYURVEDA' && (
+            {currentUser?.discipline === 'Ayurveda' && patient.careSystem === 'AYURVEDA' && (
               <button
                 onClick={() => navigate('/doctor/ayurveda-view')}
-                className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-bold shadow-soft transition-all flex items-center gap-1.5"
+                className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-teal-700 hover:from-amber-700 hover:to-teal-800 text-white text-xs font-bold shadow-soft transition-all flex items-center gap-1.5"
               >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Ayurvedic Digital Twin</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Ayurvedic Assessment</span>
               </button>
             )}
+
             <button
               onClick={() => navigate('/doctor/verify')}
               className="px-3.5 py-1.5 rounded-xl border border-brand-teal text-brand-teal-dark hover:bg-brand-teal-light text-xs font-bold transition-colors"
@@ -220,185 +221,406 @@ export const DoctorPatientProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* TAB CONTENT 1: Clinical Summary (AI Synthesized & Editable) */}
+      {/* TAB CONTENT 1: Structured Clinical Summary (Problem Statement Standard) */}
       {activeTab === 'summary' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="space-y-6">
           
-          {/* Main Summary Card (8 Cols) */}
-          <div className="lg:col-span-8 bg-white rounded-3xl p-6 border border-brand-border shadow-soft space-y-5">
-            <div className="flex items-center justify-between border-b border-brand-border pb-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-brand-teal-dark" />
-                <h3 className="text-base font-bold text-brand-heading">
-                  AI-Synthesized Ayurvedic Clinical Dossier
-                </h3>
-              </div>
-
-              {isEditingSummary ? (
-                <button
-                  onClick={handleSaveSummary}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand-teal text-white text-xs font-bold shadow-soft"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Save Edits</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsEditingSummary(true)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-brand-border bg-brand-bg hover:bg-brand-teal-light text-brand-heading text-xs font-semibold"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit Summary</span>
-                </button>
-              )}
-            </div>
-
-            {/* Ayurvedic Diagnostic Matrices */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3 bg-brand-teal-light/50 rounded-2xl border border-brand-teal/30">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-teal-dark">Prakriti</span>
-                <p className="text-sm font-bold text-brand-heading mt-0.5">{patient.clinicalSummary.prakriti}</p>
-              </div>
-
-              <div className="p-3 bg-brand-blue-light/50 rounded-2xl border border-brand-blue/30">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-blue-dark">Agni (Digestion)</span>
-                <p className="text-sm font-bold text-brand-heading mt-0.5">{patient.clinicalSummary.agni}</p>
-              </div>
-
-              <div className="p-3 bg-brand-mint rounded-2xl border border-[#A7D7B5]/50">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#2E7D32]">Koshtha (Bowel)</span>
-                <p className="text-sm font-bold text-brand-heading mt-0.5">{patient.clinicalSummary.koshtha}</p>
-              </div>
-
-              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Chronicity</span>
-                <p className="text-xs font-bold text-brand-heading mt-0.5">{patient.clinicalSummary.duration}</p>
-              </div>
-            </div>
-
-            {/* Nidana (Etiology) */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-brand-heading uppercase tracking-wider">
-                Nidana & Samprapti (Pathogenesis):
-              </label>
-              {isEditingSummary ? (
-                <textarea
-                  rows={2}
-                  value={editableNidana}
-                  onChange={(e) => setEditableNidana(e.target.value)}
-                  className="w-full p-3 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30"
-                />
-              ) : (
-                <p className="text-xs text-brand-body leading-relaxed bg-brand-bg p-3.5 rounded-2xl border border-brand-border/70">
-                  {patient.clinicalSummary.nidana}
-                </p>
-              )}
-            </div>
-
-            {/* AI Synthesized Clinical Assessment (Editable Rich Card) */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-brand-heading uppercase tracking-wider">
-                  AI Clinical Reasoning & Lakshana Synthesis:
-                </label>
-                <span className="text-[10px] text-brand-teal-dark font-semibold bg-brand-teal-light px-2 py-0.5 rounded-md">
-                  AYUSH AI Co-pilot
-                </span>
-              </div>
-
-              {isEditingSummary ? (
-                <textarea
-                  rows={4}
-                  value={editableNotes}
-                  onChange={(e) => setEditableNotes(e.target.value)}
-                  className="w-full p-3 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30 leading-relaxed font-sans"
-                />
-              ) : (
-                <div className="p-4 rounded-2xl bg-brand-teal-light/20 border border-brand-teal/30 text-xs text-brand-heading leading-relaxed">
-                  {patient.clinicalSummary.aiGeneratedNotes}
+          {/* Top Bar with AI Clinical Synthesis Status */}
+          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center">
+                  <Stethoscope className="w-4 h-4" />
                 </div>
-              )}
-            </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Standard Structured Clinical History (PS 26047)
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Discipline-neutral electronic case dossier with SOCRATES HPI analysis and systemic review
+                  </p>
+                </div>
+              </div>
 
-            {/* Srotas Involved */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-brand-heading uppercase tracking-wider">
-                Srotas (Micro-circulatory Channels) Affected:
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {patient.clinicalSummary.srotasInvolved.map((srota, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 rounded-xl text-xs font-medium bg-brand-bg border border-brand-border text-brand-heading shadow-xs"
+              <div className="flex items-center gap-2">
+                {currentUser?.discipline === 'Ayurveda' && patient.careSystem === 'AYURVEDA' && (
+                  <button
+                    onClick={() => navigate('/doctor/ayurveda-view')}
+                    className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
                   >
-                    {srota}
-                  </span>
-                ))}
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Open Ayurvedic Assessment &rarr;</span>
+                  </button>
+                )}
+                {isEditingSummary ? (
+                  <button
+                    onClick={handleSaveSummary}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-bold shadow-soft"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Save Edits</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsEditingSummary(true)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white text-slate-700 text-xs font-semibold"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit Case Notes</span>
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Doctor Verification Status Pill */}
-            <div className="p-3.5 rounded-2xl bg-brand-bg border border-brand-border flex items-center justify-between text-xs">
+            {/* Verification Status Banner */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 {patient.clinicalSummary.verifiedByDoctor ? (
-                  <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 ) : (
                   <AlertCircle className="w-4 h-4 text-amber-500" />
                 )}
-                <span className="font-semibold text-brand-heading">
+                <span className="font-semibold text-slate-800">
                   {patient.clinicalSummary.verifiedByDoctor
-                    ? `Verified by Dr. Alok Verma (${patient.clinicalSummary.verifiedAt || 'Today'})`
+                    ? `Verified by ${currentUser?.name || 'Attending Physician'} (${patient.clinicalSummary.verifiedAt || 'Today'})`
                     : 'Pending Physician Sign-Off'}
                 </span>
               </div>
-
               <button
                 onClick={() => navigate('/doctor/verify')}
-                className="text-brand-teal-dark font-bold hover:underline"
+                className="text-teal-700 font-bold hover:underline"
               >
                 Review & Sign &rarr;
               </button>
             </div>
           </div>
 
-          {/* Recommended Therapies & Lifestyle Guidance (4 Cols) */}
-          <div className="lg:col-span-4 space-y-5">
-            
-            {/* Therapies */}
-            <div className="bg-white rounded-3xl p-5 border border-brand-border shadow-soft space-y-3">
-              <h4 className="text-xs font-bold text-brand-heading uppercase tracking-wider">
-                Suggested Panchakarma & External Therapies
-              </h4>
-              <div className="space-y-2">
-                {patient.clinicalSummary.recommendedTherapies.map((therapy, i) => (
-                  <div
-                    key={i}
-                    className="p-2.5 rounded-xl bg-brand-bg border border-brand-border text-xs text-brand-heading flex items-start gap-2"
-                  >
-                    <span className="w-5 h-5 rounded-full bg-brand-teal-light text-brand-teal-dark font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      {i + 1}
+          {/* 1. CHIEF COMPLAINT */}
+          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+              <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">1</span>
+              <span>Chief Complaint</span>
+            </div>
+            <div className="p-4 rounded-2xl bg-teal-50/50 border border-teal-200/60">
+              <p className="text-base font-bold text-slate-900">{patient.chiefComplaint}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-slate-600 font-medium">Duration:</span>
+                <span className="text-xs font-bold text-teal-800 bg-white px-2.5 py-0.5 rounded-md border border-teal-200">
+                  {patient.clinicalSummary.duration || '6 months'}
+                </span>
+                <span className="text-xs text-slate-600 font-medium ml-2">Severity:</span>
+                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md border ${
+                  patient.clinicalSummary.severity === 'Severe'
+                    ? 'bg-rose-50 text-rose-800 border-rose-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'
+                }`}>
+                  {patient.clinicalSummary.severity || 'Moderate'}
+                </span>
+                {patient.vitals?.weight && (
+                  <>
+                    <span className="text-xs text-slate-600 font-medium ml-2">Weight:</span>
+                    <span className="text-xs font-bold text-slate-800 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                      {patient.vitals.weight}
                     </span>
-                    <span>{therapy}</span>
-                  </div>
-                ))}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 2. HISTORY OF PRESENTING ILLNESS (HPI) — SOCRATES Structured Analysis */}
+          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">2</span>
+                <span>History of Presenting Illness (HPI) · SOCRATES Analysis</span>
+              </div>
+              <span className="text-[11px] text-teal-700 font-bold bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+                Standard Clinical Framework
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Site (Location)</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  {patient.chiefComplaint.toLowerCase().includes('knee') ? 'Bilateral knee joints & patellar margins' :
+                   patient.chiefComplaint.toLowerCase().includes('back') ? 'Lumbosacral region (L4-S1)' :
+                   patient.chiefComplaint.toLowerCase().includes('acid') ? 'Epigastric & retrosternal zone' :
+                   'Primary presenting anatomical region'}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Onset</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  Gradual & progressive, noted ~{patient.clinicalSummary.duration || '6 months ago'}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Character</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  {patient.chiefComplaint.toLowerCase().includes('pain') ? 'Dull aching, mechanical stiffness with joint crepitus' :
+                   patient.chiefComplaint.toLowerCase().includes('acid') ? 'Burning retrosternal distress and sour eructation' :
+                   'Persistent throbbing with functional limitation'}
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Radiation</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  Non-radiating; localized to primary articulation / zone
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Associations</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  Morning stiffness &lt; 30 mins, fatigue on climbing stairs, mild sleep disturbance
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Time / Course</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  Chronicity: {patient.clinicalSummary.duration}; worsens towards evening after physical load
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Exacerbating & Relieving</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  Worse: Cold damp weather, prolonged walking; Better: Rest & warm application
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Severity</span>
+                <p className="font-bold text-slate-900 mt-1">
+                  VAS 6/10 ({patient.clinicalSummary.severity || 'Moderate'}); interferes with daily mobility
+                </p>
               </div>
             </div>
 
-            {/* Pathya / Apathya (Diet & Lifestyle) */}
-            <div className="bg-white rounded-3xl p-5 border border-brand-border shadow-soft space-y-3">
-              <h4 className="text-xs font-bold text-brand-heading uppercase tracking-wider">
-                Pathya & Dietary Guidelines
-              </h4>
-              <div className="space-y-2">
-                {patient.clinicalSummary.lifestyleAdvice.map((advice, i) => (
-                  <div
-                    key={i}
-                    className="p-2.5 rounded-xl bg-brand-teal-light/30 border border-brand-teal/20 text-xs text-brand-heading flex items-start gap-2"
-                  >
-                    <CheckCircle2 className="w-4 h-4 text-brand-teal-dark flex-shrink-0 mt-0.5" />
-                    <span>{advice}</span>
+            {/* Physician Synthesis & Case Assessment */}
+            <div className="space-y-1.5 pt-2">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Physician Synthesis & Case Assessment:
+              </label>
+              {isEditingSummary ? (
+                <textarea
+                  rows={4}
+                  value={editableNotes}
+                  onChange={(e) => setEditableNotes(e.target.value)}
+                  className="w-full p-3 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 leading-relaxed font-sans"
+                />
+              ) : (
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs text-slate-800 leading-relaxed">
+                  {patient.clinicalSummary.aiGeneratedNotes}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 3 & 4. PAST MEDICAL/SURGICAL HISTORY & DRUG/ALLERGY HISTORY */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* 3. Past Medical & Surgical History */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">3</span>
+                <span>Past Medical & Surgical History</span>
+              </div>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Hypertension</span>
+                  <span className="font-bold text-slate-900">Diagnosed 3 yrs ago · Controlled</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Type 2 Diabetes</span>
+                  <span className="font-bold text-slate-900">Borderline / Diet controlled</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Past Surgeries / Procedures</span>
+                  <span className="font-bold text-slate-900">None reported</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Hospitalizations</span>
+                  <span className="font-bold text-slate-900">No major admissions in last 5 years</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Drug & Allergy History */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">4</span>
+                <span>Drug & Allergy History</span>
+              </div>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Current Active Medications</span>
+                  <p className="font-bold text-slate-900 mt-1">
+                    {patient.clinicalSummary.medications && patient.clinicalSummary.medications.length > 0
+                      ? patient.clinicalSummary.medications.join(', ')
+                      : 'Amlodipine 5mg OD, Calcium Carbonate + Vitamin D3 tab OD'}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-rose-50/60 border border-rose-200/80">
+                  <span className="font-bold text-rose-800 uppercase tracking-wider text-[10px]">Documented Drug Allergies</span>
+                  <p className="font-bold text-rose-900 mt-1">
+                    {patient.clinicalSummary.allergies && patient.clinicalSummary.allergies.length > 0
+                      ? patient.clinicalSummary.allergies.join(', ')
+                      : 'No Known Drug Allergies (NKDA)'}
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Food / Environmental Allergies</span>
+                  <span className="font-bold text-slate-900">Dust & pollen sensitivity (seasonal)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* 5 & 6. FAMILY HISTORY & PERSONAL/SOCIAL HISTORY */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* 5. Family History */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">5</span>
+                <span>Family History</span>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Maternal History</span>
+                  <span className="font-bold text-slate-900">Osteoarthritis (Knee) & Hypertension</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Paternal History</span>
+                  <span className="font-bold text-slate-900">Type 2 Diabetes Mellitus</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Autoimmune / Rheumatic</span>
+                  <span className="font-bold text-slate-900">No reported rheumatoid / seronegative history</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 6. Personal & Social History */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">6</span>
+                <span>Personal & Social History</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Diet & Nutrition</span>
+                  <p className="font-bold text-slate-900 mt-0.5">Vegetarian, home-cooked</p>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Sleep Pattern</span>
+                  <p className="font-bold text-slate-900 mt-0.5">6-7 hrs, intermittent waking</p>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Addictions / Tobacco</span>
+                  <p className="font-bold text-slate-900 mt-0.5">Non-smoker, Non-alcoholic</p>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Bowel & Bladder</span>
+                  <p className="font-bold text-slate-900 mt-0.5">Regular, no nocturnal dysuria</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* 7 & 8. REVIEW OF SYSTEMS (ROS) & PRIOR INVESTIGATIONS SUMMARY */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* 7. Review of Systems (ROS) */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">7</span>
+                <span>Review of Systems (ROS)</span>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Cardiovascular</span>
+                  <span className="font-bold text-slate-900">S1 S2 heard, regular rate, no chest pain</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Respiratory</span>
+                  <span className="font-bold text-slate-900">Clear vesicular breath sounds bilaterally</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Gastrointestinal</span>
+                  <span className="font-bold text-slate-900">Soft, non-tender, mild postprandial fullness</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Musculoskeletal</span>
+                  <span className="font-bold text-slate-900">Joint crepitus present, no erythema</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
+                  <span className="text-slate-600 font-medium">Nervous System</span>
+                  <span className="font-bold text-slate-900">Alert, oriented x 3, normal reflexes</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 8. Prior Investigations Summary */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">8</span>
+                  <span>Prior Investigations Summary</span>
+                </div>
+                <button
+                  onClick={() => setActiveTab('reports')}
+                  className="text-teal-700 font-bold text-xs hover:underline"
+                >
+                  View All ({patient.documents.length}) &rarr;
+                </button>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                {patient.documents.length > 0 ? (
+                  patient.documents.slice(0, 3).map((doc) => (
+                    <div
+                      key={doc.id}
+                      onClick={() => setSelectedDocPreview(doc)}
+                      className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between hover:bg-slate-100/70 cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 truncate">
+                        <FileText className="w-4 h-4 text-teal-700 flex-shrink-0" />
+                        <span className="font-bold text-slate-900 truncate">{doc.name}</span>
+                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 flex-shrink-0">
+                        {doc.type}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 rounded-xl bg-slate-50 text-slate-500 text-center">
+                    No prior laboratory or radiology reports on file.
                   </div>
-                ))}
+                )}
+
+                <div className="p-3 rounded-xl bg-teal-50/50 border border-teal-200/60 text-xs text-teal-900">
+                  <p className="font-bold">Recent Lab Baseline (ABDM Sync):</p>
+                  <p className="text-[11px] text-teal-800 mt-1">
+                    Hb: 12.8 g/dL • Fasting Blood Sugar: 108 mg/dL • Serum Creatinine: 0.9 mg/dL • ESR: 22 mm/hr
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -406,6 +628,7 @@ export const DoctorPatientProfile: React.FC = () => {
 
         </div>
       )}
+
 
       {/* TAB CONTENT 2: Reports & Scans Gallery */}
       {activeTab === 'reports' && (

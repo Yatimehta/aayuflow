@@ -69,18 +69,37 @@ export const UniversalLogin: React.FC = () => {
     password: ''
   });
 
+  // Selected Doctor Discipline for Doctor Tab
+  const [doctorDiscipline, setDoctorDiscipline] = useState<'Ayurveda' | 'Allopathy'>('Ayurveda');
+
   // Demo Credentials Map for Quick Fill
-  const demoProfiles: Record<'patient' | 'doctor' | 'worker', { identifier: string; pass: string; title: string; dest: string }> = {
+  const demoProfiles = {
     patient: {
       identifier: '45-9821-4321-7890',
       pass: 'patient2026',
       title: 'Rameshwar Sharma (Patient)',
       dest: '/patient/registration'
     },
-    doctor: {
+    doctorAyurveda: {
       identifier: 'dr.alok.verma@aiia.gov.in',
       pass: 'vaidya2026',
-      title: 'Dr. Alok Verma, MD (Ayu)',
+      title: 'Dr. Alok Verma',
+      discipline: 'Ayurveda' as const,
+      qualification: 'BAMS, MD (Ayurveda) Kayachikitsa',
+      department: 'Kayachikitsa (Internal Medicine)',
+      licenseId: 'AYU-MED-DEL-2014-889',
+      yearsOfPractice: 14,
+      dest: '/doctor'
+    },
+    doctorAllopathy: {
+      identifier: 'dr.priya.nair@aiia.gov.in',
+      pass: 'doctor2026',
+      title: 'Dr. Priya Nair',
+      discipline: 'Allopathy' as const,
+      qualification: 'MBBS, MD (General Medicine), DNB',
+      department: 'General Medicine & OPD Triage',
+      licenseId: 'MCI-DEL-2016-55421',
+      yearsOfPractice: 10,
       dest: '/doctor'
     },
     worker: {
@@ -93,8 +112,26 @@ export const UniversalLogin: React.FC = () => {
 
   const handleRoleChange = (role: AuthRole) => {
     setActiveTab(role);
-    setLoginIdentifier(demoProfiles[role].identifier);
-    setLoginPassword(demoProfiles[role].pass);
+    if (role === 'doctor') {
+      const doc = doctorDiscipline === 'Allopathy' ? demoProfiles.doctorAllopathy : demoProfiles.doctorAyurveda;
+      setLoginIdentifier(doc.identifier);
+      setLoginPassword(doc.pass);
+    } else {
+      setLoginIdentifier(demoProfiles[role].identifier);
+      setLoginPassword(demoProfiles[role].pass);
+    }
+  };
+
+  const selectDoctorDiscipline = (disc: 'Ayurveda' | 'Allopathy') => {
+    setDoctorDiscipline(disc);
+    const doc = disc === 'Allopathy' ? demoProfiles.doctorAllopathy : demoProfiles.doctorAyurveda;
+    setLoginIdentifier(doc.identifier);
+    setLoginPassword(doc.pass);
+    showToast({
+      type: 'info',
+      title: `${disc} Profile Loaded`,
+      message: `Selected ${doc.title} (${disc}). Ready to sign in.`
+    });
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -120,8 +157,29 @@ export const UniversalLogin: React.FC = () => {
           message: `Signed in as ${matched.name}. Proceeding to Patient Identification.`
         });
         navigate('/patient/registration');
+      } else if (activeTab === 'doctor') {
+        const isAllopathy = doctorDiscipline === 'Allopathy' || loginIdentifier.toLowerCase().includes('priya');
+        const doc = isAllopathy ? demoProfiles.doctorAllopathy : demoProfiles.doctorAyurveda;
+        loginAsStaff(
+          'doctor',
+          doc.title,
+          doc.department,
+          doc.discipline,
+          {
+            qualification: doc.qualification,
+            licenseId: doc.licenseId,
+            yearsOfPractice: doc.yearsOfPractice,
+            email: doc.identifier
+          }
+        );
+        showToast({
+          type: 'success',
+          title: 'Physician Authenticated',
+          message: `Signed in as ${doc.title} (${doc.discipline}). Redirecting to Dashboard.`
+        });
+        navigate('/doctor');
       } else {
-        const demo = demoProfiles[activeTab];
+        const demo = demoProfiles.worker;
         loginAsStaff(activeTab, demo.title, selectedHospital.name);
         showToast({
           type: 'success',
@@ -132,6 +190,7 @@ export const UniversalLogin: React.FC = () => {
       }
     }, 600);
   };
+
 
   const handlePatientSignupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,13 +242,18 @@ export const UniversalLogin: React.FC = () => {
         message: `Welcome to AyuFlow, ${staffSignup.name}. Access confirmed for ${hosp.city} center.`
       });
 
-      const dest = demoProfiles[activeTab].dest;
+      const dest = activeTab === 'doctor' ? '/doctor' : '/worker';
       navigate(dest);
+
     }, 700);
   };
 
   const handleQuickDemoFill = () => {
-    const demo = demoProfiles[activeTab];
+    const demo = activeTab === 'patient' 
+      ? demoProfiles.patient 
+      : activeTab === 'doctor' 
+        ? (doctorDiscipline === 'Allopathy' ? demoProfiles.doctorAllopathy : demoProfiles.doctorAyurveda)
+        : demoProfiles.worker;
     setLoginIdentifier(demo.identifier);
     setLoginPassword(demo.pass);
     showToast({
@@ -269,6 +333,48 @@ export const UniversalLogin: React.FC = () => {
         {/* VIEW 1: LOGIN FORM */}
         {authMode === 'login' && (
           <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
+            
+            {/* Discipline Selector for Doctor Tab (PS 26047) */}
+            {activeTab === 'doctor' && (
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                    Select Discipline (PS 26047):
+                  </span>
+                  <span className="text-[10px] text-teal-700 font-bold bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
+                    Dual Stream
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => selectDoctorDiscipline('Ayurveda')}
+                    className={`p-2.5 rounded-xl border text-left transition-all flex flex-col ${
+                      doctorDiscipline === 'Ayurveda'
+                        ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-amber-300'
+                    }`}
+                  >
+                    <span className="text-xs font-bold truncate">Dr. Alok Verma</span>
+                    <span className="text-[10px] font-semibold text-amber-800">Ayurveda Discipline</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectDoctorDiscipline('Allopathy')}
+                    className={`p-2.5 rounded-xl border text-left transition-all flex flex-col ${
+                      doctorDiscipline === 'Allopathy'
+                        ? 'border-blue-500 bg-blue-50 text-blue-900 ring-2 ring-blue-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-blue-300'
+                    }`}
+                  >
+                    <span className="text-xs font-bold truncate">Dr. Priya Nair</span>
+                    <span className="text-[10px] font-semibold text-blue-800">Allopathy Discipline</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="block font-semibold text-slate-800 mb-1">
                 {activeTab === 'patient' 
@@ -291,6 +397,7 @@ export const UniversalLogin: React.FC = () => {
                 />
               </div>
             </div>
+
 
             <div>
               <div className="flex items-center justify-between mb-1">

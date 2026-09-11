@@ -222,3 +222,22 @@ export interface AdminStats {
   criticalWaitAlerts: number;
 }
 
+export type DoctorDiscipline = 'Ayurveda' | 'Allopathy';
+
+export interface Doctor {
+  id: string;
+  name: string;
+  discipline: DoctorDiscipline;
+  qualification: string;
+  licenseId: string;
+  department: string;
+  hospitalId: string;
+  hospitalName: string;
+  yearsOfPractice: number;
+  contactNumber: string;
+  email: string;
+  avatarUrl?: string;
+  opdCounter?: string;
+}
+
+
