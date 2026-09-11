@@ -96,6 +96,8 @@ interface AppContextType {
   speakText: (text: string) => void;
   patientLanguage: string;
   setPatientLanguage: (lang: string) => void;
+  languageConfirmed: boolean;
+  setLanguageConfirmed: (val: boolean) => void;
   globalSearchQuery: string;
   setGlobalSearchQuery: (q: string) => void;
   unlockedPatientIds: string[];
@@ -336,6 +338,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setPatientLanguageState(lang);
     try {
       localStorage.setItem('ayucarez_patient_language', lang);
+    } catch {}
+  };
+
+  // Whether the visitor has confirmed a language yet — gates the entire app until set,
+  // so language selection is the very first thing anyone sees, before sign-in.
+  const [languageConfirmed, setLanguageConfirmedState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ayucarez_language_confirmed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const setLanguageConfirmed = (val: boolean) => {
+    setLanguageConfirmedState(val);
+    try {
+      localStorage.setItem('ayucarez_language_confirmed', String(val));
     } catch {}
   };
 
@@ -918,6 +937,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         speakText,
         patientLanguage,
         setPatientLanguage,
+        languageConfirmed,
+        setLanguageConfirmed,
         globalSearchQuery,
         setGlobalSearchQuery,
         unlockedPatientIds,

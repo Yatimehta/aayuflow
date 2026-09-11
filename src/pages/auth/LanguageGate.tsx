@@ -1,48 +1,45 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Languages, ArrowRight, ArrowLeft, Check, Sparkles } from 'lucide-react';
+import { Languages, ArrowRight, Check, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { MOCK_LANGUAGES } from '../../data/mockData';
 import { useTranslation } from '../../utils/translations';
+import ayucarezLogo from '../../assets/images/logo-ayucarez.png';
+import ministryOfAyushEmblem from '../../assets/images/ministry-of-ayush-emblem.png';
 
-export const PatientLanguageSelect: React.FC = () => {
+/** Shown right after Home, before Role-Select/Login or any other destination — visiting
+ * anything else while unconfirmed redirects here (see App.tsx). Selecting a language
+ * updates the whole app live — patientLanguage is the same context value every other
+ * translated page reads, so there is no separate "confirm" step needed to see the change;
+ * clicking a tile previews it immediately. */
+export const LanguageGate: React.FC = () => {
   const navigate = useNavigate();
-  const { patientLanguage, setPatientLanguage, showToast } = useApp();
+  const { patientLanguage, setPatientLanguage, setLanguageConfirmed } = useApp();
   const { t } = useTranslation();
 
-  // Selecting a tile updates patientLanguage immediately (see below), so by the time
-  // Continue is pressed the language is already live — no stale-language toast risk.
   const handleContinue = () => {
-    const langObj = MOCK_LANGUAGES.find((l) => l.code === patientLanguage);
-    showToast({
-      type: 'info',
-      title: t('lang_toast_title'),
-      message: t('lang_toast_msg', { lang: langObj?.name || 'Hindi' }),
-    });
-    navigate('/patient/consent');
+    setLanguageConfirmed(true);
+    navigate('/role-select');
   };
 
   return (
-    <div className="min-h-[85vh] py-12 px-4 sm:px-6 flex items-center justify-center relative z-10">
-      <div className="max-w-2xl w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center p-4 py-10 bg-[#F4FBF9] relative overflow-hidden">
+      <div className="max-w-2xl w-full space-y-8 relative z-10">
 
-        {/* Back Link */}
-        <div>
-          <button
-            type="button"
-            onClick={() => navigate('/patient/dashboard')}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#0D2B3E] font-medium transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{t('lang_back_dashboard')}</span>
-          </button>
-        </div>
+        <div className="flex flex-col items-center text-center space-y-2">
+          <div className="flex items-center gap-3 mb-2">
+            <img src={ayucarezLogo} alt="Ayucarez" className="h-11 w-auto object-contain" />
+            <div className="w-px h-7 bg-[#DCEAE7]" />
+            <img
+              src={ministryOfAyushEmblem}
+              alt="Ministry of Ayush, Government of India"
+              className="h-9 w-auto object-contain"
+            />
+          </div>
 
-        {/* Header Block */}
-        <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#CEF3ED] text-[#146356] text-xs font-bold uppercase tracking-wider mb-1">
             <Languages className="w-3.5 h-3.5" />
-            <span>{t('step5_title')}</span>
+            <span>{t('lang_gate_welcome')}</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-bold text-[#0D2B3E] tracking-tight">
@@ -54,7 +51,6 @@ export const PatientLanguageSelect: React.FC = () => {
           </p>
         </div>
 
-        {/* Language Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
           {MOCK_LANGUAGES.map((lang) => {
             const isSelected = patientLanguage === lang.code;
@@ -97,20 +93,18 @@ export const PatientLanguageSelect: React.FC = () => {
           })}
         </div>
 
-        {/* Assistant Note */}
         <div className="flex items-center justify-center gap-2 text-xs text-slate-500 text-center">
           <Sparkles className="w-4 h-4 text-[#146356] flex-shrink-0" />
           <span>{t('lang_assistant_note')}</span>
         </div>
 
-        {/* Action Button */}
         <div className="pt-2 flex items-center justify-center">
           <button
             type="button"
             onClick={handleContinue}
             className="w-full sm:w-auto px-10 py-3.5 rounded-2xl bg-[#146356] hover:bg-[#0F4A40] text-white font-bold text-sm shadow-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
           >
-            <span>{t('lang_continue_btn')}</span>
+            <span>{t('lang_gate_continue')}</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>

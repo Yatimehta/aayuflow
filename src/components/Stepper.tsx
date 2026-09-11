@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import { useTranslation } from '../utils/translations';
 
 interface Step {
   id: number;
@@ -15,6 +16,7 @@ interface StepperProps {
 }
 
 export const Stepper: React.FC<StepperProps> = ({ steps, currentStep, onStepClick }) => {
+  const { t } = useTranslation();
   return (
     <div className="w-full">
       {/* Desktop & Tablet Stepper View */}
@@ -73,10 +75,10 @@ export const Stepper: React.FC<StepperProps> = ({ steps, currentStep, onStepClic
           </div>
           <div>
             <p className="text-xs font-bold text-brand-heading">
-              {steps.find((s) => s.id === currentStep)?.title || 'Intake Step'}
+              {steps.find((s) => s.id === currentStep)?.title || t('stepper_intake_step')}
             </p>
             <p className="text-[10px] text-brand-muted">
-              Step {currentStep} of {steps.length}
+              {t('stepper_step_of', { current: currentStep, total: steps.length })}
             </p>
           </div>
         </div>

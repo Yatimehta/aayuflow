@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Filter, 
-  FileText, 
-  AlertCircle, 
+import {
+  Filter,
+  FileText,
+  AlertCircle,
   Leaf,
   Stethoscope,
   Lock,
   ChevronDown,
-  Check
+  Check,
+  UserPlus
 } from 'lucide-react';
 import { Patient, PatientStatus } from '../types';
 import { useApp } from '../context/AppContext';
@@ -26,7 +27,9 @@ export const PatientTable: React.FC<PatientTableProps> = ({
   patients,
   onSelectPatient,
   onStartConsultation,
-  title = "Consultation Queue"
+  onNewPatient,
+  title = "Consultation Queue",
+  subtitle
 }) => {
   const { globalSearchQuery, unlockedPatientIds } = useApp();
 
@@ -139,13 +142,26 @@ export const PatientTable: React.FC<PatientTableProps> = ({
       <div className="p-4 sm:p-5 border-b border-[#DCEAE7]">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           
-          {/* Left: Clean Queue Title (Strictly without subtitle) */}
+          {/* Left: Queue Title, with optional subtitle */}
           <div className="flex items-center gap-3">
-            <h2 className="text-base font-bold text-[#0D2B3E]">{title}</h2>
+            <div>
+              <h2 className="text-base font-bold text-[#0D2B3E]">{title}</h2>
+              {subtitle && <p className="text-xs text-[#8FA3A0] mt-0.5">{subtitle}</p>}
+            </div>
           </div>
 
           {/* Right: Streamlined Filter Controls (Two Compact Dropdown / Pill Groups) */}
           <div className="flex items-center gap-3 flex-wrap">
+            {onNewPatient && (
+              <button
+                type="button"
+                onClick={onNewPatient}
+                className="px-4 py-1.5 rounded-xl text-sm font-bold bg-[#146356] hover:bg-[#0f4d43] text-white shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>New Patient</span>
+              </button>
+            )}
             
             {/* Control 1: Department / Stream Selector (Pill Tabs) */}
             <div className="flex items-center p-1 bg-[#F4FBF9] border border-[#DCEAE7] rounded-2xl">

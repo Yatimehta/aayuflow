@@ -69,11 +69,15 @@ export const DoctorOtpModal: React.FC<DoctorOtpModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div 
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150"
+      onClick={onClose}
+    >
+      <div
         className="w-full max-w-md bg-white rounded-3xl border border-[#DCEAE7] shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 relative"
         role="dialog"
         aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="p-6 border-b border-[#DCEAE7] bg-[#F4FBF9]/70 relative">

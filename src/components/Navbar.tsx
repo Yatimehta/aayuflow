@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Sprout, 
@@ -29,9 +29,11 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { UserRole } from '../types';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 import ayucarezLogo from '../assets/images/logo-ayucarez.png';
 import rameshwarAvatar from '../assets/images/rameshwar-avatar.jpg';
+import ministryOfAyushEmblem from '../assets/images/ministry-of-ayush-emblem.png';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +66,23 @@ export const Navbar: React.FC = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { t } = useTranslation();
 
+  const hospitalRef = useRef<HTMLDivElement>(null);
+  const accessibilityRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const anyDropdownOpen = showNotifications || showAccessibility || showHospitalDropdown || showProfileDropdown;
+  useClickOutside(
+    [hospitalRef, accessibilityRef, notificationsRef, profileRef],
+    () => {
+      setShowNotifications(false);
+      setShowAccessibility(false);
+      setShowHospitalDropdown(false);
+      setShowProfileDropdown(false);
+    },
+    anyDropdownOpen
+  );
+
   const getInitials = (name?: string) => {
     if (!name) return 'AY';
     const parts = name.trim().split(' ');
@@ -77,7 +96,7 @@ export const Navbar: React.FC = () => {
   const isDoctor = currentRole === 'doctor' || location.pathname.startsWith('/doctor');
 
   const hospitalPill = (
-    <div className="relative">
+    <div className="relative" ref={hospitalRef}>
       <button
         onClick={() => {
           setShowHospitalDropdown(!showHospitalDropdown);
@@ -127,15 +146,19 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-16 gap-4">
           
-          {/* 1. Logo & Brand — Ayucarez */}
-          <div
-            className="flex-shrink-0 flex items-center cursor-pointer"
-            onClick={() => navigate('/')}
-          >
+          {/* 1. Logo & Brand — Ayucarez, with the Ministry of Ayush emblem to its right */}
+          <div className="flex-shrink-0 flex items-center gap-3">
             <img
               src={ayucarezLogo}
               alt="Ayucarez"
-              className="h-11 w-auto object-contain"
+              className="h-11 w-auto object-contain cursor-pointer"
+              onClick={() => navigate('/')}
+            />
+            <div className="w-px h-7 bg-[#DCEAE7]" />
+            <img
+              src={ministryOfAyushEmblem}
+              alt="Ministry of Ayush, Government of India"
+              className="h-9 w-auto object-contain"
             />
           </div>
 
@@ -182,7 +205,7 @@ export const Navbar: React.FC = () => {
             )}
 
             {/* Accessibility Menu */}
-            <div className="relative">
+            <div className="relative" ref={accessibilityRef}>
               <button
                 type="button"
                 onClick={() => {
@@ -312,7 +335,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Notification Bell */}
-            <div className="relative">
+            <div className="relative" ref={notificationsRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="relative p-2 rounded-xl border border-brand-border bg-brand-bg hover:bg-brand-teal-light/50 text-brand-body transition-colors"
@@ -370,7 +393,7 @@ export const Navbar: React.FC = () => {
             {/* User Profile / Login Button */}
             <div className="flex items-center gap-2 pl-2 border-l border-[#DCEAE7]">
               {currentUser && currentRole !== 'guest' ? (
-                <div className="relative">
+                <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                     className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-[#DCEAE7] bg-white hover:bg-[#F4FBF9] text-left transition-all"

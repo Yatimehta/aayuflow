@@ -786,8 +786,14 @@ export const WorkerAssistIntake: React.FC = () => {
 
           {/* Camera Simulation Modal */}
           {isCameraActive && (
-            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-              <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 border border-[#DCEAE7] shadow-2xl">
+            <div
+              className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs"
+              onClick={() => setIsCameraActive(false)}
+            >
+              <div
+                className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 border border-[#DCEAE7] shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-base text-[#0D2B3E]">Desk Camera Viewfinder</h3>
                   <button

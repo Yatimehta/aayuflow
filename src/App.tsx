@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AppProvider } from './context/AppContext';
+import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/Navbar';
 import { ToastContainer } from './components/Toast';
 
 // Auth Pages (new 3-step flow)
+import { LanguageGate } from './pages/auth/LanguageGate';
 import { HomePage } from './pages/auth/HomePage';
 import { RoleSelectPage } from './pages/auth/RoleSelectPage';
 import { LoginPage } from './pages/auth/LoginPage';
@@ -49,17 +50,22 @@ import { DoctorSettings } from './pages/doctor/DoctorSettings';
 import { AyurvedicDashboard } from './pages/doctor/AyurvedicDashboard';
 import { DoctorProfile } from './pages/doctor/DoctorProfile';
 
-// Navbar is hidden on the 3 auth-flow screens — they are full-screen branded layouts
-const AUTH_PATHS = ['/', '/role-select', '/login'];
+// Navbar is hidden on the auth-flow screens — they are full-screen branded layouts
+const AUTH_PATHS = ['/', '/language', '/role-select', '/login'];
 
 const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const isAuthScreen = AUTH_PATHS.includes(location.pathname);
   return (
-    <div className="min-h-screen bg-[#F4FBF9] text-[#0D2B3E] flex flex-col font-sans relative overflow-x-hidden selection:bg-[#146356] selection:text-white">
-      {!isAuthScreen && (
-        <>
-          {/* Subtle faint ambient DNA/geometric line texture in background (~8% opacity) */}
+    <>
+      {/* Navbar is rendered as a page-level sibling, outside the overflow-x-hidden shell
+          below: that shell forces its computed overflow-y to 'auto' (per the CSS overflow
+          spec, since it isn't 'visible' on both axes), which would otherwise swallow the
+          Navbar's `position: sticky` — kept here so it sticks to the real viewport. */}
+      {!isAuthScreen && <Navbar />}
+      <div className="min-h-screen bg-[#F4FBF9] text-[#0D2B3E] flex flex-col font-sans relative overflow-x-hidden selection:bg-[#146356] selection:text-white">
+        {!isAuthScreen && (
+          /* Subtle faint ambient DNA/geometric line texture in background (~8% opacity) */
           <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-10">
             <svg
               className="absolute -bottom-24 -left-24 w-[650px] h-[650px] stroke-[#146356]"
@@ -82,26 +88,35 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <path d="M50 250 C150 400, 350 100, 450 250" strokeWidth="1.5" />
             </svg>
           </div>
-          <Navbar />
-        </>
-      )}
-      <div className={isAuthScreen ? '' : 'flex-1 flex flex-col relative z-10'}>
-        {children}
+        )}
+        <div className={isAuthScreen ? '' : 'flex-1 flex flex-col relative z-10'}>
+          {children}
+        </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
-    </div>
+    </>
   );
 };
 
-export const App: React.FC = () => {
+const AppRoutes: React.FC = () => {
+  const { languageConfirmed } = useApp();
+  const location = useLocation();
+
+  // Home is viewable without picking a language first, but any other destination —
+  // role select, login, or a direct deep link — redirects to /language first. That
+  // keeps language selection near the very start of the flow and always before login,
+  // while still giving it a real URL/page instead of a hidden pre-router gate.
+  if (!languageConfirmed && location.pathname !== '/' && location.pathname !== '/language') {
+    return <Navigate to="/language" replace />;
+  }
+
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <AppShell>
-          {/* Main Application Routes */}
-          <Routes>
-              {/* ── 3-Step Auth Flow ── */}
-              <Route path="/" element={<HomePage />} />
+    <AppShell>
+      {/* Main Application Routes */}
+      <Routes>
+          {/* ── 3-Step Auth Flow ── */}
+          <Route path="/" element={<HomePage />} />
+              <Route path="/language" element={<LanguageGate />} />
               <Route path="/role-select" element={<RoleSelectPage />} />
               <Route path="/login" element={<LoginPage />} />
 
@@ -153,10 +168,18 @@ export const App: React.FC = () => {
               <Route path="/lab/*" element={<Navigate to="/doctor" replace />} />
               <Route path="/admin/*" element={<Navigate to="/doctor" replace />} />
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-        </AppShell>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    </AppShell>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AppProvider>
+      <BrowserRouter>
+        <AppRoutes />
       </BrowserRouter>
     </AppProvider>
   );
