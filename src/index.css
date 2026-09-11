@@ -2,11 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-background: #F4FBF9;
+  --color-surface: #FFFFFF;
+  --color-ink: #0D2B3E;
+  --color-text-muted: #4A5D63;
+  --color-text-faint: #8FA3A0;
+  --color-border: #DCEAE7;
+
+  --color-brand: #146356;
+  --color-brand-hover: #0F4A40;
+  --color-brand-light: #E4EFEC;
+  --color-accent-mint: #CEF3ED;
+  --color-accent-mint-deep: #9FDCD1;
+
+  --color-critical: #C23B22;
+  --color-critical-light: #FBEAE9;
+  --color-moderate: #9C6B14;
+  --color-moderate-light: #FBF1DF;
+  --color-success: #2E7D4F;
+  --color-success-light: #E6F4EA;
+
+  --color-role-patient-bg: #E4F3EF;
+  --color-role-patient-icon: #146356;
+  --color-role-doctor-bg: #E3EEF9;
+  --color-role-doctor-icon: #2563A6;
+  --color-role-worker-bg: #E8F3E3;
+  --color-role-worker-icon: #3E7A3C;
+}
+
 @layer base {
   html, body {
     min-height: 100vh;
-    background: radial-gradient(circle at 30% 20%, #6b8cc4 0%, #4a6fa0 35%, #3d5a8a 70%, #2d4570 100%) fixed;
-    color: #1E293B;
+    background: var(--color-background) fixed;
+    color: var(--color-ink);
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
