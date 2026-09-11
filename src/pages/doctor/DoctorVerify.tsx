@@ -31,17 +31,17 @@ export const DoctorVerify: React.FC = () => {
 
   // Helper to map Agni from intake to summary enum
   const mapIntakeAgni = (agniStr?: string): 'Sama' | 'Vishama' | 'Tikshna' | 'Manda' => {
-    if (!agniStr) return patient.clinicalSummary.agni;
+    if (!agniStr) return (patient.clinicalSummary.agni as 'Sama' | 'Vishama' | 'Tikshna' | 'Manda') || 'Sama';
     if (agniStr.includes('Vishamagni')) return 'Vishama';
     if (agniStr.includes('Tikshnagni')) return 'Tikshna';
     if (agniStr.includes('Mandagni')) return 'Manda';
     if (agniStr.includes('Samagni')) return 'Sama';
-    return patient.clinicalSummary.agni;
+    return (patient.clinicalSummary.agni as 'Sama' | 'Vishama' | 'Tikshna' | 'Manda') || 'Sama';
   };
 
   // Editable Form fields — Auto-populated from 10-point assessment when available
   const [prakriti, setPrakriti] = useState(
-    patient.ayurvedaIntake?.bodyBuild || patient.clinicalSummary.prakriti
+    patient.ayurvedaIntake?.prakriti || patient.clinicalSummary.prakriti
   );
   const [vikriti, setVikriti] = useState(
     patient.ayurvedaIntake?.doshaBaseline
@@ -53,14 +53,14 @@ export const DoctorVerify: React.FC = () => {
   );
   const [koshtha, setKoshtha] = useState(patient.clinicalSummary.koshtha);
   const [nidana, setNidana] = useState(
-    patient.ayurvedaIntake?.hetuTriggers && patient.ayurvedaIntake.hetuTriggers.length > 0
-      ? `Hetu (Triggers): ${patient.ayurvedaIntake.hetuTriggers.join(', ')}. ${patient.clinicalSummary.nidana}`
+    patient.ayurvedaIntake?.hetu && patient.ayurvedaIntake.hetu.length > 0
+      ? `Hetu (Triggers): ${patient.ayurvedaIntake.hetu.join(', ')}. ${patient.clinicalSummary.nidana}`
       : patient.clinicalSummary.nidana
   );
   const [aiNotes, setAiNotes] = useState(patient.clinicalSummary.aiGeneratedNotes);
   const [doctorRemarks, setDoctorRemarks] = useState(
     patient.ayurvedaIntake
-      ? `I have examined the patient. 10-point assessment confirms ${patient.ayurvedaIntake.mainConcern} with ${patient.ayurvedaIntake.bodyBuild} constitution and ${patient.ayurvedaIntake.agni}. AI summary endorsed.`
+      ? `I have examined the patient. 10-point assessment confirms ${patient.ayurvedaIntake.mainConcern} with ${patient.ayurvedaIntake.prakriti} constitution and ${patient.ayurvedaIntake.agni}. AI summary endorsed.`
       : 'I have examined the patient. Symptoms and pulse (Nadi) confirm classical Sandhivata with localized Vata Prakopa. AI summary verified.'
   );
 

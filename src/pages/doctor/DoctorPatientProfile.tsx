@@ -1396,7 +1396,7 @@ export const DoctorPatientProfile: React.FC = () => {
                   </span>
                   <div className="flex items-center gap-2 flex-wrap pt-0.5">
                     <span className="px-2 py-0.5 rounded-lg bg-[#E4EFEC] text-[#146356] font-semibold text-[11px]">
-                      Prakriti: {patient.ayurvedaIntake.bodyBuild}
+                      Prakriti: {patient.ayurvedaIntake.prakriti}
                     </span>
                     <span className="px-2 py-0.5 rounded-lg bg-[#E4EFEC] text-[#146356] font-semibold text-[11px]">
                       Agni: {patient.ayurvedaIntake.agni}
@@ -1410,10 +1410,10 @@ export const DoctorPatientProfile: React.FC = () => {
                     5 & 6. Nidra (Sleep) & Vyayama (Activity)
                   </span>
                   <p className="text-[11px] text-slate-700">
-                    <strong>Nidra:</strong> {patient.ayurvedaIntake.sleepPattern}
+                    <strong>Nidra:</strong> {patient.ayurvedaIntake.nidra}
                   </p>
                   <p className="text-[11px] text-slate-700">
-                    <strong>Vyayama:</strong> {patient.ayurvedaIntake.activityLevel}
+                    <strong>Vyayama:</strong> {patient.ayurvedaIntake.vyayama}
                   </p>
                 </div>
 
@@ -1423,8 +1423,8 @@ export const DoctorPatientProfile: React.FC = () => {
                     7. Hetu (Diet & Lifestyle Triggers)
                   </span>
                   <div className="flex flex-wrap gap-1 pt-0.5">
-                    {patient.ayurvedaIntake.hetuTriggers && patient.ayurvedaIntake.hetuTriggers.length > 0 ? (
-                      patient.ayurvedaIntake.hetuTriggers.map((h, i) => (
+                    {patient.ayurvedaIntake.hetu && patient.ayurvedaIntake.hetu.length > 0 ? (
+                      patient.ayurvedaIntake.hetu.map((h: string, i: number) => (
                         <span key={i} className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-medium">
                           {h}
                         </span>
