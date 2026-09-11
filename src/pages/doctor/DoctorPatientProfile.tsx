@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
@@ -42,8 +43,9 @@ import { isAyurvedicRecord } from '../../utils/streamClassification';
 
 export const DoctorPatientProfile: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const { patients, activePatient, setActivePatientId, updatePatientClinicalSummary, showToast, currentUser } = useApp();
+  const { patients, activePatient, setActivePatientId, updatePatientClinicalSummary, updatePatientStatus, showToast, currentUser } = useApp();
 
   const paramPatientId = searchParams.get('id');
   const patient = patients.find(p => p.id === paramPatientId) || activePatient || patients[0];
@@ -209,13 +211,7 @@ export const DoctorPatientProfile: React.FC = () => {
               </button>
             )}
 
-            <button
-              onClick={() => navigate('/doctor/consultation')}
-              className="px-4 py-1.5 rounded-xl bg-[#146356] hover:bg-[#0F4A40] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <Stethoscope className="w-3.5 h-3.5" />
-              <span>Consultation & Rx</span>
-            </button>
+
           </div>
         </div>
 
@@ -683,8 +679,7 @@ export const DoctorPatientProfile: React.FC = () => {
                     <span className="text-[10px] font-bold uppercase text-slate-500">5. Sara (सार)</span>
                     <span className="text-[9px] font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded">Essence</span>
                   </div>
-                  <p className="font-bold text-[#0D2B3E] text-xs">Madhyama Sara (Asthi)</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Bone vulnerability, low joint lubrication</p>
+                  <p className="font-bold text-[#0D2B3E] text-xs">{patient.ayurvedaIntake?.sara || "Madhyama Sara (Asthi)"}</p>
                 </div>
 
                 {/* 6. Samhanana */}
@@ -693,8 +688,7 @@ export const DoctorPatientProfile: React.FC = () => {
                     <span className="text-[10px] font-bold uppercase text-slate-500">6. Samhanana (संहनन)</span>
                     <span className="text-[9px] font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded">Structure</span>
                   </div>
-                  <p className="font-bold text-[#0D2B3E] text-xs">Madhyama (मध्यम)</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Average structural symmetry & cohesion</p>
+                  <p className="font-bold text-[#0D2B3E] text-xs">{patient.ayurvedaIntake?.samhanana || "Madhyama (मध्यम)"}</p>
                 </div>
 
                 {/* 7. Pramana */}
@@ -703,8 +697,7 @@ export const DoctorPatientProfile: React.FC = () => {
                     <span className="text-[10px] font-bold uppercase text-slate-500">7. Pramana (प्रमाण)</span>
                     <span className="text-[9px] font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded">Body Build</span>
                   </div>
-                  <p className="font-bold text-[#0D2B3E] text-xs">Madhyama (BMI 24.6)</p>
-                  <p className="text-[10px] text-slate-500 leading-tight">Height & span proportional to circumference</p>
+                  <p className="font-bold text-[#0D2B3E] text-xs">{patient.ayurvedaIntake?.pramana || "Madhyama"}</p>
                 </div>
 
                 {/* 8. Satmya */}
@@ -1287,12 +1280,7 @@ export const DoctorPatientProfile: React.FC = () => {
               <h3 className="text-base font-bold text-brand-heading">Ayurvedic Formulation Timeline</h3>
               <p className="text-xs text-brand-muted">Active and completed herbal prescriptions</p>
             </div>
-            <button
-              onClick={() => navigate('/doctor/consultation')}
-              className="px-3.5 py-1.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft"
-            >
-              + Write New Prescription
-            </button>
+
           </div>
 
           {patient.prescriptions.length === 0 ? (
@@ -1813,18 +1801,19 @@ export const DoctorPatientProfile: React.FC = () => {
               if (isEditingSummary) {
                 handleSaveSummary();
               }
+              updatePatientStatus(patient.id, 'Completed'); // Or Completed
               showToast({
                 type: 'success',
-                title: 'Draft Accepted',
-                message: 'Clinical summary verified. Opening E-Prescription desk.'
+                title: t('consultationCompleted'),
+                message: 'Clinical summary verified. Patient notified to upload prescription.'
               });
-              navigate('/doctor/consultation');
+              // We should probably show a success state or just redirect to dashboard
+              navigate('/doctor');
             }}
             className="px-5 py-2 rounded-xl bg-[#146356] hover:bg-[#0F4A40] text-white text-xs font-bold shadow-md transition-all flex items-center gap-2"
           >
             <Check className="w-4 h-4" />
-            <span>Accept & Proceed to E-Prescription</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>{t('completeConsultation')}</span>
           </button>
         </div>
       </div>

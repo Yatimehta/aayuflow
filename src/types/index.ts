@@ -1,6 +1,6 @@
 export type UserRole = 'patient' | 'worker' | 'doctor' | 'admin' | 'lab' | 'guest';
 
-export type PatientStatus = 'Verified' | 'Pending' | 'Processing' | 'Rejected';
+export type PatientStatus = 'Verified' | 'Pending' | 'Processing' | 'Rejected' | 'Completed';
 
 export type CareSystem = 'AYURVEDA' | 'ALLOPATHY';
 
@@ -207,11 +207,22 @@ export interface AyurvedaIntakeData {
   };
   medications: {
     type: 'None' | 'Allopathic Medicines' | 'Ayurvedic Formulations' | 'Both';
-    details?: string;
+    details: string;
     docName?: string;
   };
   existingConditions: string[];
   priorReportName?: string;
+  
+  // New dynamic fields
+  vikriti?: string;
+  sara?: string;
+  samhanana?: string;
+  pramana?: string;
+  satmya?: string;
+  sattva?: string;
+  ahara_shakti?: string;
+  vaya?: string;
+  nidana?: string;
 }
 
 export interface IntakeChatMessage {

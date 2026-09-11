@@ -1,61 +1,77 @@
-export type LanguageCode = 'en' | 'hi';
-
-export interface TranslationDictionary {
-  [key: string]: {
-    en: string;
-    hi: string;
-  };
-}
-
-export const TRANSLATIONS: TranslationDictionary = {
-  // Stepper & Navigation
-  step1_title: { en: 'Select Hospital', hi: 'अस्पताल चुनें' },
-  step2_title: { en: 'Patient Registration', hi: 'रोगी पंजीकरण' },
-  step3_title: { en: 'OPD Token Slip', hi: 'ओपीडी टोकन पर्ची' },
-  step4_title: { en: 'Upload Records', hi: 'दस्तावेज़ अपलोड' },
-  step5_title: { en: 'Language Selection', hi: 'भाषा चयन' },
-  step6_title: { en: 'Chief Complaints', hi: 'मुख्य स्वास्थ्य समस्या' },
-  step7_title: { en: 'Clinical Questionnaire', hi: 'आयुष प्रश्नावली' },
-  step8_title: { en: 'Review & Submit', hi: 'समीक्षा और जमा करें' },
-  step9_title: { en: 'Token Confirmed', hi: 'टोकन जारी हुआ' },
-
-  // Buttons
-  btn_next: { en: 'Continue Next', hi: 'आगे बढ़ें' },
-  btn_back: { en: 'Back', hi: 'पीछे जाएं' },
-  btn_generate_token: { en: 'Generate OPD Token', hi: 'ओपीडी टोकन प्राप्त करें' },
-  btn_start_intake: { en: 'Start Conversational Intake', hi: 'संवाद आधारित जांच शुरू करें' },
-  btn_review: { en: 'Review All Responses', hi: 'सभी उत्तरों की समीक्षा करें' },
-  btn_submit_intake: { en: 'Submit Intake & Send to Doctor', hi: 'जांच जमा करें और डॉक्टर को भेजें' },
-  btn_copy_token: { en: 'Copy Token', hi: 'टोकन कॉपी करें' },
-  btn_print_slip: { en: 'Print Official Slip', hi: 'आधिकारिक पर्ची प्रिंट करें' },
-  btn_view_dashboard: { en: 'Go to Patient Dashboard', hi: 'रोगी डैशबोर्ड पर जाएं' },
-
-  // Step 2 Form
-  reg_header: { en: 'Patient Information & Demographics', hi: 'रोगी का विवरण एवं जनसांख्यिकी' },
-  reg_sub: { en: 'Enter ABHA number or mobile to pull existing ABDM records', hi: 'मौजूदा रिकॉर्ड लाने के लिए आभा आईडी या मोबाइल नंबर दर्ज करें' },
-  lbl_name: { en: 'Full Name', hi: 'पूरा नाम' },
-  lbl_age: { en: 'Age', hi: 'आयु' },
-  lbl_gender: { en: 'Gender', hi: 'लिंग' },
-  lbl_phone: { en: 'Mobile Number', hi: 'मोबाइल नंबर' },
-  lbl_abha: { en: 'ABHA ID / Address', hi: 'आभा आईडी / पता' },
-  lbl_complaint: { en: 'Primary Chief Complaint', hi: 'मुख्य स्वास्थ्य समस्या' },
-
-  // Step 6 Chat / Voice Intake
-  chat_header: { en: 'AI Conversational Clinical Intake', hi: 'एआई संवादात्मक आयुष केस-टेकिंग' },
-  chat_sub: { en: 'Explain your health issues in your own voice or words', hi: 'अपनी भाषा में बोलकर या लिखकर अपनी स्वास्थ्य समस्याएं बताएं' },
-  chat_placeholder: { en: 'Speak or type symptoms (e.g. घुटनों में दर्द, खट्टी डकारें)...', hi: 'अपनी समस्या बोलें या लिखें (जैसे घुटनों में दर्द, पेट में जलन)...' },
-  chat_mic_prompt: { en: 'Tap mic to speak symptoms in Hindi or English', hi: 'हिंदी या अंग्रेजी में बोलने के लिए माइक दबाएं' },
-
-  // Step 7 Questionnaire
-  quest_header: { en: 'Deterministic AYUSH Clinical Questionnaire', hi: 'प्रामाणिक आयुष नैदानिक प्रश्नावली' },
-  quest_sub: { en: 'Assessment of Prakriti, Agni (digestive fire), and Koshtha (bowel)', hi: 'प्रकृति, अग्नि (पाचन शक्ति), और कोष्ठ (पेट) की प्रामाणिक जांच' },
-
-  // Step 8 Review
-  review_header: { en: 'Pre-Consultation Clinical Intake Review', hi: 'डॉक्टर परामर्श पूर्व केस समीक्षा' },
-  review_sub: { en: 'Verify your recorded symptoms before sending to the physician OPD queue', hi: 'डॉक्टर के पास भेजने से पहले दर्ज किए गए लक्षणों की पुष्टि करें' }
+export const FORM_STRINGS: Record<string, any> = {
+  "en": {
+    "weight_label": "Weight (in kg) *",
+    "weight_q": "Question 1: Please enter your weight in kilograms.",
+    "age_label": "Age *",
+    "age_q": "Question 2: Please enter your age in completed years.",
+    "blood_group_label": "Blood Group",
+    "blood_group_q": "Question 3: Please select your blood group.",
+    "symptoms_label": "Symptoms & Discomfort *",
+    "symptoms_q": "Question 4: Please describe your symptoms and bodily discomfort in your own words.",
+    "symptoms_placeholder": "E.g., I have been having severe headache...",
+    "symptoms_listening": "Listening... Speak now",
+    "duration_label": "Duration *",
+    "duration_q": "Question 5: When did your health problem start? Please select one option.",
+    "severity_label": "Severity *",
+    "severity_q": "Question 6: How severe is your condition? Please select Mild, Moderate, or Severe.",
+    "severity_mild": "Mild",
+    "severity_moderate": "Moderate",
+    "severity_severe": "Severe",
+    "btn_submit": "Complete & Submit Profile",
+    "title": "Allopathic Intake",
+    "processing": "Processing...",
+    "symptomsPlaceholder": "E.g., I have been having severe headache...",
+    "intakeComplete": "Intake Complete",
+    "voice_dictate": "Voice Dictate",
+    "read_aloud": "Read this aloud"
+  },
+  "hi": {
+    "weight_label": "वजन (किलो में) *",
+    "weight_q": "प्रश्न 1: कृपया अपना वजन किलोग्राम में दर्ज करें।",
+    "age_label": "आयु *",
+    "age_q": "प्रश्न 2: कृपया अपनी आयु दर्ज करें।",
+    "blood_group_label": "रक्त समूह",
+    "blood_group_q": "प्रश्न 3: कृपया अपना रक्त समूह चुनें।",
+    "symptoms_label": "लक्षण और परेशानी *",
+    "symptoms_q": "प्रश्न 4: कृपया अपने लक्षणों और शारीरिक परेशानी का वर्णन अपने शब्दों में करें।",
+    "symptoms_placeholder": "उदाहरण: मुझे तेज सिरदर्द हो रहा है...",
+    "symptoms_listening": "सुन रहा हूँ... अब बोलें",
+    "duration_label": "अवधि *",
+    "duration_q": "प्रश्न 5: आपकी स्वास्थ्य समस्या कब शुरू हुई? कृपया एक विकल्प चुनें।",
+    "severity_label": "गंभीरता *",
+    "severity_q": "प्रश्न 6: आपकी स्थिति कितनी गंभीर है? कृपया हल्का, मध्यम, या गंभीर चुनें।",
+    "severity_mild": "हल्का",
+    "severity_moderate": "मध्यम",
+    "severity_severe": "गंभीर",
+    "btn_submit": "प्रोफ़ाइल पूर्ण और सबमिट करें",
+    "title": "एलोपैथिक प्रवेश",
+    "processing": "प्रसंस्करण...",
+    "symptomsPlaceholder": "उदाहरण: मुझे तेज सिरदर्द हो रहा है...",
+    "intakeComplete": "प्रवेश पूरा हुआ",
+    "voice_dictate": "बोलकर दर्ज करें",
+    "read_aloud": "इसे जोर से पढ़ें"
+  }
 };
 
-export const getTranslation = (key: string, lang: string = 'en'): string => {
-  const normLang = lang.toLowerCase().startsWith('hi') ? 'hi' : 'en';
-  return TRANSLATIONS[key]?.[normLang] || TRANSLATIONS[key]?.en || key;
+export const t = (key: string, lang: string): string => {
+  const languageData = FORM_STRINGS[lang] || FORM_STRINGS["en"];
+  return languageData[key] || FORM_STRINGS["en"][key] || key;
 };
+
+// Add Ayurveda Titles
+FORM_STRINGS['en']['ayurveda_title'] = 'Ayurvedic Intake';
+FORM_STRINGS['hi']['ayurveda_title'] = 'आयुर्वेदिक प्रवेश';
+if (!FORM_STRINGS['mr']) FORM_STRINGS['mr'] = {};
+FORM_STRINGS['mr']['title'] = 'अॅलोपॅथिक प्रवेश';
+FORM_STRINGS['mr']['processing'] = 'प्रक्रिया करत आहे...';
+FORM_STRINGS['mr']['symptomsPlaceholder'] = 'उदा., मला तीव्र डोकेदुखी होत आहे...';
+FORM_STRINGS['mr']['intakeComplete'] = 'प्रवेश पूर्ण झाला';
+
+FORM_STRINGS['mr']['ayurveda_title'] = 'आयुर्वेदिक प्रवेश';
+
+if (!FORM_STRINGS['ml']) FORM_STRINGS['ml'] = {};
+FORM_STRINGS['ml']['title'] = 'അലോപ്പതി ഇൻടേക്ക്';
+FORM_STRINGS['ml']['ayurveda_title'] = 'ആയുർവേദ ഇൻടേക്ക്';
+FORM_STRINGS['ml']['processing'] = 'പ്രോസസ്സ് ചെയ്യുന്നു...';
+FORM_STRINGS['ml']['symptomsPlaceholder'] = 'ഉദാഹരണത്തിന്, എനിക്ക് കഠിനമായ തലവേദന ഉണ്ട്...';
+FORM_STRINGS['ml']['intakeComplete'] = 'ഇൻടേക്ക് പൂർത്തിയായി';

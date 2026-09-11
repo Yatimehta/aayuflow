@@ -15,9 +15,11 @@ import { isAyurvedicRecord, isAllopathicRecord } from '../utils/streamClassifica
 
 interface PatientTableProps {
   patients: Patient[];
+  onNewPatient?: () => void;
+  title?: string;
+  subtitle?: string;
   onSelectPatient: (patient: Patient) => void;
   onStartConsultation?: (patient: Patient) => void;
-  title?: string;
 }
 
 export const PatientTable: React.FC<PatientTableProps> = ({
@@ -119,7 +121,7 @@ export const PatientTable: React.FC<PatientTableProps> = ({
     );
     const hasCrossSystemIntake =
       patient.ayurvedaIntake?.medications?.type === 'Both' ||
-      patient.ayurvedaIntake?.medications?.type === 'Allopathic';
+      patient.ayurvedaIntake?.medications?.type === 'Allopathic Medicines';
 
     if (hasInteraction || hasCrossSystemIntake) {
       flags.push({ label: '⚠️ Interaction Flag', type: 'interaction' });

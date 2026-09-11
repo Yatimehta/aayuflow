@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Stethoscope, ShieldCheck, Database, Save } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { Hospital as HospitalIcon } from 'lucide-react';
 
 export const DoctorSettings: React.FC = () => {
-  const { showToast } = useApp();
+  const { showToast, hospitals, selectedHospital, setSelectedHospital } = useApp();
   const [defaultDuration, setDefaultDuration] = useState('30 Days');
   const [autoSnomed, setAutoSnomed] = useState(true);
   const [abdmDirectSync, setAbdmDirectSync] = useState(true);
@@ -59,6 +60,27 @@ export const DoctorSettings: React.FC = () => {
               onChange={(e) => setAbdmDirectSync(e.target.checked)}
               className="w-4 h-4 accent-brand-teal"
             />
+          </div>
+
+
+          <div className="p-3 rounded-2xl bg-brand-bg border border-brand-border space-y-1.5">
+            <div className="flex items-center gap-2 mb-2">
+              <HospitalIcon className="w-4 h-4 text-brand-teal-dark" />
+              <label className="block font-bold text-brand-heading">Active Hospital Assignment</label>
+            </div>
+            <select
+              value={selectedHospital.id}
+              onChange={(e) => {
+                const h = hospitals.find(hosp => hosp.id === e.target.value);
+                if (h) setSelectedHospital(h);
+              }}
+              className="w-full px-3 py-2 rounded-xl border border-brand-border bg-white text-brand-heading font-medium"
+            >
+              {hospitals.map((hosp) => (
+                <option key={hosp.id} value={hosp.id}>{hosp.name} - {hosp.city}</option>
+              ))}
+            </select>
+            <p className="text-[10px] text-brand-muted mt-1">This determines which patient queue you see on the dashboard.</p>
           </div>
 
           <div className="p-3 rounded-2xl bg-brand-bg border border-brand-border space-y-1.5">

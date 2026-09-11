@@ -20,7 +20,7 @@ import { useApp } from '../../context/AppContext';
 
 export const PatientRegistration: React.FC = () => {
   const navigate = useNavigate();
-  const { activePatient, patients, selectedHospital, currentUser, showToast } = useApp();
+  const { activePatient, patients, selectedHospital, currentUser, showToast, setActivePatientId, addPatient } = useApp();
 
   const patient = activePatient || patients[0];
 
@@ -36,7 +36,38 @@ export const PatientRegistration: React.FC = () => {
     doctor: 'Dr. Alok Verma, MD (Ayu)'
   });
 
-  const handleConfirmAndProceed = () => {
+  const handleConfirmAndProceed = async () => {
+    try {
+      const { patientApi } = await import('../../api/endpoints');
+      const res = await patientApi.createPatient({
+        name: formData.name,
+        gender: formData.gender,
+        age: parseInt(formData.age) || 30,
+        phone_number: formData.phone,
+        abha_number: formData.abhaId,
+        hospital_id: selectedHospital.id
+      });
+      
+      const realId = res.id.toString();
+      addPatient({
+        id: realId,
+        name: formData.name,
+        age: parseInt(formData.age) || 30,
+        gender: formData.gender,
+        phone: formData.phone,
+        abhaId: formData.abhaId,
+        bloodGroup: 'Unknown',
+        address: '',
+        registrationDate: new Date().toISOString().split('T')[0],
+        status: 'Verified',
+        queueNumber: 99
+      });
+      setActivePatientId(realId);
+      
+    } catch (err) {
+      console.error(err);
+    }
+
     showToast({
       type: 'success',
       title: 'Registration Confirmed',

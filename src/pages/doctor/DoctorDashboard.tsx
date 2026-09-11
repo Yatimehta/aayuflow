@@ -11,9 +11,11 @@ import { StatCard } from '../../components/StatCard';
 import { PatientTable } from '../../components/PatientTable';
 import { DoctorOtpModal } from '../../components/DoctorOtpModal';
 import { Patient } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 export const DoctorDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { 
     patients, 
     selectedHospital, 
@@ -60,7 +62,7 @@ export const DoctorDashboard: React.FC = () => {
           compact
         />
         <StatCard
-          title="Completed Today"
+          title="{t('completedToday')}"
           value={`${completedPatients.length || 3} Patients`}
           icon={CheckCircle2}
           variant="mint"

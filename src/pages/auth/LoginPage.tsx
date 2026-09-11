@@ -101,39 +101,64 @@ export const LoginPage: React.FC = () => {
   const RoleIcon = meta.icon;
 
   /* ── Auth handlers (logic unchanged from UniversalLogin) ── */
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const { authApi } = await import('../../api/endpoints');
+      const res = await authApi.login({
+        identifier: loginIdentifier,
+        password: loginPassword,
+        role: activeTab === 'worker' ? 'AYUSH_WORKER' : activeTab.toUpperCase()
+      });
+      localStorage.setItem('auth_token', res.access_token);
+
       if (activeTab === 'patient') {
         const cleanId = loginIdentifier.replace(/\s+/g, '');
-        let matched = patients.find(p =>
-          (p.abhaId && p.abhaId.includes(cleanId)) ||
-          p.phone.includes(cleanId) ||
-          p.tokenNumber.toLowerCase() === cleanId.toLowerCase()
-        );
+        let matched = patients.find(p => p.phone.includes(cleanId) || (p.abhaId && p.abhaId.includes(cleanId)));
         if (!matched) matched = patients[0];
+        
+        // --- PROTOTYPE HACK: Sync mock patient to backend to get real integer ID ---
+        try {
+          const { patientApi } = await import('../../api/endpoints');
+          const pRes = await patientApi.createPatient({
+            name: matched.name,
+            gender: matched.gender || 'Other',
+            age: matched.age || 30,
+            phone_number: matched.phone || '9999999999',
+            abha_number: matched.abhaId || '',
+            hospital_id: selectedHospital.id
+          });
+          matched = { ...matched, id: pRes.id.toString() };
+        } catch (err) {
+          console.warn("Failed to sync mock patient to backend, using fallback 1", err);
+          matched = { ...matched, id: '1' };
+        }
+        // -------------------------------------------------------------------------
+        
         loginAsPatient(matched);
         showToast({ type: 'success', title: 'Welcome Back', message: `Signed in as ${matched.name}.` });
         navigate('/patient/dashboard');
+
       } else {
         const demo = demoProfiles[activeTab];
         loginAsStaff(activeTab, demo.title, selectedHospital.name);
         showToast({ type: 'success', title: 'Authentication Successful', message: `Signed in as ${demo.title}.` });
         navigate(demo.dest);
       }
-    }, 600);
+    } catch (error) {
+      console.error(error);
+      showToast({ type: 'error', title: 'Login Failed', message: 'Invalid credentials' });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleQuickDemoFill = () => {
-    const demo = demoProfiles[activeTab];
-    setLoginIdentifier(demo.identifier);
-    setLoginPassword(demo.pass);
-    showToast({ type: 'info', title: 'Demo Credentials Loaded', message: `Populated demo profile for ${demo.title}.` });
+    const handleQuickDemoFill = () => {
+    setLoginIdentifier(demoProfiles[activeTab].identifier);
+    setLoginPassword(demoProfiles[activeTab].pass);
   };
-
-  return (
+return (
     <div
       className="min-h-screen flex flex-col md:flex-row relative overflow-hidden"
       style={{
@@ -311,6 +336,16 @@ export const LoginPage: React.FC = () => {
             className="text-teal-600 font-semibold hover:underline"
           >
             Try demo account →
+          </button>
+        </div>
+        <div className="pt-3 border-t border-slate-200/80 mt-3 text-center text-xs text-slate-500">
+          <span>Need to register a new account? </span>
+          <button
+            type="button"
+            onClick={() => navigate('/login-full')}
+            className="text-teal-600 font-semibold hover:underline"
+          >
+            Sign up here
           </button>
         </div>
       </div>

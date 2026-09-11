@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Hospital, Patient, UserRole, PatientStatus, StaffMember, AuditLog, AdminStats, EvidenceReport, CareSystem, Consultation, DocumentItem, Doctor, DoctorDiscipline } from '../types';
 import { MOCK_HOSPITALS, MOCK_PATIENTS, MOCK_STAFF, MOCK_AUDIT_LOGS, MOCK_ADMIN_STATS, MOCK_CONSULTATIONS, MOCK_DOCTORS } from '../data/mockData';
@@ -69,6 +70,8 @@ interface AppContextType {
   consultations: Consultation[];
   attachLabReport: (consultationId: string, doc: DocumentItem) => void;
   updatePatientStatus: (patientId: string, status: PatientStatus, notes?: string) => void;
+
+  updatePatientIntake: (patientId: string, pathway: string, responses: Record<string, string | string[]>) => void;
   updatePatientClinicalSummary: (patientId: string, summary: Partial<Patient['clinicalSummary']>) => void;
   addPrescriptionToPatient: (patientId: string, prescription: any) => void;
   staff: StaffMember[];
@@ -764,6 +767,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+
+  const updatePatientIntake = (patientId: string, pathway: string, responses: Record<string, string | string[]>) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        if (pathway === 'ayurveda') {
+          return {
+            ...p,
+                        ayurvedaIntake: {
+              mainConcern: (responses['chief_complaint'] as string) || '',
+              affectedRegion: 'N/A', // fallback
+              prakriti: (responses['prakriti'] as string) || '',
+              agni: (responses['ahara_shakti'] as string) || '',
+              nidra: 'N/A',
+              vyayama: (responses['vyayama'] as string) || '',
+              hetu: typeof responses['nidana'] === 'string' ? [responses['nidana']] : [],
+              doshaBaseline: { vata: [], pitta: [], kapha: [] },
+              medications: { type: 'None', details: '' },
+              existingConditions: [],
+              vikriti: (responses['vikriti'] as string) || '',
+              sara: (responses['sara'] as string) || '',
+              samhanana: (responses['samhanana'] as string) || '',
+              pramana: (responses['pramana'] as string) || '',
+              satmya: (responses['satmya'] as string) || '',
+              sattva: (responses['sattva'] as string) || '',
+              ahara_shakti: (responses['ahara_shakti'] as string) || '',
+              vaya: (responses['vaya'] as string) || '',
+              nidana: (responses['nidana'] as string) || '',
+            } as any
+          };
+        } else {
+          return {
+            ...p,
+            // You can map allopathy responses to clinical summary or a specific field
+            clinicalSummary: {
+              ...p.clinicalSummary,
+              chiefComplaint: (responses['chief_complaint'] as string) || '',
+              symptoms: typeof responses['associated_symptoms'] === 'string' ? responses['associated_symptoms'].split(',') : [],
+            }
+          };
+        }
+      }
+      return p;
+    }));
+  };
+
   const updatePatientClinicalSummary = (patientId: string, summaryUpdate: Partial<Patient['clinicalSummary']>) => {
     setPatients(prev => prev.map(p => {
       if (p.id === patientId) {
@@ -844,6 +892,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         consultations,
         attachLabReport,
         updatePatientStatus,
+
+        updatePatientIntake,
         updatePatientClinicalSummary,
         addPrescriptionToPatient,
         staff,

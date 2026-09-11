@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -61,6 +62,7 @@ export const Navbar: React.FC = () => {
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showHospitalDropdown, setShowHospitalDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const { t } = useTranslation();
 
   const getInitials = (name?: string) => {
     if (!name) return 'AY';
@@ -160,8 +162,8 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* 3. Hospital Selector Pill for Staff/Doctor (kept left of spacer) */}
-          {!isPatient && (
+          {/* 3. Hospital Selector Pill for Staff/Worker (kept left of spacer) */}
+          {(!isPatient && !isDoctor) && (
             <div className="hidden lg:block">
               {hospitalPill}
             </div>
@@ -493,6 +495,7 @@ export const Navbar: React.FC = () => {
 
                           {/* Switch Facility & Logout */}
                           <div className="border-t border-[#DCEAE7] p-2 space-y-1 bg-[#F4FBF9]/60">
+                            {!isDoctor && (
                             <button
                               type="button"
                               onClick={() => {
@@ -502,8 +505,9 @@ export const Navbar: React.FC = () => {
                               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#E4EFEC] transition-colors text-left"
                             >
                               <HospitalIcon className="w-4 h-4 text-[#146356]" />
-                              <span>Switch Facility</span>
+                              <span>{t('switchFacility')}</span>
                             </button>
+                            )}
 
                             <button
                               type="button"
@@ -571,7 +575,7 @@ export const Navbar: React.FC = () => {
                               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
                             >
                               <Settings className="w-4 h-4 text-[#8FA3A0]" />
-                              <span>Facility Settings</span>
+                              <span>{t('facilitySettings')}</span>
                             </button>
                           </div>
 

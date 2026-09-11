@@ -11,12 +11,25 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useState, useEffect } from 'react';
+import { Modal } from '../../components/Modal';
+import { useTranslation } from 'react-i18next';
 
 export const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { activePatient, patients, selectedHospital } = useApp();
+  const { t } = useTranslation();
 
   const patient = activePatient || patients[0];
+  
+  const [showUploadReminder, setShowUploadReminder] = useState(false);
+  
+  useEffect(() => {
+    if (patient?.status === 'Completed' && !patient.prescriptionUploadRequested) {
+        setShowUploadReminder(true);
+    }
+  }, [patient]);
+
 
   return (
     <div className="min-h-[85vh] py-16 px-4 sm:px-6 flex items-center justify-center relative z-10">
@@ -27,7 +40,7 @@ export const PatientDashboard: React.FC = () => {
 
 
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
-            Namaste, {patient?.name?.split(' ')[0] || 'Patient'}
+            {t('greeting', { name: patient?.name?.split(' ')[0] || 'Patient' })}
           </h1>
           
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -126,6 +139,43 @@ export const PatientDashboard: React.FC = () => {
         )}
 
       </div>
+
+      {/* Upload Prescription Reminder Modal */}
+      {showUploadReminder && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-center mb-2">
+              <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
+                <Upload className="w-6 h-6" />
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <h3 className="font-bold text-slate-900 text-lg">{t('consultationCompleted')}</h3>
+              <p className="text-sm text-slate-500">
+                {t('pleaseUpload')}
+              </p>
+            </div>
+            <div className="pt-4 space-y-2">
+              <button
+                onClick={() => {
+                  setShowUploadReminder(false);
+                  navigate('/patient/upload');
+                }}
+                className="w-full py-2.5 rounded-xl bg-teal-600 text-white font-bold shadow-sm hover:bg-teal-700 transition-colors"
+              >
+                Upload Prescription
+              </button>
+              <button
+                onClick={() => setShowUploadReminder(false)}
+                className="w-full py-2.5 rounded-xl text-slate-500 font-semibold hover:bg-slate-50 transition-colors"
+              >
+                Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+

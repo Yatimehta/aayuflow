@@ -1,3 +1,4 @@
+import { t } from '../../utils/translations';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -40,7 +41,7 @@ import {
   INITIAL_CHAT_MESSAGES 
 } from '../../data/mockData';
 import { DocumentItem, IntakeChatMessage, Patient, CareSystem } from '../../types';
-import { getTranslation } from '../../utils/translations';
+
 
 export const PatientPortal: React.FC = () => {
   const navigate = useNavigate();
@@ -126,16 +127,16 @@ export const PatientPortal: React.FC = () => {
 
   const isHindi = selectedLang === 'hi';
   const stepsList = [
-    { id: 1, title: getTranslation('step1_title', selectedLang), shortTitle: isHindi ? 'अस्पताल' : 'Hospital' },
-    { id: 2, title: getTranslation('step2_title', selectedLang), shortTitle: isHindi ? 'रजिस्ट्रेशन' : 'Details' },
-    { id: 3, title: getTranslation('step3_title', selectedLang), shortTitle: isHindi ? 'टोकन' : 'Token' },
+    { id: 1, title: t('step1_title', selectedLang), shortTitle: isHindi ? 'अस्पताल' : 'Hospital' },
+    { id: 2, title: t('step2_title', selectedLang), shortTitle: isHindi ? 'रजिस्ट्रेशन' : 'Details' },
+    { id: 3, title: t('step3_title', selectedLang), shortTitle: isHindi ? 'टोकन' : 'Token' },
     { id: 4, title: 'Care Stream', shortTitle: isHindi ? 'चिकित्सा' : 'Stream' },
-    { id: 5, title: getTranslation('step5_title', selectedLang), shortTitle: isHindi ? 'भाषा' : 'Language' },
-    { id: 6, title: getTranslation('step4_title', selectedLang), shortTitle: isHindi ? 'दस्तावेज़' : 'Docs' },
-    { id: 7, title: getTranslation('step6_title', selectedLang), shortTitle: isHindi ? 'शिकायत' : 'Voice' },
-    { id: 8, title: getTranslation('step7_title', selectedLang), shortTitle: isHindi ? 'प्रश्नावली' : 'Form' },
-    { id: 9, title: getTranslation('step8_title', selectedLang), shortTitle: isHindi ? 'समीक्षा' : 'Review' },
-    { id: 10, title: getTranslation('step9_title', selectedLang), shortTitle: isHindi ? 'जारी' : 'Ready' }
+    { id: 5, title: t('step5_title', selectedLang), shortTitle: isHindi ? 'भाषा' : 'Language' },
+    { id: 6, title: t('step4_title', selectedLang), shortTitle: isHindi ? 'दस्तावेज़' : 'Docs' },
+    { id: 7, title: t('step6_title', selectedLang), shortTitle: isHindi ? 'शिकायत' : 'Voice' },
+    { id: 8, title: t('step7_title', selectedLang), shortTitle: isHindi ? 'प्रश्नावली' : 'Form' },
+    { id: 9, title: t('step8_title', selectedLang), shortTitle: isHindi ? 'समीक्षा' : 'Review' },
+    { id: 10, title: t('step9_title', selectedLang), shortTitle: isHindi ? 'जारी' : 'Ready' }
   ];
 
   // Voice simulation logic

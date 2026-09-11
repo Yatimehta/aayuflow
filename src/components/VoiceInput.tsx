@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { intakeApi } from "../api/endpoints";
 import { Mic, MicOff, Type, Volume2, Sparkles, Check, RefreshCw, X } from 'lucide-react';
 
 export interface VoiceInputProps {
@@ -10,19 +12,16 @@ export interface VoiceInputProps {
   language?: string;
   className?: string;
   rows?: number;
+  disabled?: boolean;
+  onResult?: (transcript: string) => void;
 }
 
-const DEFAULT_SAMPLE_PHRASES = [
-  'घुटनों में सुबह बहुत तेज़ दर्द और अकड़न रहती है',
-  'Severe acidity and retrosternal burning sensation after meals',
-  'पिछले 2 हफ्ते से लगातार सूखी खांसी और छाती में जकड़न है',
-  'Frequent urination at night with weakness and fatigue'
-];
+const DEFAULT_SAMPLE_PHRASES: string[] = [];
 
 export const VoiceInput: React.FC<VoiceInputProps> = ({
   value,
   onChange,
-  placeholder = 'Describe symptoms or observations...',
+  placeholder = '...',
   label,
   samplePhrases = DEFAULT_SAMPLE_PHRASES,
   language = 'Hindi / English',
@@ -33,6 +32,11 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [interimTranscript, setInterimTranscript] = useState('');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const { t } = useTranslation();
   const timerRef = useRef<any>(null);
   const streamIntervalRef = useRef<any>(null);
 
@@ -52,52 +56,51 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
   }, [isRecording]);
 
   // Simulated progressive speech recognition streaming
-  const startRecording = () => {
-    setIsRecording(true);
-    setInterimTranscript('');
+  
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
 
-    // Pick an appropriate sample phrase to stream
-    const chosenPhrase = samplePhrases[Math.floor(Math.random() * samplePhrases.length)];
-    const words = chosenPhrase.split(' ');
-    let wordIndex = 0;
-
-    // Delay start of speech recognition slightly
-    const startDelay = setTimeout(() => {
-      streamIntervalRef.current = setInterval(() => {
-        if (wordIndex < words.length) {
-          wordIndex++;
-          const currentWords = words.slice(0, wordIndex).join(' ');
-          setInterimTranscript(currentWords);
-        } else {
-          // Finished speaking
-          if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
-          setTimeout(() => {
-            setIsRecording(false);
-            const newValue = value ? `${value} ${chosenPhrase}` : chosenPhrase;
-            onChange(newValue);
-            setInterimTranscript('');
-          }, 600);
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
         }
-      }, 350);
-    }, 700);
+      };
 
-    return () => {
-      clearTimeout(startDelay);
-      if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
-    };
-  };
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setIsProcessing(true);
+        try {
+          const res = await intakeApi.transcribeAudio(audioBlob, language);
+          const transcript = res.text;
+          onChange(transcript);
+        } catch (e) {
+          console.error("Transcription failed", e);
+        } finally {
+          setIsProcessing(false);
+        }
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
 
-  const stopRecording = () => {
-    if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
-    setIsRecording(false);
-    if (interimTranscript) {
-      const newValue = value ? `${value} ${interimTranscript}` : interimTranscript;
-      onChange(newValue);
-      setInterimTranscript('');
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Microphone access denied", err);
     }
   };
 
-  const toggleRecording = () => {
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+const toggleRecording = () => {
     if (isRecording) {
       stopRecording();
     } else {
@@ -174,7 +177,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-brand-heading">
-                    {isRecording ? 'Listening in Hindi & Regional dialects...' : 'Tap mic to speak symptoms'}
+                    {isRecording ? t('listening', { defaultValue: 'Listening...' }) : t('tapMicToSpeak', { defaultValue: 'Tap mic to speak' })}
                   </span>
                   {isRecording && (
                     <span className="font-mono text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
@@ -205,7 +208,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
                   </div>
                 ) : (
                   <p className="text-[11px] text-brand-muted">
-                    Supports Hindi, Marathi, Bengali, Tamil, Telugu, and Indian English
+                    {t('supportedLanguagesInfo', { defaultValue: 'Voice supported for your language' })}
                   </p>
                 )}
               </div>
@@ -247,25 +250,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
             )}
           </div>
 
-          {/* Quick Clickable Suggestions */}
-          <div className="space-y-1.5 pt-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-muted flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-brand-teal" />
-              <span>Or click a sample complaint to test:</span>
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {samplePhrases.slice(0, 3).map((phrase, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => onChange(phrase)}
-                  className="text-[11px] text-brand-body text-left px-2.5 py-1 rounded-lg bg-white border border-brand-border hover:border-brand-teal/50 hover:bg-brand-teal-light/20 transition-all line-clamp-1"
-                >
-                  "{phrase}"
-                </button>
-              ))}
-            </div>
-          </div>
+          
         </div>
       ) : (
         /* Manual Keyboard Mode */
@@ -277,20 +262,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
             placeholder={placeholder}
             className="w-full px-3.5 py-2.5 text-xs rounded-2xl border border-brand-border bg-white text-brand-heading placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-teal/40 transition-all leading-relaxed shadow-soft"
           />
-          {/* Quick Suggestions below Textarea */}
-          <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-[10px] font-semibold text-brand-muted">Quick insert:</span>
-            {samplePhrases.slice(0, 2).map((phrase, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => onChange(value ? `${value} ${phrase}` : phrase)}
-                className="text-[10px] text-brand-muted hover:text-brand-heading px-2 py-0.5 rounded-md bg-brand-bg border border-brand-border transition-colors"
-              >
-                + "{phrase.substring(0, 32)}..."
-              </button>
-            ))}
-          </div>
+          
         </div>
       )}
     </div>
