@@ -53,13 +53,13 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const isAuthScreen = AUTH_PATHS.includes(location.pathname);
   return (
-    <div className="min-h-screen bg-cly-gradient text-slate-800 flex flex-col font-sans relative overflow-x-hidden selection:bg-teal-500 selection:text-white">
+    <div className="min-h-screen bg-[#F4FBF9] text-[#0D2B3E] flex flex-col font-sans relative overflow-x-hidden selection:bg-[#146356] selection:text-white">
       {!isAuthScreen && (
         <>
           {/* Subtle faint ambient DNA/geometric line texture in background (~8% opacity) */}
-          <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-25">
+          <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-10">
             <svg
-              className="absolute -bottom-24 -left-24 w-[650px] h-[650px] text-white stroke-current"
+              className="absolute -bottom-24 -left-24 w-[650px] h-[650px] stroke-[#146356]"
               fill="none"
               viewBox="0 0 400 400"
             >
@@ -69,7 +69,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <path d="M50 200 Q125 300 200 200 T350 200" strokeWidth="1.2" />
             </svg>
             <svg
-              className="absolute -top-32 -right-32 w-[750px] h-[750px] text-white stroke-current"
+              className="absolute -top-32 -right-32 w-[750px] h-[750px] stroke-[#146356]"
               fill="none"
               viewBox="0 0 500 500"
             >

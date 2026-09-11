@@ -64,19 +64,19 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60 shadow-xs transition-all">
+    <header className="sticky top-0 z-40 bg-white border-b border-[#DCEAE7] shadow-sm transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
           {/* Logo & Brand */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-teal-400 flex items-center justify-center shadow-md text-white transition-transform hover:scale-105">
+            <div className="w-10 h-10 rounded-xl bg-[#146356] flex items-center justify-center shadow-md text-white transition-transform hover:scale-105">
               <Sprout className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-bold tracking-tight text-slate-900">Ayu<span className="text-teal-600">Flow</span></span>
-                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+                <span className="text-xl font-bold tracking-tight text-[#0D2B3E]">Ayu<span className="text-[#146356]">Flow</span></span>
+                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#E4EFEC] text-[#146356] border border-[#9FDCD1]">
                   AYUSH AI
                 </span>
               </div>
@@ -282,7 +282,7 @@ export const Navbar: React.FC = () => {
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-teal-dark text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#146356] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                     {unreadCount}
                   </span>
                 )}
@@ -338,14 +338,14 @@ export const Navbar: React.FC = () => {
                     className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white text-left transition-all shadow-xs"
                     title="User Profile & Settings"
                   >
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-500 to-teal-400 flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0">
                       {getInitials(currentUser.name)}
                     </div>
                     <div className="hidden sm:block text-left">
                       <p className="text-xs font-bold text-slate-800 leading-tight truncate max-w-[100px]">
                         {currentUser?.name ? currentUser.name.split(' ')[0] : 'User'}
                       </p>
-                      <p className="text-[10px] text-teal-700 font-extrabold uppercase leading-tight tracking-wider">
+                      <p className="text-[10px] text-[#146356] font-extrabold uppercase leading-tight tracking-wider">
                         {currentRole}
                       </p>
                     </div>
@@ -356,13 +356,13 @@ export const Navbar: React.FC = () => {
                     <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-soft-lg border border-slate-200/80 py-2 z-50 animate-in fade-in zoom-in-95">
                       <div className="px-4 py-3 border-b border-slate-100">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-teal-400 flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0">
+                          <div className="w-9 h-9 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0">
                             {getInitials(currentUser.name)}
                           </div>
                           <div className="overflow-hidden">
                             <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-teal-50 text-teal-700 font-bold uppercase tracking-wider border border-teal-200">
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#E4EFEC] text-[#146356] font-bold uppercase tracking-wider border border-[#9FDCD1]">
                                 {currentRole}
                               </span>
                               {currentUser.abhaId && (

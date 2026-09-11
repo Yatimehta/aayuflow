@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
       )}
 
       <aside
-        className={`fixed lg:static top-16 bottom-0 left-0 z-40 w-64 bg-white/75 backdrop-blur-2xl border-r border-white/50 shadow-sm flex flex-col justify-between transition-transform duration-200 ease-in-out ${
+        className={`fixed lg:static top-16 bottom-0 left-0 z-40 w-64 bg-white border-r border-[#DCEAE7] shadow-sm flex flex-col justify-between transition-transform duration-200 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -96,15 +96,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
           <div className="p-3 rounded-xl bg-brand-bg border border-brand-border">
             <div className="flex items-center gap-2 text-xs font-semibold text-brand-heading">
               <Hospital className="w-3.5 h-3.5 text-brand-teal-dark flex-shrink-0" />
-              <span className="truncate">{selectedHospital.name}</span>
+              <span className="truncate text-[#0D2B3E]">{selectedHospital.name}</span>
             </div>
-            <div className="mt-1 flex items-center justify-between text-[11px] text-brand-muted">
+            <div className="mt-1 flex items-center justify-between text-[11px] text-[#4A5D63]">
               <span>
                 {role === 'worker' 
                   ? 'Desk: AYUSH-A1' 
                   : (currentUser?.discipline === 'Allopathy' ? 'OPD: General Med' : 'OPD: Kayachikitsa')}
               </span>
-              <span className="text-brand-teal-dark font-medium">{selectedHospital.currentWaitMinutes}m wait</span>
+              <span className="text-[#146356] font-medium">{selectedHospital.currentWaitMinutes}m wait</span>
             </div>
           </div>
 
@@ -124,8 +124,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
                       isActive
-                        ? 'bg-brand-teal text-white shadow-soft font-semibold'
-                        : 'text-brand-heading hover:bg-brand-teal-light/60 hover:text-brand-teal-dark'
+                        ? 'bg-[#146356] text-white shadow-sm font-semibold'
+                        : 'text-[#0D2B3E] hover:bg-[#E4EFEC] hover:text-[#146356]'
                     }`
                   }
                 >
@@ -150,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
         </div>
 
         {/* Footer info strip */}
-        <div className="p-4 border-t border-brand-border bg-brand-bg/50">
+        <div className="p-4 border-t border-[#DCEAE7] bg-[#F4FBF9]">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[11px] font-medium text-brand-body">HIS / ABDM Connected</span>

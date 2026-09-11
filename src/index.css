@@ -78,20 +78,18 @@
    EXACT LIGHT GLASSMORPHISM DESIGN SYSTEM (Matches reference image)
    ========================================================================== */
 
-/* The primary page background gradient */
+/* The primary page background — now uses the brand mint-white token */
 .bg-cly-gradient {
-  background: radial-gradient(circle at 30% 20%, #6b8cc4 0%, #4a6fa0 35%, #3d5a8a 70%, #2d4570 100%) fixed;
+  background: #F4FBF9;
 }
 
-/* Primary Glass Card: Light frosted glass floating on the blue gradient */
+/* Primary Glass Card: Clean white card on the light background */
 .glass-card {
-  background: rgba(255, 255, 255, 0.65); /* lower opacity than current, let gradient show through more */
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: #FFFFFF;
+  border: 1px solid #DCEAE7;
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(30, 41, 82, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  color: #1E293B;
+  box-shadow: 0 2px 12px rgba(20, 99, 86, 0.06), 0 1px 3px rgba(20, 99, 86, 0.04);
+  color: #0D2B3E;
 }
 
 .glass-card-hover {
@@ -99,37 +97,35 @@
 }
 .glass-card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
-  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 28px rgba(20, 99, 86, 0.12);
+  border-color: #9FDCD1;
 }
 
-/* Nested Sub-Cards: Inside a glass panel, more opaque white with sharp delineation */
+/* Nested Sub-Cards */
 .glass-subcard {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(226, 232, 240, 0.85);
+  background: #F4FBF9;
+  border: 1px solid #DCEAE7;
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  color: #1E293B;
+  box-shadow: 0 1px 4px rgba(20, 99, 86, 0.05);
+  color: #0D2B3E;
 }
 
-/* Top Stat Strip Pattern (matches reference header exactly) */
+/* Stat Strip */
 .stat-strip {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: #FFFFFF;
+  border: 1px solid #DCEAE7;
   border-radius: 18px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
-  color: #1E293B;
+  box-shadow: 0 2px 8px rgba(20, 99, 86, 0.06);
+  color: #0D2B3E;
 }
 
-/* Callout Badge (matches the white pill callout on top right) */
+/* Callout Badge */
 .callout-badge {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: #FFFFFF;
+  border: 1px solid #DCEAE7;
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  color: #1E293B;
+  box-shadow: 0 2px 8px rgba(20, 99, 86, 0.08);
+  color: #0D2B3E;
 }
 
 /* Risk Gradient Bar (smooth Green -> Yellow -> Orange -> Red) */
@@ -139,7 +135,7 @@
 
 /* Brand Button: Teal gradient with soft shadow */
 .btn-brand-primary {
-  background: linear-gradient(135deg, #76C7C0 0%, #4AA8A0 100%);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-hover) 100%);
   color: #FFFFFF;
   font-weight: 600;
   border-radius: 9999px;
@@ -147,8 +143,8 @@
   transition: all 0.2s ease;
 }
 .btn-brand-primary:hover {
-  background: linear-gradient(135deg, #65B8B1 0%, #3D968E 100%);
-  box-shadow: 0 6px 20px rgba(74, 168, 160, 0.45);
+  background: var(--color-brand-hover);
+  box-shadow: 0 6px 20px rgba(20, 99, 86, 0.45);
   transform: translateY(-1px);
 }
 
