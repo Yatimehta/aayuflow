@@ -1,10 +1,15 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { Navbar } from './components/Navbar';
 import { ToastContainer } from './components/Toast';
 
-// Auth Pages
+// Auth Pages (new 3-step flow)
+import { HomePage } from './pages/auth/HomePage';
+import { RoleSelectPage } from './pages/auth/RoleSelectPage';
+import { LoginPage } from './pages/auth/LoginPage';
+
+// Legacy full-form login (kept at /login-full)
 import { UniversalLogin } from './pages/auth/UniversalLogin';
 
 // Landing Page (Moved to /about)
@@ -41,17 +46,21 @@ import { DoctorSettings } from './pages/doctor/DoctorSettings';
 import { AyurvedicDashboard } from './pages/doctor/AyurvedicDashboard';
 import { DoctorProfile } from './pages/doctor/DoctorProfile';
 
-export const App: React.FC = () => {
+// Navbar is hidden on the 3 auth-flow screens — they are full-screen branded layouts
+const AUTH_PATHS = ['/', '/role-select', '/login'];
+
+const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const isAuthScreen = AUTH_PATHS.includes(location.pathname);
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <div className="min-h-screen bg-cly-gradient text-slate-800 flex flex-col font-sans relative overflow-x-hidden selection:bg-teal-500 selection:text-white">
-          
+    <div className="min-h-screen bg-cly-gradient text-slate-800 flex flex-col font-sans relative overflow-x-hidden selection:bg-teal-500 selection:text-white">
+      {!isAuthScreen && (
+        <>
           {/* Subtle faint ambient DNA/geometric line texture in background (~8% opacity) */}
           <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-25">
-            <svg 
-              className="absolute -bottom-24 -left-24 w-[650px] h-[650px] text-white stroke-current" 
-              fill="none" 
+            <svg
+              className="absolute -bottom-24 -left-24 w-[650px] h-[650px] text-white stroke-current"
+              fill="none"
               viewBox="0 0 400 400"
             >
               <circle cx="200" cy="200" r="160" strokeWidth="1" strokeDasharray="4 6" />
@@ -59,9 +68,9 @@ export const App: React.FC = () => {
               <path d="M50 200 Q125 100 200 200 T350 200" strokeWidth="1.2" />
               <path d="M50 200 Q125 300 200 200 T350 200" strokeWidth="1.2" />
             </svg>
-            <svg 
-              className="absolute -top-32 -right-32 w-[750px] h-[750px] text-white stroke-current" 
-              fill="none" 
+            <svg
+              className="absolute -top-32 -right-32 w-[750px] h-[750px] text-white stroke-current"
+              fill="none"
               viewBox="0 0 500 500"
             >
               <ellipse cx="250" cy="250" rx="220" ry="140" transform="rotate(-30 250 250)" strokeWidth="1" strokeDasharray="3 5" />
@@ -70,18 +79,33 @@ export const App: React.FC = () => {
               <path d="M50 250 C150 400, 350 100, 450 250" strokeWidth="1.5" />
             </svg>
           </div>
-
-          {/* Global Sticky Top Navigation with persistent Role Switcher */}
           <Navbar />
+        </>
+      )}
+      <div className={isAuthScreen ? '' : 'flex-1 flex flex-col relative z-10'}>
+        {children}
+      </div>
+      <ToastContainer />
+    </div>
+  );
+};
 
+export const App: React.FC = () => {
+  return (
+    <AppProvider>
+      <BrowserRouter>
+        <AppShell>
           {/* Main Application Routes */}
-          <div className="flex-1 flex flex-col relative z-10">
-            <Routes>
-              {/* Root / lands immediately on Universal Login / Sign Up */}
-              <Route path="/" element={<UniversalLogin />} />
-              <Route path="/login" element={<UniversalLogin />} />
+          <Routes>
+              {/* ── 3-Step Auth Flow ── */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/role-select" element={<RoleSelectPage />} />
+              <Route path="/login" element={<LoginPage />} />
 
-              {/* Marketing / Hero moved to /about */}
+              {/* Legacy full-form login (all 5 roles) */}
+              <Route path="/login-full" element={<UniversalLogin />} />
+
+              {/* Marketing / Hero */}
               <Route path="/about" element={<LandingPage />} />
 
               {/* Patient Portal */}
@@ -125,11 +149,7 @@ export const App: React.FC = () => {
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </div>
-
-          {/* Global Reactive Toast Stack */}
-          <ToastContainer />
-        </div>
+        </AppShell>
       </BrowserRouter>
     </AppProvider>
   );
