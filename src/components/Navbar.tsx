@@ -27,6 +27,9 @@ import {
 import { useApp } from '../context/AppContext';
 import { UserRole } from '../types';
 
+import ayucarezLogo from '../assets/images/logo-ayucarez.png';
+import rameshwarAvatar from '../assets/images/rameshwar-avatar.jpg';
+
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,43 +66,54 @@ export const Navbar: React.FC = () => {
     return name.slice(0, 2).toUpperCase();
   };
 
+  // Use profile pic for patient named Rameshwar, otherwise initials
+  const isRameshwar = currentUser?.name?.toLowerCase().includes('rameshwar');
+
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-[#DCEAE7] shadow-sm transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center h-16 gap-4">
           
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 rounded-xl bg-[#146356] flex items-center justify-center shadow-md text-white transition-transform hover:scale-105">
-              <Sprout className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl font-bold tracking-tight text-[#0D2B3E]">Ayu<span className="text-[#146356]">Flow</span></span>
-                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#E4EFEC] text-[#146356] border border-[#9FDCD1]">
-                  AYUSH AI
-                </span>
-              </div>
-              <p className="hidden md:block text-[11px] text-slate-500 -mt-0.5">
-                Accessible Care • Rooted in Ayurveda
-              </p>
+          {/* 1. Logo & Brand — Ayucarez */}
+          <div
+            className="flex-shrink-0 flex items-center cursor-pointer"
+            onClick={() => navigate('/')}
+          >
+            <img
+              src={ayucarezLogo}
+              alt="Ayucarez"
+              className="h-8 w-auto object-contain"
+            />
+          </div>
+
+          {/* 2. Search Bar */}
+          <div className="flex-1 max-w-sm hidden sm:block">
+            <div className="relative">
+              <Search className="w-4 h-4 text-[#8FA3A0] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={localSearch}
+                onChange={(e) => setLocalSearch(e.target.value)}
+                placeholder="Search patient, token (AYU-1042)..."
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-[#DCEAE7] bg-[#F4FBF9] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#146356]/30 transition-all placeholder:text-[#8FA3A0]"
+              />
             </div>
           </div>
 
-          {/* Hospital Selector Pill */}
+          {/* 3. Hospital Selector Pill */}
           <div className="relative hidden lg:block">
             <button
               onClick={() => setShowHospitalDropdown(!showHospitalDropdown)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-brand-border bg-brand-bg hover:bg-brand-teal-light/50 text-xs font-medium text-brand-heading transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#DCEAE7] bg-[#F4FBF9] hover:bg-[#E4EFEC] text-xs font-medium text-[#0D2B3E] transition-colors"
             >
-              <HospitalIcon className="w-3.5 h-3.5 text-brand-teal-dark" />
+              <HospitalIcon className="w-3.5 h-3.5 text-[#146356]" />
               <span className="max-w-[200px] truncate">{selectedHospital.name}</span>
-              <ChevronDown className="w-3 h-3 text-brand-muted" />
+              <ChevronDown className="w-3 h-3 text-[#8FA3A0]" />
             </button>
 
             {showHospitalDropdown && (
-              <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white shadow-soft-lg border border-brand-border py-2 z-50 animate-in fade-in zoom-in-95">
-                <div className="px-3 py-1.5 border-b border-brand-border text-[11px] font-semibold text-brand-muted uppercase tracking-wider">
+              <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white shadow-lg border border-[#DCEAE7] py-2 z-50">
+                <div className="px-3 py-1.5 border-b border-[#DCEAE7] text-[11px] font-semibold text-[#8FA3A0] uppercase tracking-wider">
                   Select Active Hospital / OPD
                 </div>
                 <div className="max-h-64 overflow-y-auto py-1">
@@ -110,14 +124,14 @@ export const Navbar: React.FC = () => {
                         setSelectedHospital(hosp);
                         setShowHospitalDropdown(false);
                       }}
-                      className="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-brand-teal-light transition-colors"
+                      className="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#E4EFEC] transition-colors"
                     >
                       <div className="pr-2">
-                        <p className="font-medium text-brand-heading">{hosp.name}</p>
-                        <p className="text-[11px] text-brand-muted">{hosp.city} • {hosp.currentWaitMinutes}m wait</p>
+                        <p className="font-medium text-[#0D2B3E]">{hosp.name}</p>
+                        <p className="text-[11px] text-[#8FA3A0]">{hosp.city} • {hosp.currentWaitMinutes}m wait</p>
                       </div>
                       {selectedHospital.id === hosp.id && (
-                        <Check className="w-4 h-4 text-brand-teal-dark flex-shrink-0" />
+                        <Check className="w-4 h-4 text-[#146356] flex-shrink-0" />
                       )}
                     </button>
                   ))}
@@ -126,24 +140,13 @@ export const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Global Search Input */}
-          <div className="flex-1 max-w-xs md:max-w-sm hidden sm:block">
-            <div className="relative">
-              <Search className="w-4 h-4 text-brand-muted absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
-                placeholder="Search patient, token (AYU-1042)..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/40 transition-all placeholder:text-brand-muted"
-              />
-            </div>
-          </div>
+          {/* Spacer */}
+          <div className="flex-1" />
 
-          {/* Right Action Stack: Accessibility + Notifications + Profile */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* 4. Right Action Stack */}
+          <div className="flex items-center gap-2">
 
-            {/* Accessibility Menu (PS Section 3.2) */}
+            {/* Accessibility Menu */}
             <div className="relative">
               <button
                 type="button"
@@ -155,15 +158,15 @@ export const Navbar: React.FC = () => {
                 }}
                 className={`relative p-2 rounded-xl border transition-all ${
                   (largeText || highContrast || audioGuided)
-                    ? 'border-teal-500 bg-teal-50 text-teal-700 font-bold shadow-xs'
-                    : 'border-brand-border bg-brand-bg hover:bg-brand-teal-light/50 text-brand-body'
+                    ? 'border-[#146356] bg-[#E4EFEC] text-[#146356] font-bold shadow-xs'
+                    : 'border-[#DCEAE7] bg-[#F4FBF9] hover:bg-[#E4EFEC] text-[#4A5D63]'
                 }`}
-                title="Accessibility Settings (High Contrast, Large Text, Audio-Guided)"
+                title="Accessibility Settings"
                 aria-label="Accessibility Settings"
               >
                 <Accessibility className="w-4 h-4" />
                 {(largeText || highContrast || audioGuided) && (
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-teal-600 rounded-full ring-2 ring-white" />
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#146356] rounded-full ring-2 ring-white" />
                 )}
               </button>
 
@@ -329,56 +332,65 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* User Profile / Login Button (Eliminating simultaneous display) */}
-            <div className="flex items-center gap-2 pl-1 border-l border-slate-200/80">
+            {/* User Profile / Login Button */}
+            <div className="flex items-center gap-2 pl-2 border-l border-[#DCEAE7]">
               {currentUser && currentRole !== 'guest' ? (
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200/80 bg-white/80 hover:bg-white text-left transition-all shadow-xs"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-[#DCEAE7] bg-white hover:bg-[#F4FBF9] text-left transition-all"
                     title="User Profile & Settings"
                   >
-                    <div className="w-8 h-8 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0">
-                      {getInitials(currentUser.name)}
-                    </div>
+                    {/* Profile avatar — show photo for Rameshwar, initials otherwise */}
+                    {isRameshwar ? (
+                      <img
+                        src={rameshwarAvatar}
+                        alt="Rameshwar"
+                        className="w-8 h-8 rounded-xl object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        {getInitials(currentUser.name)}
+                      </div>
+                    )}
                     <div className="hidden sm:block text-left">
-                      <p className="text-xs font-bold text-slate-800 leading-tight truncate max-w-[100px]">
+                      <p className="text-xs font-bold text-[#0D2B3E] leading-tight truncate max-w-[100px]">
                         {currentUser?.name ? currentUser.name.split(' ')[0] : 'User'}
                       </p>
                       <p className="text-[10px] text-[#146356] font-extrabold uppercase leading-tight tracking-wider">
                         {currentRole}
                       </p>
                     </div>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
+                    <ChevronDown className="w-3.5 h-3.5 text-[#8FA3A0] hidden sm:block" />
                   </button>
 
                   {showProfileDropdown && (
-                    <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-soft-lg border border-slate-200/80 py-2 z-50 animate-in fade-in zoom-in-95">
-                      <div className="px-4 py-3 border-b border-slate-100">
+                    <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-lg border border-[#DCEAE7] py-2 z-50">
+                      <div className="px-4 py-3 border-b border-[#DCEAE7]">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0">
-                            {getInitials(currentUser.name)}
-                          </div>
+                          {isRameshwar ? (
+                            <img
+                              src={rameshwarAvatar}
+                              alt="Rameshwar"
+                              className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-9 h-9 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                              {getInitials(currentUser.name)}
+                            </div>
+                          )}
                           <div className="overflow-hidden">
-                            <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
+                            <p className="text-xs font-bold text-[#0D2B3E] truncate">{currentUser.name}</p>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#E4EFEC] text-[#146356] font-bold uppercase tracking-wider border border-[#9FDCD1]">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#E4EFEC] text-[#146356] font-bold uppercase tracking-wider border border-[#9FDCD1]">
                                 {currentRole}
                               </span>
-                              {currentUser.abhaId && (
-                                <span className="text-[10px] text-emerald-600 font-semibold truncate">ABHA Verified</span>
-                              )}
                             </div>
                           </div>
                         </div>
-                        {currentUser.abhaId && (
-                          <p className="text-[10px] text-slate-500 font-mono mt-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 truncate">
-                            {currentUser.abhaId}
-                          </p>
-                        )}
                         {currentUser.department && (
-                          <p className="text-[11px] text-slate-500 mt-1.5">
-                            Dept: <span className="font-semibold text-slate-700">{currentUser.department}</span>
+                          <p className="text-[11px] text-[#4A5D63] mt-1.5">
+                            Dept: <span className="font-semibold text-[#0D2B3E]">{currentUser.department}</span>
                           </p>
                         )}
                       </div>
@@ -391,26 +403,25 @@ export const Navbar: React.FC = () => {
                             else if (currentRole === 'doctor') navigate('/doctor/profile');
                             else navigate('/doctor');
                           }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
                         >
-                          <User className="w-4 h-4 text-slate-400" />
+                          <User className="w-4 h-4 text-[#8FA3A0]" />
                           <span>My Profile & Records</span>
                         </button>
-
 
                         <button
                           onClick={() => {
                             setShowProfileDropdown(false);
                             setShowHospitalDropdown(true);
                           }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
                         >
-                          <Settings className="w-4 h-4 text-slate-400" />
+                          <Settings className="w-4 h-4 text-[#8FA3A0]" />
                           <span>Facility Settings</span>
                         </button>
                       </div>
 
-                      <div className="border-t border-slate-100 mt-1 pt-1 p-1">
+                      <div className="border-t border-[#DCEAE7] mt-1 pt-1 p-1">
                         <button
                           onClick={() => {
                             setShowProfileDropdown(false);
@@ -429,10 +440,10 @@ export const Navbar: React.FC = () => {
               ) : (
                 <button
                   onClick={() => navigate('/login')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white/80 hover:bg-white text-xs font-semibold text-slate-800 transition-colors shadow-xs"
-                  title="Universal Login"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#DCEAE7] bg-white hover:bg-[#F4FBF9] text-xs font-semibold text-[#0D2B3E] transition-colors"
+                  title="Login"
                 >
-                  <LogIn className="w-3.5 h-3.5 text-teal-600" />
+                  <LogIn className="w-3.5 h-3.5 text-[#146356]" />
                   <span>Login</span>
                 </button>
               )}

@@ -24,10 +24,7 @@ export const PatientDashboard: React.FC = () => {
         
         {/* Google-Style Minimalist Greeting Header */}
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>ABHA Verified</span>
-          </div>
+
 
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
             Namaste, {patient?.name?.split(' ')[0] || 'Patient'}
