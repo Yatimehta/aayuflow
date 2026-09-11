@@ -126,7 +126,8 @@ export const App: React.FC = () => {
 
               {/* AYUSH Worker Portal */}
               <Route path="/worker" element={<WorkerLayout />}>
-                <Route index element={<WorkerDashboard />} />
+                <Route index element={<WorkerAssistIntake />} />
+                <Route path="dashboard" element={<WorkerDashboard />} />
                 <Route path="login" element={<WorkerLogin />} />
                 <Route path="assist" element={<WorkerAssistIntake />} />
                 <Route path="patients" element={<WorkerPatients />} />

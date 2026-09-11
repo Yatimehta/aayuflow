@@ -32,12 +32,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
   const isAyushPatient = (activePatient?.careSystem || 'AYURVEDA') === 'AYURVEDA';
 
   const workerNavItems = [
-    { label: 'Dashboard', path: '/worker', icon: LayoutDashboard, exact: true },
-    { label: 'Patients', path: '/worker/patients', icon: Users, badge: patients.length },
+    { label: 'Assistant Desk', path: '/worker', icon: LayoutDashboard, exact: true },
+    { label: 'Registered Patients', path: '/worker/patients', icon: Users, badge: patients.length },
     { label: 'Assist Intake', path: '/worker/assist', icon: FileSpreadsheet },
-    { label: 'Scan Documents', path: '/worker/documents', icon: FileText },
-    { label: 'OPD Queue', path: '/worker/queue', icon: Clock, badge: patients.filter(p => p.status === 'Pending').length },
-    { label: 'Hospital Settings', path: '/worker/settings', icon: Settings }
+    { label: 'Scan Papers', path: '/worker/documents', icon: FileText },
+    { label: 'Waiting Queue', path: '/worker/queue', icon: Clock, badge: patients.filter(p => p.status === 'Pending').length },
+    { label: 'Desk Settings', path: '/worker/settings', icon: Settings }
   ];
 
   const doctorNavItems = [
