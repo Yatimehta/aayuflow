@@ -12,31 +12,33 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { AudioAloudButton } from '../../components/AudioAloudButton';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientConsent: React.FC = () => {
   const navigate = useNavigate();
   const { activePatient, patients, selectedHospital, showToast } = useApp();
+  const { t } = useTranslation();
 
   const patient = activePatient || patients[0];
   const [consentChecked, setConsentChecked] = useState(false);
   const [readMoreOpen, setReadMoreOpen] = useState(false);
 
-  const consentAudioScript = `Consent Explanation: Ayucarez collects your spoken voice symptoms, uploaded diagnostic documents, and medical history. This information is securely transmitted to ${selectedHospital.name} and linked with the Ayushman Bharat Digital Mission to prepare your OPD case file.`;
+  const consentAudioScript = t('pc_audio_script', { hospital: selectedHospital.name });
 
   const handleContinue = () => {
     if (!consentChecked) {
       showToast({
         type: 'error',
-        title: 'Consent Required',
-        message: 'Please review and accept the patient data consent terms to proceed.'
+        title: t('pc_toast_required_title'),
+        message: t('pc_toast_required_msg')
       });
       return;
     }
 
     showToast({
       type: 'success',
-      title: 'Consent Recorded',
-      message: 'ABDM explicit consent token registered. Proceeding to clinical intake.'
+      title: t('pc_toast_recorded_title'),
+      message: t('pc_toast_recorded_msg')
     });
 
     navigate('/patient/intake-path');
@@ -54,26 +56,26 @@ export const PatientConsent: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#0D2B3E] font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Language Selection</span>
+            <span>{t('pc_back_lang')}</span>
           </button>
 
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#CEF3ED] text-[#146356] border border-[#9FDCD1] text-[11px] font-bold uppercase tracking-wider mb-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#146356]" />
-                <span>PS Module D · ABDM Explicit Consent</span>
+                <span>{t('pc_badge')}</span>
               </div>
               <h1 className="text-2xl font-bold text-[#0D2B3E] tracking-tight">
-                Patient Data Consent & Sharing Authorization
+                {t('pc_title')}
               </h1>
               <p className="text-xs text-slate-500 mt-1">
-                Please review how your health data is gathered, protected, and shared before clinical intake begins.
+                {t('pc_subtitle')}
               </p>
             </div>
 
             <AudioAloudButton
               text={consentAudioScript}
-              label="Audio Explanation"
+              label={t('pc_audio_label')}
               alwaysShow={true}
               className="flex-shrink-0"
             />
@@ -87,7 +89,7 @@ export const PatientConsent: React.FC = () => {
           <div className="space-y-3.5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
               <FileLock2 className="w-4 h-4 text-[#146356]" />
-              <span>What Data Will Be Collected</span>
+              <span>{t('pc_section1_header')}</span>
             </h2>
 
             {/* Plain instructional cards — purely informational, no hover/press button affordance */}
@@ -96,9 +98,9 @@ export const PatientConsent: React.FC = () => {
                 <div className="w-8 h-8 rounded-xl bg-[#E4EFEC] text-[#146356] flex items-center justify-center">
                   <Mic className="w-4 h-4" />
                 </div>
-                <p className="font-bold text-[#0D2B3E]">Voice & Spoken Symptoms</p>
+                <p className="font-bold text-[#0D2B3E]">{t('pc_voice_title')}</p>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Speech dictation transcribed to describe chief complaints and pain severity in your native tongue.
+                  {t('pc_voice_desc')}
                 </p>
               </div>
 
@@ -106,9 +108,9 @@ export const PatientConsent: React.FC = () => {
                 <div className="w-8 h-8 rounded-xl bg-[#E4EFEC] text-[#146356] flex items-center justify-center">
                   <FileText className="w-4 h-4" />
                 </div>
-                <p className="font-bold text-[#0D2B3E]">Medical Documents</p>
+                <p className="font-bold text-[#0D2B3E]">{t('pc_docs_title')}</p>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Uploaded lab test reports, previous prescriptions, and diagnostic scans for AI extraction.
+                  {t('pc_docs_desc')}
                 </p>
               </div>
 
@@ -116,9 +118,9 @@ export const PatientConsent: React.FC = () => {
                 <div className="w-8 h-8 rounded-xl bg-[#E4EFEC] text-[#146356] flex items-center justify-center">
                   <Database className="w-4 h-4" />
                 </div>
-                <p className="font-bold text-[#0D2B3E]">Health History & Vitals</p>
+                <p className="font-bold text-[#0D2B3E]">{t('pc_history_title')}</p>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Age, biological sex, blood group, duration of illness, and basic vitals for OPD case routing.
+                  {t('pc_history_desc')}
                 </p>
               </div>
             </div>
@@ -137,10 +139,10 @@ export const PatientConsent: React.FC = () => {
                 />
                 <div className="space-y-1 flex-1">
                   <span className="text-xs font-bold text-[#0D2B3E] block leading-snug">
-                    I consent to sharing this information with {selectedHospital.name} and the Ayushman Bharat Digital Mission (ABDM) for the purpose of this consultation.
+                    {t('pc_consent_label', { hospital: selectedHospital.name })}
                   </span>
                   <p className="text-[11px] text-slate-500">
-                    Checking this box records your explicit electronic informed consent token.
+                    {t('pc_consent_sub')}
                   </p>
                 </div>
               </label>
@@ -153,19 +155,19 @@ export const PatientConsent: React.FC = () => {
                   onClick={() => setReadMoreOpen(!readMoreOpen)}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#146356] hover:text-[#0F4A40] transition-colors cursor-pointer"
                 >
-                  <span>{readMoreOpen ? 'Hide data usage details' : 'Read more about data usage & protection'}</span>
+                  <span>{readMoreOpen ? t('pc_read_more_hide') : t('pc_read_more_show')}</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${readMoreOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {readMoreOpen && (
                   <div className="mt-3 p-3.5 rounded-xl bg-[#F4FBF9] border border-[#DCEAE7] text-xs text-slate-700 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
                     <p className="text-[11px] font-bold text-[#0D2B3E] uppercase tracking-wider">
-                      Data Usage & Protection Guidelines:
+                      {t('pc_usage_header')}
                     </p>
                     <ul className="space-y-1.5 pl-4 list-disc text-slate-600 text-xs">
-                      <li>Data is typically used by the consulting physician.</li>
-                      <li>Data is encrypted in transit and at rest.</li>
-                      <li>No medical data is shared without consent.</li>
+                      <li>{t('pc_usage_1')}</li>
+                      <li>{t('pc_usage_2')}</li>
+                      <li>{t('pc_usage_3')}</li>
                     </ul>
                   </div>
                 )}
@@ -180,7 +182,7 @@ export const PatientConsent: React.FC = () => {
               onClick={() => navigate('/patient/dashboard')}
               className="text-xs text-slate-500 hover:text-slate-800 font-medium"
             >
-              Cancel & Return
+              {t('pc_cancel_btn')}
             </button>
 
             <button
@@ -194,7 +196,7 @@ export const PatientConsent: React.FC = () => {
                   : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <span>Continue to Stream Selection</span>
+              <span>{t('pc_continue_btn')}</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>

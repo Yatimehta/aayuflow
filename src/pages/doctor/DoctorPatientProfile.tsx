@@ -1735,8 +1735,14 @@ export const DoctorPatientProfile: React.FC = () => {
 
       {/* Modal for Document Preview */}
       {selectedDocPreview && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-soft-lg border border-brand-border space-y-4">
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedDocPreview(null)}
+        >
+          <div
+            className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-soft-lg border border-brand-border space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b border-brand-border pb-3">
               <h3 className="text-sm font-bold text-brand-heading">{selectedDocPreview.name}</h3>
               <button
@@ -1831,8 +1837,14 @@ export const DoctorPatientProfile: React.FC = () => {
 
       {/* REJECT / RETAKE INTAKE MODAL */}
       {showRejectModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#DCEAE7] space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4"
+          onClick={() => setShowRejectModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#DCEAE7] space-y-4 animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-[#C23B22]" />

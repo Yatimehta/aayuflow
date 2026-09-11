@@ -246,8 +246,14 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
       {/* Simple Document Preview Modal */}
       {previewDoc && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-soft-lg border border-brand-border space-y-4">
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4"
+          onClick={() => setPreviewDoc(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-soft-lg border border-brand-border space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b border-brand-border pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-brand-teal-dark" />

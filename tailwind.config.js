@@ -19,6 +19,21 @@ export default {
           moderateLight: '#FBF1DF',
           success: '#2E7D4F',
           successLight: '#E6F4EA',
+          // Aliases for class names already used throughout the app
+          // (bg-brand-teal, text-brand-heading, etc.) that were missing here.
+          primary: '#146356',
+          teal: '#146356',
+          'teal-dark': '#0F4A40',
+          'teal-light': '#E4EFEC',
+          blue: '#5C9FB5',
+          'blue-dark': '#3D7A8C',
+          'blue-light': '#E3EEF9',
+          heading: '#0D2B3E',
+          body: '#334155',
+          muted: '#4A5D63',
+          border: '#DCEAE7',
+          bg: '#F4FBF9',
+          mint: '#CEF3ED',
         },
       },
       fontFamily: {

@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import ayucarezLogo from '../../assets/images/logo.png';
+import ministryOfAyushEmblem from '../../assets/images/ministry-of-ayush-emblem.png';
 
 /* ─── Decorative corner leaf cluster (shared with RoleSelectPage) ─────────── */
 const LeafCluster = ({
@@ -125,7 +126,7 @@ export const HomePage: React.FC = () => {
 
       {/* ── Fixed Header Element (Ayucarez Logo Top-Left) ─────────────────── */}
       <header className="fixed top-0 left-0 right-0 z-40 px-6 sm:px-12 py-3.5 sm:py-4 flex items-center justify-between bg-[#f4fbfa]/85 backdrop-blur-md border-b border-teal-100/50">
-        <div className="flex items-center">
+        <div className="flex items-center gap-3">
           <img
             src={ayucarezLogo}
             alt="Ayucarez"
@@ -135,6 +136,12 @@ export const HomePage: React.FC = () => {
               mixBlendMode: 'multiply',
             }}
             onClick={() => navigate('/')}
+          />
+          <div className="w-px h-6 sm:h-7 bg-teal-900/15" />
+          <img
+            src={ministryOfAyushEmblem}
+            alt="Ministry of Ayush, Government of India"
+            className="h-7 sm:h-9 w-auto object-contain"
           />
         </div>
 
@@ -166,7 +173,7 @@ export const HomePage: React.FC = () => {
 
           {/* Subtext */}
           <p className="mt-4 sm:mt-5 text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto font-normal">
-            AYUSH Integrated Clinical Portal &amp; ABDM EHR Gateway — bridging modern medicine with traditional wisdom.
+            Ayurveda and modern medicine, together in one simple health app.
           </p>
 
           {/* Primary CTA Button */}
@@ -189,7 +196,7 @@ export const HomePage: React.FC = () => {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 border border-teal-200/70 text-teal-800 shadow-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-              ABDM Compliant
+              Works with Ayushman Bharat
             </span>
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 border border-teal-200/70 text-teal-800 shadow-sm">
               <Leaf className="w-3.5 h-3.5 text-teal-600" />
@@ -197,7 +204,7 @@ export const HomePage: React.FC = () => {
             </span>
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 border border-teal-200/70 text-teal-800 shadow-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-              HIPAA-Grade Security
+              Your Data Stays Safe
             </span>
           </div>
         </section>
@@ -297,7 +304,7 @@ export const HomePage: React.FC = () => {
 
         {/* ── Footer note ─────────────────────────────────────────────────── */}
         <footer className="mt-20 text-center text-xs text-slate-400">
-          <p>© 2026 Ayucarez. Empowering AYUSH Healthcare with ABDM Interoperability.</p>
+          <p>© 2026 Ayucarez. Making AYUSH healthcare simple for everyone.</p>
         </footer>
       </main>
 

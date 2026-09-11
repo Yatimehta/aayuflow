@@ -269,8 +269,14 @@ export const LabStaffPortal: React.FC = () => {
 
       {/* UPLOAD DIAGNOSTIC REPORT MODAL */}
       {isUploadModalOpen && selectedConsultation && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-card bg-white/95 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4">
+        <div
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setIsUploadModalOpen(false)}
+        >
+          <div
+            className="glass-card bg-white/95 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center">

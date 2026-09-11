@@ -2,10 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stethoscope, Leaf, ArrowRight, ArrowLeft, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientIntakePath: React.FC = () => {
   const navigate = useNavigate();
   const { selectedHospital } = useApp();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-[85vh] py-12 px-4 sm:px-6 flex items-center justify-center relative z-10">
@@ -20,7 +22,7 @@ export const PatientIntakePath: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#0D2B3E] font-medium transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Consent</span>
+            <span>{t('pip_back')}</span>
           </button>
         </div>
 
@@ -28,15 +30,15 @@ export const PatientIntakePath: React.FC = () => {
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#CEF3ED] text-[#146356] text-xs font-bold uppercase tracking-wider mb-1">
             <Layers className="w-3.5 h-3.5" />
-            <span>Step 3 · Consultation Stream</span>
+            <span>{t('pip_badge')}</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-bold text-[#0D2B3E] tracking-tight">
-            Select Consultation Stream
+            {t('pip_title')}
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
-            परामर्श धारा चुनें • Choose the clinical approach for generating your OPD case draft at {selectedHospital.name}.
+            {t('pip_subtitle', { hospital: selectedHospital.name })}
           </p>
         </div>
 
@@ -58,33 +60,33 @@ export const PatientIntakePath: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg sm:text-xl font-bold text-[#0D2B3E] group-hover:text-[#146356] transition-colors">
-                    Allopathic Intake
+                    {t('pip_allo_title')}
                   </h2>
                 </div>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">
-                  आधुनिक चिकित्सा
+                  {t('pip_allo_native')}
                 </p>
                 <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                  Standard symptom history, duration, severity scale, and prior prescription reports.
+                  {t('pip_allo_desc')}
                 </p>
               </div>
 
               {/* Scope highlights */}
               <div className="pt-2 flex flex-wrap gap-1.5 text-[11px]">
                 <span className="px-2.5 py-1 rounded-lg bg-[#F4FBF9] text-slate-600 border border-[#DCEAE7]">
-                  Chief Complaints
+                  {t('pip_allo_tag1')}
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-[#F4FBF9] text-slate-600 border border-[#DCEAE7]">
-                  Severity & Onset
+                  {t('pip_allo_tag2')}
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-[#F4FBF9] text-slate-600 border border-[#DCEAE7]">
-                  Prior Rx Upload
+                  {t('pip_allo_tag3')}
                 </span>
               </div>
             </div>
 
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#146356] group-hover:underline">
-              <span>Begin Allopathic Intake</span>
+              <span>{t('pip_allo_cta')}</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] transition-transform duration-200 group-hover:translate-x-1" />
             </div>
           </div>
@@ -98,7 +100,7 @@ export const PatientIntakePath: React.FC = () => {
             {/* Recommended pill */}
             <div className="absolute -top-3 right-6 px-3 py-0.5 rounded-full bg-[#146356] text-white text-[10px] font-bold uppercase tracking-wider shadow-xs flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-[#CEF3ED]" />
-              <span>AIIA AYUSH Protocol</span>
+              <span>{t('pip_ayu_badge')}</span>
             </div>
 
             <div className="space-y-4">
@@ -110,44 +112,37 @@ export const PatientIntakePath: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg sm:text-xl font-bold text-[#0D2B3E] group-hover:text-[#146356] transition-colors">
-                    Ayurvedic Intake
+                    {t('pip_ayu_title')}
                   </h2>
                 </div>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">
-                  आयुर्वेदिक मूल्यांकन
+                  {t('pip_ayu_native')}
                 </p>
                 <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                  Prakriti (body constitution), Agni (digestive fire), lifestyle triggers, and Dosha phenotype baseline.
+                  {t('pip_ayu_desc')}
                 </p>
               </div>
 
               {/* Scope highlights */}
               <div className="pt-2 flex flex-wrap gap-1.5 text-[11px]">
                 <span className="px-2.5 py-1 rounded-lg bg-[#E4EFEC] text-[#146356] font-medium border border-[#9FDCD1]">
-                  Prakriti & Agni
+                  {t('pip_ayu_tag1')}
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-[#E4EFEC] text-[#146356] font-medium border border-[#9FDCD1]">
-                  Dosha Baseline
+                  {t('pip_ayu_tag2')}
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-[#E4EFEC] text-[#146356] font-medium border border-[#9FDCD1]">
-                  Hetu & Diet Triggers
+                  {t('pip_ayu_tag3')}
                 </span>
               </div>
             </div>
 
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#146356] group-hover:underline">
-              <span>Begin Ayurvedic Intake</span>
+              <span>{t('pip_ayu_cta')}</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] transition-transform duration-200 group-hover:translate-x-1" />
             </div>
           </div>
 
-        </div>
-
-        {/* Security / ABDM Guarantee footnote */}
-        <div className="text-center pt-2">
-          <p className="text-xs text-slate-400">
-            Both intake streams feed directly into the ABDM FHIR Clinical Dossier for your consulting doctor.
-          </p>
         </div>
 
       </div>

@@ -1,29 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Hospital as HospitalIcon,
-  User,
-  UserPlus,
   Search,
   CheckCircle2,
-  Mic,
-  MicOff,
   Send,
   Sparkles,
   ArrowRight,
   ArrowLeft,
   FileText,
-  Languages,
   Check,
   Printer,
   Copy,
   Clock,
-  ChevronRight,
   Stethoscope,
-  Volume2,
   Leaf,
-  ShieldAlert,
-  Layers
+  ShieldAlert
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
@@ -34,26 +26,28 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { VoiceInput } from '../../components/VoiceInput';
 import { AISafetyBanner } from '../../components/AISafetyBanner';
 import { PriorityFlag } from '../../components/PriorityFlag';
-import { 
-  MOCK_LANGUAGES, 
-  MOCK_CLINICAL_QUESTIONS, 
-  INITIAL_CHAT_MESSAGES 
+import {
+  MOCK_LANGUAGES,
+  MOCK_CLINICAL_QUESTIONS,
+  INITIAL_CHAT_MESSAGES
 } from '../../data/mockData';
 import { DocumentItem, IntakeChatMessage, Patient, CareSystem } from '../../types';
-import { getTranslation } from '../../utils/translations';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientPortal: React.FC = () => {
   const navigate = useNavigate();
-  const { 
-    hospitals, 
-    selectedHospital, 
-    setSelectedHospital, 
-    patients, 
-    addPatient, 
+  const {
+    hospitals,
+    selectedHospital,
+    setSelectedHospital,
+    patients,
     completeIntake,
     setActivePatientId,
-    showToast 
+    showToast,
+    patientLanguage,
+    setPatientLanguage
   } = useApp();
+  const { t } = useTranslation();
 
   const [currentStep, setCurrentStep] = useState<number>(1);
 
@@ -95,8 +89,9 @@ export const PatientPortal: React.FC = () => {
     setCurrentToken(`${prefix}-${dateStr}-0${currentQueueNo}`);
   };
 
-  // Step 5: Language selection
-  const [selectedLang, setSelectedLang] = useState('hi');
+  // Step 5: Language selection — uses the global patientLanguage from context (not local
+  // state), so the choice actually applies everywhere else in the app too.
+  const selectedLang = patientLanguage;
 
   // Step 6: Documents
   const [uploadedDocs, setUploadedDocs] = useState<DocumentItem[]>([]);
@@ -124,25 +119,24 @@ export const PatientPortal: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isHindi = selectedLang === 'hi';
   const stepsList = [
-    { id: 1, title: getTranslation('step1_title', selectedLang), shortTitle: isHindi ? 'अस्पताल' : 'Hospital' },
-    { id: 2, title: getTranslation('step2_title', selectedLang), shortTitle: isHindi ? 'रजिस्ट्रेशन' : 'Details' },
-    { id: 3, title: getTranslation('step3_title', selectedLang), shortTitle: isHindi ? 'टोकन' : 'Token' },
-    { id: 4, title: 'Care Stream', shortTitle: isHindi ? 'चिकित्सा' : 'Stream' },
-    { id: 5, title: getTranslation('step5_title', selectedLang), shortTitle: isHindi ? 'भाषा' : 'Language' },
-    { id: 6, title: getTranslation('step4_title', selectedLang), shortTitle: isHindi ? 'दस्तावेज़' : 'Docs' },
-    { id: 7, title: getTranslation('step6_title', selectedLang), shortTitle: isHindi ? 'शिकायत' : 'Voice' },
-    { id: 8, title: getTranslation('step7_title', selectedLang), shortTitle: isHindi ? 'प्रश्नावली' : 'Form' },
-    { id: 9, title: getTranslation('step8_title', selectedLang), shortTitle: isHindi ? 'समीक्षा' : 'Review' },
-    { id: 10, title: getTranslation('step9_title', selectedLang), shortTitle: isHindi ? 'जारी' : 'Ready' }
+    { id: 1, title: t('step1_title'), shortTitle: t('st1') },
+    { id: 2, title: t('step2_title'), shortTitle: t('st2') },
+    { id: 3, title: t('step3_title'), shortTitle: t('st3') },
+    { id: 4, title: t('s4_title'), shortTitle: t('st4') },
+    { id: 5, title: t('step5_title'), shortTitle: t('st5') },
+    { id: 6, title: t('step4_title'), shortTitle: t('st6') },
+    { id: 7, title: t('step6_title'), shortTitle: t('st7') },
+    { id: 8, title: t('step7_title'), shortTitle: t('st8') },
+    { id: 9, title: t('step8_title'), shortTitle: t('st9') },
+    { id: 10, title: t('step9_title'), shortTitle: t('st10') }
   ];
 
   // Voice simulation logic
   const toggleListening = () => {
     if (!isListening) {
       setIsListening(true);
-      setVoiceSpeechFeedback('Listening... Please speak in Hindi, English, or your chosen language');
+      setVoiceSpeechFeedback(t('s7_listening'));
 
       const phrases = [
         "Mujhe dono ghutno mein subah uthte hi bahut dard aur akdan rehti hai.",
@@ -154,7 +148,7 @@ export const PatientPortal: React.FC = () => {
       setTimeout(() => {
         setChatInput(randomPhrase);
         setIsListening(false);
-        setVoiceSpeechFeedback('Voice converted to text via AYUSH Multilingual ASR');
+        setVoiceSpeechFeedback(t('s7_voice_converted'));
       }, 2500);
     } else {
       setIsListening(false);
@@ -211,14 +205,14 @@ export const PatientPortal: React.FC = () => {
       });
       showToast({
         type: 'success',
-        title: 'Patient Record Found',
+        title: t('toast_found_title'),
         message: `Loaded record for ${found.name} (${found.tokenNumber})`
       });
     } else {
       showToast({
         type: 'error',
-        title: 'Not Found',
-        message: 'No patient matches this phone number or token. You can register as New Patient.'
+        title: t('toast_notfound_title'),
+        message: t('toast_notfound_msg')
       });
     }
   };
@@ -269,7 +263,7 @@ export const PatientPortal: React.FC = () => {
   return (
     <div className="min-h-screen py-6 sm:py-10 relative z-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        
+
         {/* Step Indicator Header */}
         <div className="mb-6">
           <Stepper
@@ -283,19 +277,19 @@ export const PatientPortal: React.FC = () => {
 
         {/* Wizard Container Card */}
         <div className="glass-card bg-white/85 p-6 sm:p-8 relative shadow-xl">
-          
+
           {/* STEP 1: Select Hospital */}
           {currentStep === 1 && (
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 1 of 8
+                  {t('s1_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  Select AYUSH Hospital or OPD Center
+                  {t('s1_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  Choose your preferred Ayurveda or Homoeopathy hospital to begin check-in and queue token generation.
+                  {t('s1_subtitle')}
                 </p>
               </div>
 
@@ -306,7 +300,7 @@ export const PatientPortal: React.FC = () => {
                   type="text"
                   value={hospitalSearch}
                   onChange={(e) => setHospitalSearch(e.target.value)}
-                  placeholder="Search hospital name, city, or institute..."
+                  placeholder={t('s1_search_placeholder')}
                   className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30"
                 />
               </div>
@@ -355,10 +349,10 @@ export const PatientPortal: React.FC = () => {
                         <div className="mt-4 pt-3 border-t border-brand-border/60 flex items-center justify-between text-xs">
                           <span className="flex items-center gap-1 text-brand-teal-dark font-medium">
                             <Clock className="w-3.5 h-3.5" />
-                            {hosp.currentWaitMinutes} min est. wait
+                            {t('s1_wait_min', { n: hosp.currentWaitMinutes })}
                           </span>
                           <span className="text-brand-muted">
-                            {hosp.activeDoctors} Doctors Active
+                            {t('s1_doctors_active', { n: hosp.activeDoctors })}
                           </span>
                         </div>
                       </div>
@@ -372,7 +366,7 @@ export const PatientPortal: React.FC = () => {
                   onClick={() => setCurrentStep(2)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Continue with {selectedHospital.city} OPD</span>
+                  <span>{t('s1_continue_btn', { city: selectedHospital.city })}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -384,13 +378,13 @@ export const PatientPortal: React.FC = () => {
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 2 of 8
+                  {t('s2_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  Patient Identification & Registration
+                  {t('s2_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  Check in as an existing OPD patient with your mobile number or register as a new patient.
+                  {t('s2_subtitle')}
                 </p>
               </div>
 
@@ -404,7 +398,7 @@ export const PatientPortal: React.FC = () => {
                       : 'text-brand-muted hover:text-brand-heading'
                   }`}
                 >
-                  New Patient
+                  {t('s2_tab_new')}
                 </button>
                 <button
                   onClick={() => setPatientMode('existing')}
@@ -414,7 +408,7 @@ export const PatientPortal: React.FC = () => {
                       : 'text-brand-muted hover:text-brand-heading'
                   }`}
                 >
-                  Search Existing Patient
+                  {t('s2_tab_existing')}
                 </button>
               </div>
 
@@ -422,21 +416,21 @@ export const PatientPortal: React.FC = () => {
               {patientMode === 'existing' ? (
                 <div className="p-5 rounded-2xl bg-brand-bg border border-brand-border space-y-4">
                   <p className="text-xs font-semibold text-brand-heading">
-                    Enter Mobile Number or Token ID (e.g. +91 98112 34567 or AYU-1042):
+                    {t('s2_existing_prompt')}
                   </p>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={existingSearchPhone}
                       onChange={(e) => setExistingSearchPhone(e.target.value)}
-                      placeholder="Enter mobile number or token..."
+                      placeholder={t('s2_existing_placeholder')}
                       className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-brand-border bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30"
                     />
                     <button
                       onClick={handleExistingSearch}
                       className="px-4 py-2.5 rounded-xl bg-brand-heading text-white text-xs font-bold hover:bg-slate-700"
                     >
-                      Lookup
+                      {t('s2_lookup_btn')}
                     </button>
                   </div>
 
@@ -447,10 +441,10 @@ export const PatientPortal: React.FC = () => {
                         <StatusBadge status={foundPatient.status} size="sm" />
                       </div>
                       <p className="text-xs text-brand-muted">
-                        Token: {foundPatient.tokenNumber} • Phone: {foundPatient.phone} • Age: {foundPatient.age}
+                        {t('s2_found_token')} {foundPatient.tokenNumber} • {t('s2_found_phone')} {foundPatient.phone} • {t('s2_found_age')} {foundPatient.age}
                       </p>
                       <p className="text-xs text-brand-body font-medium">
-                        Complaint: {foundPatient.chiefComplaint}
+                        {t('s2_found_complaint')} {foundPatient.chiefComplaint}
                       </p>
                     </div>
                   )}
@@ -460,7 +454,7 @@ export const PatientPortal: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-brand-heading mb-1">
-                      Full Name *
+                      {t('s2_lbl_name')}
                     </label>
                     <input
                       type="text"
@@ -472,7 +466,7 @@ export const PatientPortal: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-semibold text-brand-heading mb-1">
-                      Mobile Number *
+                      {t('s2_lbl_phone')}
                     </label>
                     <input
                       type="text"
@@ -484,7 +478,7 @@ export const PatientPortal: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-semibold text-brand-heading mb-1">
-                      Age & Gender *
+                      {t('s2_lbl_age_gender')}
                     </label>
                     <div className="flex gap-2">
                       <input
@@ -492,42 +486,42 @@ export const PatientPortal: React.FC = () => {
                         value={formData.age}
                         onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                         className="w-24 px-3 py-2 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30"
-                        placeholder="Age"
+                        placeholder={t('s2_lbl_age_gender')}
                       />
                       <select
                         value={formData.gender}
                         onChange={(e) => setFormData({ ...formData, gender: e.target.value as any })}
                         className="flex-1 px-3 py-2 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30"
                       >
-                        <option value="Male">Male (पुरुष)</option>
-                        <option value="Female">Female (स्त्री)</option>
-                        <option value="Other">Other</option>
+                        <option value="Male">{t('s2_gender_male')}</option>
+                        <option value="Female">{t('s2_gender_female')}</option>
+                        <option value="Other">{t('s2_gender_other')}</option>
                       </select>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-brand-heading mb-1">
-                      ABHA ID / Ayushman Card (Optional)
+                      {t('s2_lbl_abha')}
                     </label>
                     <input
                       type="text"
                       value={formData.abhaId}
                       onChange={(e) => setFormData({ ...formData, abhaId: e.target.value })}
-                      placeholder="e.g. 14-8890-4321-7711"
+                      placeholder={t('s2_abha_placeholder')}
                       className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-brand-heading mb-1">
-                      Primary Health Complaint (Brief)
+                      {t('s2_lbl_complaint')}
                     </label>
                     <input
                       type="text"
                       value={formData.chiefComplaint}
                       onChange={(e) => setFormData({ ...formData, chiefComplaint: e.target.value })}
-                      placeholder="e.g. Joint pain, chronic acidity, respiratory allergy..."
+                      placeholder={t('s2_complaint_placeholder')}
                       className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-brand-border bg-brand-bg focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal/30"
                     />
                   </div>
@@ -541,13 +535,13 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <span>{t('btn_back')}</span>
                 </button>
                 <button
                   onClick={() => setCurrentStep(3)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Generate OPD Token</span>
+                  <span>{t('s2_generate_token_btn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -559,13 +553,13 @@ export const PatientPortal: React.FC = () => {
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 3 of 8
+                  {t('s3_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  OPD Token & Queue Slip
+                  {t('s3_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  Your token has been generated. Show this digital token at the AYUSH OPD intake counter or continue self-intake.
+                  {t('s3_subtitle')}
                 </p>
               </div>
 
@@ -573,11 +567,11 @@ export const PatientPortal: React.FC = () => {
               <div className="max-w-md mx-auto rounded-3xl border-2 border-brand-teal bg-gradient-to-b from-brand-teal-light/50 via-white to-brand-blue-light/30 p-6 sm:p-8 shadow-soft-lg text-center space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-teal text-white text-xs font-bold shadow-soft">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Verified OPD Slot</span>
+                  <span>{t('s3_verified_slot')}</span>
                 </div>
 
                 <div>
-                  <p className="text-xs text-brand-muted uppercase tracking-wider font-semibold">Your Token Number</p>
+                  <p className="text-xs text-brand-muted uppercase tracking-wider font-semibold">{t('s3_token_label')}</p>
                   <h1 className="text-4xl sm:text-5xl font-extrabold text-brand-heading tracking-tight font-mono text-brand-teal-dark mt-1">
                     {currentToken}
                   </h1>
@@ -585,20 +579,20 @@ export const PatientPortal: React.FC = () => {
 
                 <div className="p-3 bg-white rounded-2xl border border-brand-border/80 shadow-xs space-y-1.5 text-xs text-left">
                   <div className="flex justify-between">
-                    <span className="text-brand-muted">Patient:</span>
+                    <span className="text-brand-muted">{t('s3_patient_label')}</span>
                     <span className="font-bold text-brand-heading">{formData.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-brand-muted">OPD Queue Position:</span>
-                    <span className="font-bold text-brand-teal-dark">#{currentQueueNo} (Approx 15 mins)</span>
+                    <span className="text-brand-muted">{t('s3_queue_label')}</span>
+                    <span className="font-bold text-brand-teal-dark">{t('s3_queue_value', { n: currentQueueNo })}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-brand-muted">Hospital:</span>
+                    <span className="text-brand-muted">{t('s3_hospital_label')}</span>
                     <span className="font-medium text-brand-heading truncate max-w-[200px]">{selectedHospital.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-brand-muted">ABHA ID:</span>
-                    <span className="font-mono text-brand-body">{formData.abhaId || 'Linked to Mobile'}</span>
+                    <span className="text-brand-muted">{t('s3_abha_label')}</span>
+                    <span className="font-mono text-brand-body">{formData.abhaId || t('s3_abha_fallback')}</span>
                   </div>
                 </div>
 
@@ -611,14 +605,14 @@ export const PatientPortal: React.FC = () => {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-brand-border bg-white hover:bg-brand-bg text-xs font-medium text-brand-heading shadow-xs"
                   >
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Copy Token</span>
+                    <span>{t('s3_copy_btn')}</span>
                   </button>
                   <button
                     onClick={() => window.print()}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-brand-border bg-white hover:bg-brand-bg text-xs font-medium text-brand-heading shadow-xs"
                   >
                     <Printer className="w-3.5 h-3.5" />
-                    <span>Print Slip</span>
+                    <span>{t('s3_print_btn')}</span>
                   </button>
                 </div>
               </div>
@@ -630,13 +624,13 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <span>{t('btn_back')}</span>
                 </button>
                 <button
                   onClick={() => setCurrentStep(4)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Proceed to Select Care Stream</span>
+                  <span>{t('s3_proceed_btn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -648,13 +642,13 @@ export const PatientPortal: React.FC = () => {
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 4 of 9
+                  {t('s4_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  Select Your Care Stream (चिकित्सा पद्धति)
+                  {t('s4_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  Choose between classical Ayurvedic holistic treatment or modern Allopathic clinical care. Your records and consultation history will remain strictly segregated.
+                  {t('s4_subtitle')}
                 </p>
               </div>
 
@@ -677,13 +671,13 @@ export const PatientPortal: React.FC = () => {
                         ? 'bg-emerald-600 text-white'
                         : 'bg-emerald-100 text-emerald-800'
                     }`}>
-                      {selectedCareSystem === 'AYURVEDA' ? 'Selected Stream' : 'Select Ayurveda'}
+                      {selectedCareSystem === 'AYURVEDA' ? t('s4_ayu_status_selected') : t('s4_ayu_status_select')}
                     </span>
                   </div>
 
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-bold text-brand-heading">Ayurveda Care Stream</h3>
+                      <h3 className="text-lg font-bold text-brand-heading">{t('s4_ayu_name')}</h3>
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-200/60 text-emerald-900">
                         AYU-PREFIX
                       </span>
@@ -692,12 +686,12 @@ export const PatientPortal: React.FC = () => {
                       "सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः"
                     </p>
                     <p className="text-xs text-brand-body leading-relaxed">
-                      Holistic healing addressing root cause imbalances through Tridosha diagnosis (Vata, Pitta, Kapha), Agni assessment, classical Panchakarma therapies, and herbal formulations.
+                      {t('s4_ayu_desc')}
                     </p>
                   </div>
 
                   <div className="mt-5 pt-4 border-t border-emerald-200/50 space-y-2">
-                    <p className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider">Features & Protocols:</p>
+                    <p className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider">{t('s4_features_label')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {['Prakriti Assessment', 'Nadi Pariksha', 'Panchakarma', 'Herbo-Mineral Formulations', 'Digital Twin Silhouette'].map((tag, i) => (
                         <span key={i} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-white border border-emerald-200 text-emerald-800">
@@ -726,27 +720,27 @@ export const PatientPortal: React.FC = () => {
                         ? 'bg-sky-600 text-white'
                         : 'bg-sky-100 text-sky-800'
                     }`}>
-                      {selectedCareSystem === 'ALLOPATHY' ? 'Selected Stream' : 'Select Allopathy'}
+                      {selectedCareSystem === 'ALLOPATHY' ? t('s4_allo_status_selected') : t('s4_allo_status_select')}
                     </span>
                   </div>
 
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-bold text-brand-heading">Allopathy Care Stream</h3>
+                      <h3 className="text-lg font-bold text-brand-heading">{t('s4_allo_name')}</h3>
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-sky-200/60 text-sky-900">
                         ALLO-PREFIX
                       </span>
                     </div>
                     <p className="text-xs italic text-sky-800 font-serif">
-                      "Evidence-Based Modern Clinical Medicine"
+                      {t('s4_allo_tagline')}
                     </p>
                     <p className="text-xs text-brand-body leading-relaxed">
-                      Conventional medical management, symptom control, laboratory diagnostics, diagnostic imaging, and evidence-guided pharmaceuticals administered by specialist physicians.
+                      {t('s4_allo_desc')}
                     </p>
                   </div>
 
                   <div className="mt-5 pt-4 border-t border-sky-200/50 space-y-2">
-                    <p className="text-[11px] font-bold text-sky-900 uppercase tracking-wider">Features & Protocols:</p>
+                    <p className="text-[11px] font-bold text-sky-900 uppercase tracking-wider">{t('s4_features_label')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {['Specialist OPD', 'Pathology & Lab Tests', 'Radiology Scans', 'Evidence Pharmacotherapy', 'Acute Care Triage'].map((tag, i) => (
                         <span key={i} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-white border border-sky-200 text-sky-800">
@@ -761,13 +755,13 @@ export const PatientPortal: React.FC = () => {
               {/* Active Token Notice */}
               <div className="p-4 rounded-2xl bg-brand-bg border border-brand-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-brand-muted">Assigned Visit Token:</span>
+                  <span className="text-xs text-brand-muted">{t('s4_assigned_token_label')}</span>
                   <span className="font-mono text-sm font-extrabold text-brand-teal-dark bg-white px-3 py-1 rounded-xl border border-brand-border shadow-xs">
                     {currentToken}
                   </span>
                 </div>
                 <span className="text-xs font-semibold text-brand-body">
-                  Active Care Stream: <strong className={selectedCareSystem === 'AYURVEDA' ? 'text-emerald-700' : 'text-sky-700'}>{selectedCareSystem}</strong>
+                  {t('s4_active_stream_label')} <strong className={selectedCareSystem === 'AYURVEDA' ? 'text-emerald-700' : 'text-sky-700'}>{selectedCareSystem}</strong>
                 </span>
               </div>
 
@@ -778,13 +772,13 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <span>{t('btn_back')}</span>
                 </button>
                 <button
                   onClick={() => setCurrentStep(5)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Continue to Language Selection</span>
+                  <span>{t('s4_continue_btn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -796,13 +790,13 @@ export const PatientPortal: React.FC = () => {
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 5 of 9
+                  {t('s5_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  Select Preferred Language for AI Intake
+                  {t('s5_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  AyuFlow speaks and understands 10+ Indian regional languages and classical Ayurvedic terminology.
+                  {t('s5_subtitle')}
                 </p>
               </div>
 
@@ -812,7 +806,7 @@ export const PatientPortal: React.FC = () => {
                   return (
                     <button
                       key={lang.code}
-                      onClick={() => setSelectedLang(lang.code)}
+                      onClick={() => setPatientLanguage(lang.code)}
                       className={`p-4 rounded-2xl border-2 text-left transition-all ${
                         isSelected
                           ? 'border-brand-teal bg-brand-teal-light shadow-soft scale-[1.02]'
@@ -835,13 +829,13 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Care Stream</span>
+                  <span>{t('s5_back_btn')}</span>
                 </button>
                 <button
                   onClick={() => setCurrentStep(6)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Proceed to Upload Documents</span>
+                  <span>{t('s5_continue_btn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -853,13 +847,13 @@ export const PatientPortal: React.FC = () => {
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 6 of 9
+                  {t('s6_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  Scan & Upload Medical Records
+                  {t('s6_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  Upload previous doctor prescriptions, blood tests, or Ayurvedic case sheets for AI entity extraction.
+                  {t('s6_subtitle')}
                 </p>
               </div>
 
@@ -871,7 +865,7 @@ export const PatientPortal: React.FC = () => {
               <div className="p-4 rounded-2xl bg-brand-blue-light/50 border border-brand-blue/40 flex items-start gap-3">
                 <Sparkles className="w-5 h-5 text-brand-blue-dark flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-brand-heading leading-relaxed">
-                  <span className="font-bold">Ayurvedic OCR Note:</span> Even handwritten prescriptions with Sanskrit names (like <em>Guggulu</em>, <em>Kashayam</em>, <em>Bhasma</em>) are automatically transcribed and provided to the consulting physician.
+                  <span className="font-bold">{t('s6_ocr_note_label')}</span> {t('s6_ocr_note_text')}
                 </p>
               </div>
 
@@ -881,13 +875,13 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <span>{t('btn_back')}</span>
                 </button>
                 <button
                   onClick={() => setCurrentStep(7)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Start Conversational Intake</span>
+                  <span>{t('s6_continue_btn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -900,18 +894,18 @@ export const PatientPortal: React.FC = () => {
               <div className="border-b border-brand-border pb-4 flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                    Step 7 of 9
+                    {t('s7_badge')}
                   </span>
                   <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                    AI Conversational Case-Taking
+                    {t('s7_title')}
                   </h2>
                   <p className="text-xs sm:text-sm text-brand-body mt-1">
-                    Describe your symptoms freely. Speak using the microphone or select suggested symptoms.
+                    {t('s7_subtitle')}
                   </p>
                 </div>
                 <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-teal-light text-brand-teal-dark text-xs font-semibold">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Speech-to-Text Active</span>
+                  <span>{t('s7_stt_active')}</span>
                 </div>
               </div>
 
@@ -922,7 +916,7 @@ export const PatientPortal: React.FC = () => {
                     key={msg.id}
                     message={msg}
                     onOptionClick={(opt) => handleSendChat(opt)}
-                    onSpeak={(txt) => {
+                    onSpeak={() => {
                       showToast({ type: 'info', title: 'Audio Output', message: `Speaking text in ${selectedLang.toUpperCase()}` });
                     }}
                   />
@@ -945,7 +939,7 @@ export const PatientPortal: React.FC = () => {
                   value={chatInput}
                   onChange={(val) => setChatInput(val)}
                   placeholder="Speak or type your symptoms (e.g., घुटने में दर्द, पेट में जलन, chronic acidity)..."
-                  label="Chief Complaint Voice Intake"
+                  label={t('s7_voice_label')}
                   language={MOCK_LANGUAGES.find(l => l.code === selectedLang)?.name || 'Hindi (हिंदी)'}
                   samplePhrases={[
                     'घुटनों में सुबह उठने पर बहुत तेज़ दर्द और अकड़न रहती है',
@@ -965,7 +959,7 @@ export const PatientPortal: React.FC = () => {
                         : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                     }`}
                   >
-                    <span>Send into Consultation Chat</span>
+                    <span>{t('s7_send_btn')}</span>
                     <Send className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -977,13 +971,13 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <span>{t('s7_back_btn')}</span>
                 </button>
                 <button
                   onClick={() => setCurrentStep(8)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Next: Clinical Questionnaire</span>
+                  <span>{t('s7_continue_btn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -995,13 +989,13 @@ export const PatientPortal: React.FC = () => {
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 8 of 9
+                  {t('s8_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  Deterministic Clinical Questionnaire
+                  {t('s8_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  10 standardized SIH clinical checkpoints assessing chronicity, severity, prior episodes, comorbidities, medications, and allergies.
+                  {t('s8_subtitle')}
                 </p>
               </div>
 
@@ -1009,10 +1003,10 @@ export const PatientPortal: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold text-brand-heading mb-2">
                   <span>
-                    Question {questionnaireIndex + 1} of {MOCK_CLINICAL_QUESTIONS.length}
+                    {t('s8_question_progress', { current: questionnaireIndex + 1, total: MOCK_CLINICAL_QUESTIONS.length })}
                   </span>
                   <span className="text-brand-teal-dark">
-                    Category: {MOCK_CLINICAL_QUESTIONS[questionnaireIndex].category}
+                    {t('s8_category_label')} {MOCK_CLINICAL_QUESTIONS[questionnaireIndex].category}
                   </span>
                 </div>
                 <div className="w-full h-2 bg-brand-border rounded-full overflow-hidden">
@@ -1038,7 +1032,7 @@ export const PatientPortal: React.FC = () => {
 
                     <div className="p-3 rounded-xl bg-white border border-brand-border/60 text-xs text-brand-body flex items-start gap-2">
                       <Sparkles className="w-4 h-4 text-brand-teal-dark flex-shrink-0 mt-0.5" />
-                      <span><strong>Clinical Rationale:</strong> {q.ayushContext}</span>
+                      <span><strong>{t('s8_rationale_label')}</strong> {q.ayushContext}</span>
                     </div>
 
                     <div className="space-y-2 pt-2">
@@ -1080,7 +1074,7 @@ export const PatientPortal: React.FC = () => {
                             : 'text-brand-muted hover:text-brand-heading bg-white border border-brand-border'
                         }`}
                       >
-                        Previous Question
+                        {t('s8_prev_question_btn')}
                       </button>
 
                       {questionnaireIndex < MOCK_CLINICAL_QUESTIONS.length - 1 ? (
@@ -1088,14 +1082,14 @@ export const PatientPortal: React.FC = () => {
                           onClick={() => setQuestionnaireIndex(prev => prev + 1)}
                           className="px-5 py-2 rounded-xl bg-brand-heading text-white text-xs font-bold hover:bg-slate-700 shadow-soft"
                         >
-                          Next Question
+                          {t('s8_next_question_btn')}
                         </button>
                       ) : (
                         <button
                           onClick={() => setCurrentStep(9)}
                           className="px-6 py-2 rounded-xl bg-brand-teal text-white text-xs font-bold hover:bg-brand-teal-dark shadow-soft"
                         >
-                          Review All Responses
+                          {t('s8_review_all_btn')}
                         </button>
                       )}
                     </div>
@@ -1109,13 +1103,13 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Chat</span>
+                  <span>{t('s8_back_btn')}</span>
                 </button>
                 <button
                   onClick={() => setCurrentStep(9)}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
-                  <span>Skip to Review</span>
+                  <span>{t('s8_skip_btn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -1127,13 +1121,13 @@ export const PatientPortal: React.FC = () => {
             <div className="space-y-6">
               <div className="border-b border-brand-border pb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-teal-dark bg-brand-teal-light px-2.5 py-1 rounded-full">
-                  Step 9 of 9
+                  {t('s9_badge')}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-brand-heading mt-2">
-                  Review & Confirm Clinical Dossier
+                  {t('s9_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-1">
-                  Please verify your responses before dispatching the pre-consultation summary to the doctor's queue.
+                  {t('s9_subtitle')}
                 </p>
               </div>
 
@@ -1146,8 +1140,8 @@ export const PatientPortal: React.FC = () => {
                   <div className="flex items-center gap-2.5">
                     <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
                     <div>
-                      <span className="text-xs font-bold block">Priority Clinical Review Triggered</span>
-                      <span className="text-[11px] text-amber-800">Severe pain or mobility restriction flagged. Patient routed to urgent queue.</span>
+                      <span className="text-xs font-bold block">{t('s9_priority_title')}</span>
+                      <span className="text-[11px] text-amber-800">{t('s9_priority_desc')}</span>
                     </div>
                   </div>
                   <PriorityFlag pulse={true} size="md" />
@@ -1157,15 +1151,15 @@ export const PatientPortal: React.FC = () => {
               {/* Patient Summary Header Box */}
               <div className="p-4 rounded-2xl bg-brand-bg border border-brand-border grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div>
-                  <span className="text-brand-muted">Patient Name:</span>
+                  <span className="text-brand-muted">{t('s9_summary_name')}</span>
                   <p className="font-bold text-brand-heading">{formData.name}</p>
                 </div>
                 <div>
-                  <span className="text-brand-muted">Assigned Token:</span>
+                  <span className="text-brand-muted">{t('s9_summary_token')}</span>
                   <p className="font-mono font-bold text-brand-teal-dark">{currentToken}</p>
                 </div>
                 <div>
-                  <span className="text-brand-muted">Care Stream:</span>
+                  <span className="text-brand-muted">{t('s9_summary_stream')}</span>
                   <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
                     selectedCareSystem === 'AYURVEDA' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800'
                   }`}>
@@ -1173,15 +1167,15 @@ export const PatientPortal: React.FC = () => {
                   </span>
                 </div>
                 <div>
-                  <span className="text-brand-muted">Attached Records:</span>
-                  <p className="font-medium text-brand-heading">{uploadedDocs.length} files</p>
+                  <span className="text-brand-muted">{t('s9_summary_docs')}</span>
+                  <p className="font-medium text-brand-heading">{t('s9_docs_count', { n: uploadedDocs.length })}</p>
                 </div>
               </div>
 
               {/* Questionnaire Answer Cards */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-brand-heading uppercase tracking-wider">
-                  Logged SIH Assessment Answers (10 Checkpoints)
+                  {t('s9_answers_header')}
                 </h4>
 
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
@@ -1192,7 +1186,7 @@ export const PatientPortal: React.FC = () => {
                     >
                       <p className="font-semibold text-brand-heading">{q.question}</p>
                       <p className="text-brand-teal-dark font-medium bg-brand-teal-light/40 px-2.5 py-1 rounded-lg border border-brand-teal/20">
-                        {questionAnswers[q.id] || 'Not answered'}
+                        {questionAnswers[q.id] || t('s9_not_answered')}
                       </p>
                     </div>
                   ))}
@@ -1206,7 +1200,7 @@ export const PatientPortal: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Edit Answers</span>
+                  <span>{t('s9_edit_btn')}</span>
                 </button>
                 <button
                   disabled={isSubmitting}
@@ -1217,7 +1211,7 @@ export const PatientPortal: React.FC = () => {
                       : 'bg-brand-teal hover:bg-brand-teal-dark hover:scale-[1.02]'
                   }`}
                 >
-                  <span>{isSubmitting ? 'Synthesizing AI Clinical Dossier...' : 'Submit Intake to Doctor\'s Queue'}</span>
+                  <span>{isSubmitting ? t('s9_submitting') : t('s9_submit_btn')}</span>
                   <CheckCircle2 className="w-4 h-4" />
                 </button>
               </div>
@@ -1227,7 +1221,7 @@ export const PatientPortal: React.FC = () => {
           {/* STEP 10: Intake Completed & Sent to Doctor */}
           {currentStep === 10 && (
             <div className="text-center py-6 sm:py-10 space-y-6 animate-in zoom-in-95 duration-200">
-              
+
               {/* Checkmark Icon with soft green halo */}
               <div className="w-20 h-20 rounded-3xl bg-[#EAF7ED] text-[#2E7D32] border-2 border-[#A7D7B5] flex items-center justify-center mx-auto shadow-soft animate-bounce">
                 <Check className="w-10 h-10 stroke-[3]" />
@@ -1235,20 +1229,20 @@ export const PatientPortal: React.FC = () => {
 
               <div className="max-w-lg mx-auto">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#2E7D32] bg-[#EAF7ED] px-3 py-1 rounded-full border border-[#A7D7B5]">
-                  Case Intake Completed
+                  {t('s10_badge')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-brand-heading mt-3">
-                  Data Successfully Sent to Doctor's Queue
+                  {t('s10_title')}
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-body mt-2 leading-relaxed">
-                  Your clinical case profile and AI-synthesized record have been dispatched to the consulting physician at <strong>{selectedHospital.name}</strong>.
+                  {t('s10_desc', { hospital: selectedHospital.name })}
                 </p>
               </div>
 
               {/* Token Reminder Box */}
               <div className="max-w-sm mx-auto p-5 rounded-2xl bg-brand-bg border border-brand-border shadow-soft space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                  <span className="text-xs text-brand-muted uppercase tracking-wider font-semibold">Live OPD Token</span>
+                  <span className="text-xs text-brand-muted uppercase tracking-wider font-semibold">{t('s10_token_label')}</span>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     selectedCareSystem === 'AYURVEDA' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800'
                   }`}>
@@ -1256,8 +1250,8 @@ export const PatientPortal: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-3xl font-extrabold font-mono text-brand-teal-dark">{currentToken}</p>
-                <p className="text-xs font-semibold text-brand-heading">Queue Position: #{currentQueueNo}</p>
-                <p className="text-[11px] text-brand-muted">Please proceed to OPD Waiting Room 3 when called.</p>
+                <p className="text-xs font-semibold text-brand-heading">{t('s10_queue_position', { n: currentQueueNo })}</p>
+                <p className="text-[11px] text-brand-muted">{t('s10_waiting_room')}</p>
               </div>
 
               {/* Action Jump Buttons */}
@@ -1267,20 +1261,20 @@ export const PatientPortal: React.FC = () => {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand-heading hover:bg-slate-700 text-white text-xs font-bold shadow-soft transition-all"
                 >
                   <FileText className="w-4 h-4" />
-                  <span>View My Patient Dashboard & Token</span>
+                  <span>{t('s10_view_dashboard_btn')}</span>
                 </button>
                 <button
                   onClick={() => navigate('/doctor')}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft transition-all"
                 >
                   <Stethoscope className="w-4 h-4" />
-                  <span>Jump to Doctor View</span>
+                  <span>{t('s10_jump_doctor_btn')}</span>
                 </button>
                 <button
                   onClick={() => navigate('/')}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl border border-brand-border bg-white hover:bg-brand-bg text-xs font-semibold text-brand-heading transition-all"
                 >
-                  <span>Return to Home</span>
+                  <span>{t('s10_return_home_btn')}</span>
                 </button>
               </div>
             </div>
