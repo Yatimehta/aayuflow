@@ -8,7 +8,8 @@ import {
   UserPlus, 
   Sparkles,
   ExternalLink,
-  AlertCircle
+  AlertCircle,
+  Leaf
 } from 'lucide-react';
 import { Patient, PatientStatus } from '../types';
 import { StatusBadge } from './StatusBadge';
@@ -38,7 +39,9 @@ export const PatientTable: React.FC<PatientTableProps> = ({
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.tokenNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.phone.includes(searchTerm) ||
-        p.chiefComplaint.toLowerCase().includes(searchTerm.toLowerCase());
+        p.chiefComplaint.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.careSystem && p.careSystem.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (p.intakeType && p.intakeType.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchStatus = statusFilter === 'All' || p.status === statusFilter;
       return matchSearch && matchStatus;
     })
@@ -228,13 +231,16 @@ export const PatientTable: React.FC<PatientTableProps> = ({
 
                   {/* Care Stream */}
                   <td className="py-3 px-4">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border ${
-                      patient.careSystem === 'AYURVEDA'
-                        ? 'bg-amber-50 text-amber-800 border-amber-200'
-                        : 'bg-blue-50 text-blue-800 border-blue-200'
-                    }`}>
-                      {patient.careSystem === 'AYURVEDA' ? 'AYUSH · Ayurveda' : 'Allopathy · General'}
-                    </span>
+                    {patient.careSystem === 'AYURVEDA' || patient.intakeType === 'ayurveda' ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#CEF3ED] text-[#146356] border border-[#9FDCD1]">
+                        <Leaf className="w-3 h-3 text-[#146356]" />
+                        <span>AYUSH Intake</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                        Allopathy · General
+                      </span>
+                    )}
                   </td>
 
                   {/* Status */}

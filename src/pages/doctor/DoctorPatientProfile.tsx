@@ -21,7 +21,8 @@ import {
   Scale,
   Layers,
   FlaskConical,
-  Languages
+  Languages,
+  Leaf
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -175,13 +176,19 @@ export const DoctorPatientProfile: React.FC = () => {
                 }`}>
                   {patient.tokenNumber}
                 </span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                  patient.careSystem === 'AYURVEDA'
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  patient.careSystem === 'AYURVEDA' || patient.intakeType === 'ayurveda'
+                    ? 'bg-[#CEF3ED] text-[#146356] border border-[#9FDCD1]'
                     : 'bg-sky-50 text-sky-700 border border-sky-200'
                 }`}>
-                  {patient.careSystem || 'AYURVEDA'}
+                  {patient.intakeType === 'ayurveda' || patient.careSystem === 'AYURVEDA' ? 'AYUSH Intake' : 'Allopathy'}
                 </span>
+                {patient.otp && (
+                  <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#E4EFEC] text-[#146356] border border-[#9FDCD1]">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase">Doctor Access OTP:</span>
+                    <span className="tracking-wider">{patient.otp}</span>
+                  </span>
+                )}
                 {patient.priorityFlag && <PriorityFlag size="sm" />}
                 <StatusBadge status={patient.status} size="sm" />
               </div>
@@ -854,6 +861,154 @@ export const DoctorPatientProfile: React.FC = () => {
               {patient.ayurvedaHistory?.length || 1} Record(s) on File
             </span>
           </div>
+
+          {/* Active OPD 10-Point Ayurvedic Assessment / Dashavidha Block */}
+          {patient.ayurvedaIntake && (
+            <div className="p-5 sm:p-6 rounded-3xl bg-[#F4FBF9] border-2 border-[#146356]/40 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#DCEAE7] pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-xl bg-[#146356] text-white flex items-center justify-center font-bold">
+                    <Leaf className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h4 className="text-sm font-bold text-[#0D2B3E]">
+                      Dashavidha Pariksha & 10-Point Intake Assessment
+                    </h4>
+                    <p className="text-[11px] text-slate-500">
+                      Auto-populated from patient electronic intake questionnaire · AIIA Protocol
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#CEF3ED] text-[#146356] border border-[#9FDCD1] uppercase tracking-wider self-start sm:self-auto">
+                  Live Intake Data
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+                {/* 1 & 2. Concern & Region */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#DCEAE7] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#146356] tracking-wider">
+                    1 & 2. Chief Concern & Anatomical Region
+                  </span>
+                  <p className="font-bold text-[#0D2B3E] text-sm">{patient.ayurvedaIntake.mainConcern}</p>
+                  <p className="text-[11px] text-slate-500">
+                    Primary Region: <strong className="text-slate-800">{patient.ayurvedaIntake.affectedRegion}</strong>
+                  </p>
+                </div>
+
+                {/* 3 & 4. Prakriti & Agni */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#DCEAE7] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#146356] tracking-wider">
+                    3 & 4. Deha Prakriti & Agni (Digestion)
+                  </span>
+                  <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                    <span className="px-2 py-0.5 rounded-lg bg-[#E4EFEC] text-[#146356] font-semibold text-[11px]">
+                      Prakriti: {patient.ayurvedaIntake.bodyBuild}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg bg-[#E4EFEC] text-[#146356] font-semibold text-[11px]">
+                      Agni: {patient.ayurvedaIntake.agni}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 5 & 6. Nidra & Vyayama */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#DCEAE7] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#146356] tracking-wider">
+                    5 & 6. Nidra (Sleep) & Vyayama (Activity)
+                  </span>
+                  <p className="text-[11px] text-slate-700">
+                    <strong>Nidra:</strong> {patient.ayurvedaIntake.sleepPattern}
+                  </p>
+                  <p className="text-[11px] text-slate-700">
+                    <strong>Vyayama:</strong> {patient.ayurvedaIntake.activityLevel}
+                  </p>
+                </div>
+
+                {/* 7. Hetu Triggers */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#DCEAE7] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-[#146356] tracking-wider">
+                    7. Hetu (Diet & Lifestyle Triggers)
+                  </span>
+                  <div className="flex flex-wrap gap-1 pt-0.5">
+                    {patient.ayurvedaIntake.hetuTriggers && patient.ayurvedaIntake.hetuTriggers.length > 0 ? (
+                      patient.ayurvedaIntake.hetuTriggers.map((h, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-medium">
+                          {h}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-slate-400 italic">No specific hetu triggers identified</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* 8. Dosha Phenotype Baseline */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#DCEAE7] md:col-span-2 space-y-2">
+                  <span className="text-[10px] uppercase font-bold text-[#146356] tracking-wider">
+                    8. Dosha Phenotype Baseline
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="p-2.5 rounded-xl bg-purple-50/50 border border-purple-100">
+                      <span className="text-[10px] font-bold text-purple-900 block">Vata Attributes</span>
+                      <p className="text-[11px] text-purple-800 mt-0.5">
+                        {patient.ayurvedaIntake.doshaBaseline.vata.join(', ') || 'None selected'}
+                      </p>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-amber-50/50 border border-amber-100">
+                      <span className="text-[10px] font-bold text-amber-900 block">Pitta Attributes</span>
+                      <p className="text-[11px] text-amber-800 mt-0.5">
+                        {patient.ayurvedaIntake.doshaBaseline.pitta.join(', ') || 'None selected'}
+                      </p>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                      <span className="text-[10px] font-bold text-emerald-900 block">Kapha Attributes</span>
+                      <p className="text-[11px] text-emerald-800 mt-0.5">
+                        {patient.ayurvedaIntake.doshaBaseline.kapha.join(', ') || 'None selected'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 9 & 10. Cross-System Safety & Existing Conditions */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#DCEAE7] md:col-span-2 space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#146356] tracking-wider block">
+                        9. Cross-System Medications & Safety
+                      </span>
+                      <p className="text-[11px] text-slate-800 mt-1">
+                        <strong>Type:</strong> {patient.ayurvedaIntake.medications.type}
+                      </p>
+                      {patient.ayurvedaIntake.medications.details && (
+                        <p className="text-[11px] text-slate-600">
+                          {patient.ayurvedaIntake.medications.details}
+                        </p>
+                      )}
+                      {patient.ayurvedaIntake.medications.docName && (
+                        <p className="text-[10px] text-emerald-700 font-semibold mt-1">
+                          📄 Rx Attached: {patient.ayurvedaIntake.medications.docName}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#146356] tracking-wider block">
+                        10. Prior Conditions & Reports (Roga Itihasa)
+                      </span>
+                      <p className="text-[11px] text-slate-800 mt-1">
+                        {patient.ayurvedaIntake.existingConditions.join(', ') || 'None reported'}
+                      </p>
+                      {patient.ayurvedaIntake.priorReportName && (
+                        <p className="text-[10px] text-emerald-700 font-semibold mt-1">
+                          📎 Attached File: {patient.ayurvedaIntake.priorReportName}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {(!patient.ayurvedaHistory || patient.ayurvedaHistory.length === 0) ? (
             <div className="py-12 text-center text-brand-muted">

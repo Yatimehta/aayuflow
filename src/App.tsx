@@ -20,6 +20,8 @@ import { PatientDashboard } from './pages/patient/PatientDashboard';
 import { PatientLanguageSelect } from './pages/patient/PatientLanguageSelect';
 import { PatientRegistration } from './pages/patient/PatientRegistration';
 import { PatientConsent } from './pages/patient/PatientConsent';
+import { PatientIntakePath } from './pages/patient/PatientIntakePath';
+import { PatientAyurvedaIntake } from './pages/patient/PatientAyurvedaIntake';
 import { PatientIntake } from './pages/patient/PatientIntake';
 import { PatientUploadDocument } from './pages/patient/PatientUploadDocument';
 import { PatientRecords } from './pages/patient/PatientRecords';
@@ -114,6 +116,8 @@ export const App: React.FC = () => {
               <Route path="/patient/language" element={<PatientLanguageSelect />} />
               <Route path="/patient/registration" element={<PatientRegistration />} />
               <Route path="/patient/consent" element={<PatientConsent />} />
+              <Route path="/patient/intake-path" element={<PatientIntakePath />} />
+              <Route path="/patient/intake-ayurveda" element={<PatientAyurvedaIntake />} />
               <Route path="/patient/dashboard" element={<PatientDashboard />} />
               <Route path="/patient/intake" element={<PatientIntake />} />
               <Route path="/patient/upload" element={<PatientUploadDocument />} />

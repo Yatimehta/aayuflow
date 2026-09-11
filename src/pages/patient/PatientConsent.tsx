@@ -39,7 +39,7 @@ export const PatientConsent: React.FC = () => {
       message: 'ABDM explicit consent token registered. Proceeding to clinical intake.'
     });
 
-    navigate('/patient/intake');
+    navigate('/patient/intake-path');
   };
 
   return (
@@ -194,7 +194,7 @@ export const PatientConsent: React.FC = () => {
                   : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <span>Continue to Intake Questionnaire</span>
+              <span>Continue to Stream Selection</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>

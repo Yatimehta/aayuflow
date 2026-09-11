@@ -170,6 +170,7 @@ export interface Patient {
   appointmentTime: string;
   status: PatientStatus;
   careSystem?: CareSystem;
+  intakeType?: 'ayurveda' | 'allopathy';
   chiefComplaint: string;
   doshaPrimary: string;
   preferredLanguage: string;
@@ -188,6 +189,29 @@ export interface Patient {
   previousVisits: PreviousVisit[];
   ayurvedaHistory?: Consultation[];
   allopathyHistory?: Consultation[];
+  ayurvedaIntake?: AyurvedaIntakeData;
+}
+
+export interface AyurvedaIntakeData {
+  mainConcern: string;
+  affectedRegion: string;
+  prakriti: string;
+  agni: string;
+  nidra: string;
+  vyayama: string;
+  hetu: string[];
+  doshaBaseline: {
+    vata: string[];
+    pitta: string[];
+    kapha: string[];
+  };
+  medications: {
+    type: 'None' | 'Allopathic Medicines' | 'Ayurvedic Formulations' | 'Both';
+    details?: string;
+    docName?: string;
+  };
+  existingConditions: string[];
+  priorReportName?: string;
 }
 
 export interface IntakeChatMessage {

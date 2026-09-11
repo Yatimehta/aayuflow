@@ -29,15 +29,39 @@ export const DoctorVerify: React.FC = () => {
 
   const patient = activePatient || patients[0];
 
-  // Editable Form fields
-  const [prakriti, setPrakriti] = useState(patient.clinicalSummary.prakriti);
-  const [vikriti, setVikriti] = useState(patient.clinicalSummary.vikriti);
-  const [agni, setAgni] = useState(patient.clinicalSummary.agni);
+  // Helper to map Agni from intake to summary enum
+  const mapIntakeAgni = (agniStr?: string): 'Sama' | 'Vishama' | 'Tikshna' | 'Manda' => {
+    if (!agniStr) return patient.clinicalSummary.agni;
+    if (agniStr.includes('Vishamagni')) return 'Vishama';
+    if (agniStr.includes('Tikshnagni')) return 'Tikshna';
+    if (agniStr.includes('Mandagni')) return 'Manda';
+    if (agniStr.includes('Samagni')) return 'Sama';
+    return patient.clinicalSummary.agni;
+  };
+
+  // Editable Form fields — Auto-populated from 10-point assessment when available
+  const [prakriti, setPrakriti] = useState(
+    patient.ayurvedaIntake?.bodyBuild || patient.clinicalSummary.prakriti
+  );
+  const [vikriti, setVikriti] = useState(
+    patient.ayurvedaIntake?.doshaBaseline
+      ? `Vata [${patient.ayurvedaIntake.doshaBaseline.vata.join(', ') || 'N/A'}] • Pitta [${patient.ayurvedaIntake.doshaBaseline.pitta.join(', ') || 'N/A'}] • Kapha [${patient.ayurvedaIntake.doshaBaseline.kapha.join(', ') || 'N/A'}]`
+      : patient.clinicalSummary.vikriti
+  );
+  const [agni, setAgni] = useState(
+    mapIntakeAgni(patient.ayurvedaIntake?.agni)
+  );
   const [koshtha, setKoshtha] = useState(patient.clinicalSummary.koshtha);
-  const [nidana, setNidana] = useState(patient.clinicalSummary.nidana);
+  const [nidana, setNidana] = useState(
+    patient.ayurvedaIntake?.hetuTriggers && patient.ayurvedaIntake.hetuTriggers.length > 0
+      ? `Hetu (Triggers): ${patient.ayurvedaIntake.hetuTriggers.join(', ')}. ${patient.clinicalSummary.nidana}`
+      : patient.clinicalSummary.nidana
+  );
   const [aiNotes, setAiNotes] = useState(patient.clinicalSummary.aiGeneratedNotes);
   const [doctorRemarks, setDoctorRemarks] = useState(
-    'I have examined the patient. Symptoms and pulse (Nadi) confirm classical Sandhivata with localized Vata Prakopa. AI summary verified.'
+    patient.ayurvedaIntake
+      ? `I have examined the patient. 10-point assessment confirms ${patient.ayurvedaIntake.mainConcern} with ${patient.ayurvedaIntake.bodyBuild} constitution and ${patient.ayurvedaIntake.agni}. AI summary endorsed.`
+      : 'I have examined the patient. Symptoms and pulse (Nadi) confirm classical Sandhivata with localized Vata Prakopa. AI summary verified.'
   );
 
   // Request Changes Modal
@@ -109,11 +133,20 @@ export const DoctorVerify: React.FC = () => {
             {patient.name.charAt(0)}
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-bold text-xs text-brand-heading">{patient.name}</span>
               <span className="font-mono text-xs font-bold text-brand-teal-dark bg-brand-teal-light px-1.5 py-0.5 rounded">
                 {patient.tokenNumber}
               </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#CEF3ED] text-[#146356] border border-[#9FDCD1]">
+                {patient.intakeType === 'ayurveda' || patient.careSystem === 'AYURVEDA' ? 'AYUSH Intake' : 'Allopathy'}
+              </span>
+              {patient.otp && (
+                <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#E4EFEC] text-[#146356] border border-[#9FDCD1]">
+                  <span>OTP:</span>
+                  <span className="tracking-wider">{patient.otp}</span>
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-brand-muted">{patient.age} yrs • {patient.gender} • {patient.phone}</p>
           </div>
