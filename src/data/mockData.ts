@@ -390,7 +390,14 @@ export const MOCK_PATIENTS: Patient[] = [
         size: '1.2 MB',
         uploadDate: '2026-09-08',
         status: 'Verified',
-        ocrExtractedSummary: 'Aceclofenac 100mg + Paracetamol 325mg BD, Pantoprazole 40mg OD. Patient reported gastric irritation with NSAIDs.'
+        ocrExtractedSummary: 'Aceclofenac 100mg + Paracetamol 325mg BD, Telmisartan 40mg OD. Patient reported gastric irritation with NSAIDs.',
+        drugInteractions: [
+          {
+            drugs: ['Aceclofenac 100mg', 'Telmisartan 40mg'],
+            warning: 'Concomitant NSAID with ARB antihypertensive may diminish blood pressure reduction and increase acute nephrotoxic risk.',
+            severity: 'Moderate'
+          }
+        ]
       },
       {
         id: 'doc-103',
@@ -400,7 +407,28 @@ export const MOCK_PATIENTS: Patient[] = [
         size: '890 KB',
         uploadDate: '2026-09-08',
         status: 'Verified',
-        ocrExtractedSummary: 'Serum Uric Acid: 5.4 mg/dL (Normal). CRP: 3.8 mg/L (Borderline). RA Factor: Negative (<10 IU/mL).'
+        ocrExtractedSummary: 'Serum Uric Acid: 5.4 mg/dL (Normal). CRP: 3.8 mg/L. RA Factor: Negative (<10 IU/mL).',
+        labResults: [
+          { parameter: 'Serum Uric Acid', value: '5.4', unit: 'mg/dL', referenceRange: '3.5 - 7.2 mg/dL', isAbnormal: false },
+          { parameter: 'C-Reactive Protein (CRP)', value: '3.8', unit: 'mg/L', referenceRange: '< 5.0 mg/L', isAbnormal: false },
+          { parameter: 'RA Factor', value: '< 10', unit: 'IU/mL', referenceRange: '< 14 IU/mL', isAbnormal: false }
+        ]
+      },
+      {
+        id: 'doc-104',
+        patientId: 'pat-1',
+        name: 'Diagnostic_Pathology_Lab_Panel.pdf',
+        type: 'Lab Report',
+        size: '1.6 MB',
+        uploadDate: '2026-09-08',
+        status: 'Verified',
+        ocrExtractedSummary: 'Routine metabolic extraction: Hemoglobin 8.2 g/dL, Blood Pressure 160/100 mmHg, Blood Sugar 220 mg/dL, Creatinine 0.9 mg/dL.',
+        labResults: [
+          { parameter: 'Hemoglobin', value: '8.2', unit: 'g/dL', referenceRange: '13.5 - 17.5 g/dL', isAbnormal: true },
+          { parameter: 'Blood Pressure', value: '160/100', unit: 'mmHg', referenceRange: '90-120/60-80', isAbnormal: true },
+          { parameter: 'Blood Sugar (Fasting)', value: '220', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true },
+          { parameter: 'Serum Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: false }
+        ]
       }
     ],
     prescriptions: [
@@ -608,7 +636,14 @@ export const MOCK_PATIENTS: Patient[] = [
         size: '1.7 MB',
         uploadDate: '2026-09-09',
         status: 'Verified',
-        ocrExtractedSummary: 'Fasting Blood Sugar: 142 mg/dL. Postprandial: 198 mg/dL. HbA1c: 7.9%. Total Cholesterol: 218 mg/dL.'
+        ocrExtractedSummary: 'Fasting Blood Sugar: 142 mg/dL. Postprandial: 198 mg/dL. HbA1c: 7.9%. Total Cholesterol: 218 mg/dL.',
+        labResults: [
+          { parameter: 'HbA1c', value: '7.9', unit: '%', referenceRange: '< 5.7 %', isAbnormal: true },
+          { parameter: 'Fasting Blood Sugar', value: '142', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true },
+          { parameter: 'Postprandial Sugar', value: '198', unit: 'mg/dL', referenceRange: '< 140 mg/dL', isAbnormal: true },
+          { parameter: 'Total Cholesterol', value: '218', unit: 'mg/dL', referenceRange: '< 200 mg/dL', isAbnormal: true },
+          { parameter: 'Serum Creatinine', value: '1.0', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: false }
+        ]
       }
     ],
     prescriptions: [],

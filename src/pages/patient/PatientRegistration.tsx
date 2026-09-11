@@ -40,9 +40,9 @@ export const PatientRegistration: React.FC = () => {
     showToast({
       type: 'success',
       title: 'Registration Confirmed',
-      message: `Identity verified for ${formData.name}. Welcome to your Patient Portal.`
+      message: `Identity verified for ${formData.name}. Proceeding to data consent.`
     });
-    navigate('/patient/dashboard');
+    navigate('/patient/consent');
   };
 
   return (
@@ -226,13 +226,21 @@ export const PatientRegistration: React.FC = () => {
         </div>
 
         {/* Action Button */}
-        <div className="pt-2">
+        <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/patient/dashboard')}
+            className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors text-center"
+          >
+            <span>Skip to Dashboard</span>
+          </button>
+
           <button
             type="button"
             onClick={handleConfirmAndProceed}
-            className="w-full py-3.5 rounded-xl btn-brand-primary font-bold shadow-md transition-all flex items-center justify-center gap-2 text-sm"
+            className="flex-1 w-full py-3.5 rounded-xl btn-brand-primary font-bold shadow-md transition-all flex items-center justify-center gap-2 text-sm"
           >
-            <span>Confirm Registration & Proceed to Patient Screen</span>
+            <span>Confirm & Proceed to Consent</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>

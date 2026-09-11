@@ -7,7 +7,8 @@ import {
   FileText, 
   UserPlus, 
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  AlertCircle
 } from 'lucide-react';
 import { Patient, PatientStatus } from '../types';
 import { StatusBadge } from './StatusBadge';
@@ -42,6 +43,12 @@ export const PatientTable: React.FC<PatientTableProps> = ({
       return matchSearch && matchStatus;
     })
     .sort((a, b) => {
+      // PS Requirement 2: Red-flag priority cases visually JUMP to top of queue ahead of standard FIFO
+      const aPriority = a.priorityFlag || a.clinicalSummary?.priorityFlag || false;
+      const bPriority = b.priorityFlag || b.clinicalSummary?.priorityFlag || false;
+      if (aPriority && !bPriority) return -1;
+      if (!aPriority && bPriority) return 1;
+
       if (sortBy === 'token') return a.tokenNumber.localeCompare(b.tokenNumber);
       if (sortBy === 'name') return a.name.localeCompare(b.name);
       return a.queueNumber - b.queueNumber;
@@ -141,26 +148,44 @@ export const PatientTable: React.FC<PatientTableProps> = ({
                 </td>
               </tr>
             ) : (
-              filtered.map((patient) => (
-                <tr
-                  key={patient.id}
-                  onClick={() => onSelectPatient(patient)}
-                  className="hover:bg-brand-teal-light/30 transition-colors cursor-pointer group"
-                >
-                  {/* Token & Queue */}
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-lg bg-brand-bg border border-brand-border text-[11px] font-bold text-brand-heading flex items-center justify-center">
-                        #{patient.queueNumber}
-                      </span>
-                      <div>
-                        <span className="font-mono font-bold text-xs text-brand-teal-dark bg-brand-teal-light px-2 py-0.5 rounded-md border border-brand-teal/20">
-                          {patient.tokenNumber}
+              filtered.map((patient) => {
+                const isPriority = patient.priorityFlag || patient.clinicalSummary?.priorityFlag || false;
+                return (
+                  <tr
+                    key={patient.id}
+                    onClick={() => onSelectPatient(patient)}
+                    className={`transition-colors cursor-pointer group ${
+                      isPriority 
+                        ? 'border-l-4 border-l-rose-500 bg-rose-50/20 hover:bg-rose-50/40' 
+                        : 'hover:bg-brand-teal-light/30'
+                    }`}
+                  >
+                    {/* Token & Queue */}
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-6 h-6 rounded-lg border text-[11px] font-bold flex items-center justify-center ${
+                          isPriority
+                            ? 'bg-rose-100 border-rose-300 text-rose-800'
+                            : 'bg-brand-bg border-brand-border text-brand-heading'
+                        }`}>
+                          #{patient.queueNumber}
                         </span>
-                        <p className="text-[10px] text-brand-muted mt-0.5">{patient.appointmentTime}</p>
+                        <div>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-mono font-bold text-xs text-brand-teal-dark bg-brand-teal-light px-2 py-0.5 rounded-md border border-brand-teal/20">
+                              {patient.tokenNumber}
+                            </span>
+                            {isPriority && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-rose-100 text-rose-700 border border-rose-300">
+                                <AlertCircle className="w-3 h-3 text-rose-600" />
+                                <span>PRIORITY</span>
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-brand-muted mt-0.5">{patient.appointmentTime}</p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
                   {/* Patient Info */}
                   <td className="py-3 px-4">
@@ -231,8 +256,8 @@ export const PatientTable: React.FC<PatientTableProps> = ({
                     </button>
                   </td>
                 </tr>
-              ))
-            )}
+              );
+            }))}
           </tbody>
         </table>
       </div>

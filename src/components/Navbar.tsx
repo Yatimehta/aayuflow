@@ -18,7 +18,11 @@ import {
   ChevronRight,
   FlaskConical,
   Settings,
-  LogOut
+  LogOut,
+  Accessibility,
+  Eye,
+  Type,
+  Volume2
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { UserRole } from '../types';
@@ -37,10 +41,17 @@ export const Navbar: React.FC = () => {
     unreadCount, 
     markNotificationRead,
     clearAllNotifications,
-    logout
+    logout,
+    largeText,
+    setLargeText,
+    highContrast,
+    setHighContrast,
+    audioGuided,
+    setAudioGuided
   } = useApp();
 
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showAccessibility, setShowAccessibility] = useState(false);
   const [showHospitalDropdown, setShowHospitalDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
@@ -129,8 +140,138 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Action Stack: Notifications + Profile */}
+          {/* Right Action Stack: Accessibility + Notifications + Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
+
+            {/* Accessibility Menu (PS Section 3.2) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAccessibility(!showAccessibility);
+                  setShowNotifications(false);
+                  setShowHospitalDropdown(false);
+                  setShowProfileDropdown(false);
+                }}
+                className={`relative p-2 rounded-xl border transition-all ${
+                  (largeText || highContrast || audioGuided)
+                    ? 'border-teal-500 bg-teal-50 text-teal-700 font-bold shadow-xs'
+                    : 'border-brand-border bg-brand-bg hover:bg-brand-teal-light/50 text-brand-body'
+                }`}
+                title="Accessibility Settings (High Contrast, Large Text, Audio-Guided)"
+                aria-label="Accessibility Settings"
+              >
+                <Accessibility className="w-4 h-4" />
+                {(largeText || highContrast || audioGuided) && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-teal-600 rounded-full ring-2 ring-white" />
+                )}
+              </button>
+
+              {showAccessibility && (
+                <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-soft-lg border border-slate-200 py-3 px-4 z-50 animate-in fade-in zoom-in-95">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <Accessibility className="w-4 h-4 text-teal-600" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">Accessibility Mode</p>
+                        <p className="text-[10px] text-slate-500">PS 26047 · Inclusive OPD Access</p>
+                      </div>
+                    </div>
+                    {(largeText || highContrast || audioGuided) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLargeText(false);
+                          setHighContrast(false);
+                          setAudioGuided(false);
+                        }}
+                        className="text-[10px] text-rose-600 hover:underline font-semibold"
+                      >
+                        Reset all
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    {/* High Contrast / Darker Borders */}
+                    <div className="flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                      <div className="flex items-start gap-2.5">
+                        <Eye className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold text-slate-800">High-Contrast Mode</p>
+                          <p className="text-[11px] text-slate-500">Darker text, starker borders & high-contrast buttons</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setHighContrast(!highContrast)}
+                        className={`w-11 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
+                          highContrast ? 'bg-teal-600' : 'bg-slate-200'
+                        }`}
+                        aria-pressed={highContrast}
+                      >
+                        <span
+                          className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                            highContrast ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Large Text / Scaled Touch Targets */}
+                    <div className="flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                      <div className="flex items-start gap-2.5">
+                        <Type className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold text-slate-800">Large-Text & Touch Targets</p>
+                          <p className="text-[11px] text-slate-500">+20-25% font scaling & larger interactive touch buttons</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setLargeText(!largeText)}
+                        className={`w-11 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
+                          largeText ? 'bg-teal-600' : 'bg-slate-200'
+                        }`}
+                        aria-pressed={largeText}
+                      >
+                        <span
+                          className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                            largeText ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Audio-Guided Mode */}
+                    <div className="flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                      <div className="flex items-start gap-2.5">
+                        <Volume2 className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold text-slate-800">Audio-Guided Assistance</p>
+                          <p className="text-[11px] text-slate-500">Enables "Read this aloud" audio guidance buttons across intake</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAudioGuided(!audioGuided)}
+                        className={`w-11 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
+                          audioGuided ? 'bg-teal-600' : 'bg-slate-200'
+                        }`}
+                        aria-pressed={audioGuided}
+                      >
+                        <span
+                          className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                            audioGuided ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Notification Bell */}
             <div className="relative">

@@ -161,3 +161,82 @@
     page-break-inside: avoid;
   }
 }
+
+/* ==========================================================================
+   ACCESSIBILITY MODE STYLES (PS Section 3.2)
+   ========================================================================== */
+
+/* 1. Large Text Mode: increases base scale by ~20-25% and touch targets */
+html.large-text {
+  font-size: 120%;
+}
+html.large-text button,
+html.large-text input,
+html.large-text select,
+html.large-text textarea {
+  min-height: 44px;
+}
+html.large-text .text-xs {
+  font-size: 0.925rem !important;
+  line-height: 1.4 !important;
+}
+html.large-text .text-\[11px\],
+html.large-text .text-\[10px\] {
+  font-size: 0.85rem !important;
+  line-height: 1.3 !important;
+}
+html.large-text .text-sm {
+  font-size: 1.05rem !important;
+}
+
+/* 2. High Contrast Mode: deeper text, high-contrast borders & solid backgrounds */
+html.high-contrast body {
+  background: #0f172a !important;
+  color: #000000 !important;
+}
+html.high-contrast .glass-card,
+html.high-contrast .glass-subcard,
+html.high-contrast .stat-strip,
+html.high-contrast .callout-badge {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  box-shadow: 0 4px 0 #000000 !important;
+  color: #000000 !important;
+}
+html.high-contrast p,
+html.high-contrast span,
+html.high-contrast label,
+html.high-contrast h1,
+html.high-contrast h2,
+html.high-contrast h3,
+html.high-contrast h4 {
+  color: #000000 !important;
+}
+html.high-contrast button {
+  border-width: 2px !important;
+  border-color: #000000 !important;
+  font-weight: 800 !important;
+}
+html.high-contrast .text-slate-500,
+html.high-contrast .text-slate-400,
+html.high-contrast .text-slate-600 {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+html.high-contrast input,
+html.high-contrast select,
+html.high-contrast textarea {
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Speaking Soundwave Animation */
+@keyframes soundwave {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+.animate-soundwave-1 { animation: soundwave 0.8s ease-in-out infinite; }
+.animate-soundwave-2 { animation: soundwave 0.8s ease-in-out 0.2s infinite; }
+.animate-soundwave-3 { animation: soundwave 0.8s ease-in-out 0.4s infinite; }
+

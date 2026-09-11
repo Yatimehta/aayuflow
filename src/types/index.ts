@@ -20,6 +20,20 @@ export interface Hospital {
   departments: string[];
 }
 
+export interface LabResultItem {
+  parameter: string;
+  value: string;
+  unit?: string;
+  referenceRange: string;
+  isAbnormal: boolean;
+}
+
+export interface DrugInteractionItem {
+  drugs: string[];
+  warning: string;
+  severity: 'Moderate' | 'Severe';
+}
+
 export interface DocumentItem {
   id: string;
   patientId: string;
@@ -31,7 +45,10 @@ export interface DocumentItem {
   status: PatientStatus;
   url?: string;
   ocrExtractedSummary?: string;
+  labResults?: LabResultItem[];
+  drugInteractions?: DrugInteractionItem[];
 }
+
 
 export interface ClinicalSummary {
   patientBanner?: {

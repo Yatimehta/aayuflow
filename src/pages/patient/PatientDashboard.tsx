@@ -43,7 +43,7 @@ export const PatientDashboard: React.FC = () => {
           
           {/* Option 1: Start Intake */}
           <div
-            onClick={() => navigate('/patient/intake')}
+            onClick={() => navigate('/patient/consent')}
             className="group bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 hover:border-teal-500/70 hover:shadow-md cursor-pointer transition-all duration-200 flex flex-col justify-between space-y-5"
           >
             <div className="space-y-3">

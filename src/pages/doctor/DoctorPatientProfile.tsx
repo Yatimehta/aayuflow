@@ -20,12 +20,14 @@ import {
   Thermometer,
   Scale,
   Layers,
-  FlaskConical
+  FlaskConical,
+  Languages
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { StatusBadge } from '../../components/StatusBadge';
 import { AISafetyBanner } from '../../components/AISafetyBanner';
 import { PriorityFlag } from '../../components/PriorityFlag';
+import { DocumentLabResults } from '../../components/DocumentLabResults';
 import { DocumentItem } from '../../types';
 
 export const DoctorPatientProfile: React.FC = () => {
@@ -34,6 +36,7 @@ export const DoctorPatientProfile: React.FC = () => {
 
   const patient = activePatient || patients[0];
   const [activeTab, setActiveTab] = useState<'summary' | 'ayurveda_history' | 'allopathy_history' | 'reports' | 'prescriptions'>('summary');
+  const [summaryLanguage, setSummaryLanguage] = useState<'en' | 'hi'>('en');
 
   // Editable summary state
   const [isEditingSummary, setIsEditingSummary] = useState(false);
@@ -42,6 +45,61 @@ export const DoctorPatientProfile: React.FC = () => {
 
   // Document preview modal
   const [selectedDocPreview, setSelectedDocPreview] = useState<DocumentItem | null>(null);
+
+  const isHi = summaryLanguage === 'hi';
+
+  const chiefComplaintText = isHi
+    ? 'द्विपक्षीय जानु संधि शूल एवं प्रातःकालीन स्तब्धता (संधिवात), 8 माह से'
+    : patient.chiefComplaint;
+
+  const durationText = isHi
+    ? '8 माह निरंतर (शीत ऋतु में प्रकोप)'
+    : (patient.clinicalSummary.duration || '6 months');
+
+  const severityText = isHi
+    ? (patient.clinicalSummary.severity === 'Severe' ? 'तीव्र (Severe)' : 'मध्यम (Moderate)')
+    : (patient.clinicalSummary.severity || 'Moderate');
+
+  const siteText = isHi
+    ? 'द्विपक्षीय जानु संधि एवं पटेला परिधि'
+    : (patient.chiefComplaint.toLowerCase().includes('knee') ? 'Bilateral knee joints & patellar margins' :
+       patient.chiefComplaint.toLowerCase().includes('back') ? 'Lumbosacral region (L4-S1)' :
+       patient.chiefComplaint.toLowerCase().includes('acid') ? 'Epigastric & retrosternal zone' :
+       'Primary presenting anatomical region');
+
+  const onsetText = isHi
+    ? 'क्रमिक एवं निरंतर प्रगतिशील, लगभग 8 माह पूर्व प्रारंभ'
+    : `Gradual & progressive, noted ~${patient.clinicalSummary.duration || '6 months ago'}`;
+
+  const characterText = isHi
+    ? 'सुस्त गंभीर वेदना, जानु मोड़ने पर चटकने की आवाज (क्रेपिटस) एवं स्तब्धता'
+    : (patient.chiefComplaint.toLowerCase().includes('pain') ? 'Dull aching, mechanical stiffness with joint crepitus' :
+       patient.chiefComplaint.toLowerCase().includes('acid') ? 'Burning retrosternal distress and sour eructation' :
+       'Persistent throbbing with functional limitation');
+
+  const radiationText = isHi
+    ? 'अ-प्रसारी; मुख्य जानु जोड़ एवं पटेला परिधि तक सीमित'
+    : 'Non-radiating; localized to primary articulation / zone';
+
+  const associationsText = isHi
+    ? 'प्रातःकालीन जकड़न >45 मिनट, सीढ़ियां चढ़ने में कठिनाई, फर्श से उठने में असमर्थता'
+    : 'Morning stiffness >45 mins, fatigue on climbing stairs, mild sleep disturbance';
+
+  const timeCourseText = isHi
+    ? `कालक्रम: ${patient.clinicalSummary.duration}; शाम को श्रम के पश्चात दर्द में वृद्धि`
+    : `Chronicity: ${patient.clinicalSummary.duration}; worsens towards evening after physical load`;
+
+  const exacerbatingText = isHi
+    ? 'प्रकोपक: शीतल नम मौसम, अधिक चलना | उपशामक: विश्राम एवं उष्ण स्वेदन'
+    : 'Worse: Cold damp weather, prolonged walking; Better: Rest & warm application';
+
+  const severityScoreText = isHi
+    ? `VAS 6/10 (${severityText}); दैनिक गतिशीलता में बाधा`
+    : `VAS 6/10 (${patient.clinicalSummary.severity || 'Moderate'}); interferes with daily mobility`;
+
+  const clinicalNotesText = isHi
+    ? 'एआई नैदानिक सारांश: रोगी में शास्त्रीय संधिवात (ऑस्टियोआर्थराइटिस) के लक्षण प्रमाणित हैं। क्रेपिटस एवं प्रातःकालीन जकड़न वात प्रकोप से संबंधित हैं जो ठंड में बढ़ते हैं। रेडियोग्राफी में मीडियल कम्पार्टमेंट संकुचन देखा गया है। वात-शामक जानु बस्ति (मुरिवेन्ना तैल) एवं पत्र पिंड स्वेद चिकित्सा अनुशंसित है।'
+    : (editableNotes || patient.clinicalSummary.aiGeneratedNotes);
 
   const handleSaveSummary = () => {
     updatePatientClinicalSummary(patient.id, {
@@ -242,7 +300,34 @@ export const DoctorPatientProfile: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Bilingual Output Toggle (PS Module C) */}
+                <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setSummaryLanguage('en')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                      summaryLanguage === 'en'
+                        ? 'bg-white text-teal-800 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    English
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSummaryLanguage('hi')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 ${
+                      summaryLanguage === 'hi'
+                        ? 'bg-white text-teal-800 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Languages className="w-3 h-3 text-teal-600" />
+                    <span>हिंदी (Hindi)</span>
+                  </button>
+                </div>
+
                 {currentUser?.discipline === 'Ayurveda' && patient.careSystem === 'AYURVEDA' && (
                   <button
                     onClick={() => navigate('/doctor/ayurveda-view')}
@@ -299,26 +384,26 @@ export const DoctorPatientProfile: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-soft space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
               <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">1</span>
-              <span>Chief Complaint</span>
+              <span>{isHi ? 'मुख्य शिकायत (Chief Complaint)' : 'Chief Complaint'}</span>
             </div>
             <div className="p-4 rounded-2xl bg-teal-50/50 border border-teal-200/60">
-              <p className="text-base font-bold text-slate-900">{patient.chiefComplaint}</p>
+              <p className="text-base font-bold text-slate-900">{chiefComplaintText}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="text-xs text-slate-600 font-medium">Duration:</span>
+                <span className="text-xs text-slate-600 font-medium">{isHi ? 'अवधि:' : 'Duration:'}</span>
                 <span className="text-xs font-bold text-teal-800 bg-white px-2.5 py-0.5 rounded-md border border-teal-200">
-                  {patient.clinicalSummary.duration || '6 months'}
+                  {durationText}
                 </span>
-                <span className="text-xs text-slate-600 font-medium ml-2">Severity:</span>
+                <span className="text-xs text-slate-600 font-medium ml-2">{isHi ? 'तीव्रता:' : 'Severity:'}</span>
                 <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md border ${
                   patient.clinicalSummary.severity === 'Severe'
                     ? 'bg-rose-50 text-rose-800 border-rose-200'
                     : 'bg-amber-50 text-amber-800 border-amber-200'
                 }`}>
-                  {patient.clinicalSummary.severity || 'Moderate'}
+                  {severityText}
                 </span>
                 {patient.vitals?.weight && (
                   <>
-                    <span className="text-xs text-slate-600 font-medium ml-2">Weight:</span>
+                    <span className="text-xs text-slate-600 font-medium ml-2">{isHi ? 'भार:' : 'Weight:'}</span>
                     <span className="text-xs font-bold text-slate-800 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                       {patient.vitals.weight}
                     </span>
@@ -333,80 +418,75 @@ export const DoctorPatientProfile: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                 <span className="w-6 h-6 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">2</span>
-                <span>History of Presenting Illness (HPI) · SOCRATES Analysis</span>
+                <span>{isHi ? 'वर्तमान बीमारी का इतिहास · सोक्रेटीस विश्लेषण (SOCRATES)' : 'History of Presenting Illness (HPI) · SOCRATES Analysis'}</span>
               </div>
               <span className="text-[11px] text-teal-700 font-bold bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
-                Standard Clinical Framework
+                {isHi ? 'मानक नैदानिक ढांचा' : 'Standard Clinical Framework'}
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Site (Location)</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  {patient.chiefComplaint.toLowerCase().includes('knee') ? 'Bilateral knee joints & patellar margins' :
-                   patient.chiefComplaint.toLowerCase().includes('back') ? 'Lumbosacral region (L4-S1)' :
-                   patient.chiefComplaint.toLowerCase().includes('acid') ? 'Epigastric & retrosternal zone' :
-                   'Primary presenting anatomical region'}
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'स्थान (Site)' : 'Site (Location)'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{siteText}</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Onset</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  Gradual & progressive, noted ~{patient.clinicalSummary.duration || '6 months ago'}
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'प्रारंभ (Onset)' : 'Onset'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{onsetText}</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Character</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  {patient.chiefComplaint.toLowerCase().includes('pain') ? 'Dull aching, mechanical stiffness with joint crepitus' :
-                   patient.chiefComplaint.toLowerCase().includes('acid') ? 'Burning retrosternal distress and sour eructation' :
-                   'Persistent throbbing with functional limitation'}
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'लक्षण स्वरूप (Character)' : 'Character'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{characterText}</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Radiation</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  Non-radiating; localized to primary articulation / zone
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'प्रसार (Radiation)' : 'Radiation'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{radiationText}</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Associations</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  Morning stiffness &lt; 30 mins, fatigue on climbing stairs, mild sleep disturbance
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'सहयोगी लक्षण (Associations)' : 'Associations'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{associationsText}</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Time / Course</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  Chronicity: {patient.clinicalSummary.duration}; worsens towards evening after physical load
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'समय चक्र (Time / Course)' : 'Time / Course'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{timeCourseText}</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Exacerbating & Relieving</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  Worse: Cold damp weather, prolonged walking; Better: Rest & warm application
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'प्रकोपक / उपशामक (Exacerbating & Relieving)' : 'Exacerbating & Relieving'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{exacerbatingText}</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
-                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Severity</span>
-                <p className="font-bold text-slate-900 mt-1">
-                  VAS 6/10 ({patient.clinicalSummary.severity || 'Moderate'}); interferes with daily mobility
-                </p>
+                <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                  {isHi ? 'तीव्रता स्कोर (Severity)' : 'Severity'}
+                </span>
+                <p className="font-bold text-slate-900 mt-1">{severityScoreText}</p>
               </div>
             </div>
 
             {/* Physician Synthesis & Case Assessment */}
             <div className="space-y-1.5 pt-2">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Physician Synthesis & Case Assessment:
+                {isHi ? 'चिकित्सक संश्लेषण एवं केस मूल्यांकन:' : 'Physician Synthesis & Case Assessment:'}
               </label>
               {isEditingSummary ? (
                 <textarea
@@ -417,7 +497,7 @@ export const DoctorPatientProfile: React.FC = () => {
                 />
               ) : (
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs text-slate-800 leading-relaxed">
-                  {patient.clinicalSummary.aiGeneratedNotes}
+                  {clinicalNotesText}
                 </div>
               )}
             </div>
@@ -680,6 +760,8 @@ export const DoctorPatientProfile: React.FC = () => {
                       {doc.ocrExtractedSummary}
                     </div>
                   )}
+
+                  <DocumentLabResults labResults={doc.labResults} drugInteractions={doc.drugInteractions} className="mt-2.5" />
 
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-brand-border/60">
                     <button
@@ -1023,6 +1105,7 @@ export const DoctorPatientProfile: React.FC = () => {
               <p className="text-brand-body bg-white p-3 rounded-xl border border-brand-border">
                 {selectedDocPreview.ocrExtractedSummary || 'No clinical entities extracted.'}
               </p>
+              <DocumentLabResults labResults={selectedDocPreview.labResults} drugInteractions={selectedDocPreview.drugInteractions} className="pt-2" />
             </div>
             <div className="flex justify-end">
               <button

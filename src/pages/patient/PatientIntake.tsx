@@ -13,6 +13,7 @@ import {
   FileText
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { AudioAloudButton } from '../../components/AudioAloudButton';
 
 export const PatientIntake: React.FC = () => {
   const navigate = useNavigate();
@@ -207,10 +208,13 @@ export const PatientIntake: React.FC = () => {
           
           {/* Question 1: Weight */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-              <Scale className="w-3.5 h-3.5 text-teal-600" />
-              <span>Weight (in kg) *</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <Scale className="w-3.5 h-3.5 text-teal-600" />
+                <span>Weight (in kg) *</span>
+              </label>
+              <AudioAloudButton text="Question 1: Please enter your weight in kilograms." />
+            </div>
             <div className="flex items-center gap-3">
               <div className="relative w-36">
                 <input
@@ -247,10 +251,13 @@ export const PatientIntake: React.FC = () => {
 
           {/* Question 2: Age */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-teal-600" />
-              <span>Age (in years) *</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                <span>Age (in years) *</span>
+              </label>
+              <AudioAloudButton text="Question 2: Please enter your age in completed years." />
+            </div>
             <div className="w-36">
               <input
                 type="number"
@@ -266,10 +273,13 @@ export const PatientIntake: React.FC = () => {
 
           {/* Question 3: Blood Group */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-              <Droplet className="w-3.5 h-3.5 text-teal-600" />
-              <span>Blood Group *</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <Droplet className="w-3.5 h-3.5 text-teal-600" />
+                <span>Blood Group *</span>
+              </label>
+              <AudioAloudButton text="Question 3: Please select your blood group." />
+            </div>
             <div className="max-w-xs">
               <select
                 value={bloodGroup}
@@ -291,19 +301,23 @@ export const PatientIntake: React.FC = () => {
                 <span>Describe your symptoms *</span>
               </label>
 
-              {/* Voice Dictation */}
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
-                  isListening
-                    ? 'bg-rose-500 text-white animate-pulse'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                <span>{isListening ? 'Listening...' : 'Voice Dictate'}</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <AudioAloudButton text="Question 4: Please describe your symptoms and bodily discomfort in your own words." />
+                
+                {/* Voice Dictation */}
+                <button
+                  type="button"
+                  onClick={toggleVoiceInput}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                    isListening
+                      ? 'bg-rose-500 text-white animate-pulse'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                  <span>{isListening ? 'Listening...' : 'Voice Dictate'}</span>
+                </button>
+              </div>
             </div>
 
             <textarea
@@ -318,10 +332,13 @@ export const PatientIntake: React.FC = () => {
 
           {/* Question 5: When did the problem start? */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-teal-600" />
-              <span>When did the problem start? *</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-teal-600" />
+                <span>When did the problem start? *</span>
+              </label>
+              <AudioAloudButton text="Question 5: When did your health problem start? Please select one option." />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {durationOptions.map((opt) => {
                 const isSelected = duration === opt;
@@ -345,9 +362,12 @@ export const PatientIntake: React.FC = () => {
 
           {/* Question 6: Severity (Exactly 3 large selectable cards) */}
           <div className="space-y-2.5">
-            <label className="block text-xs font-semibold text-slate-800">
-              Severity *
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-800">
+                Severity *
+              </label>
+              <AudioAloudButton text="Question 6: How severe is your condition? Please select Mild, Moderate, or Severe." />
+            </div>
             <div className="grid grid-cols-3 gap-3">
               {(['Mild', 'Moderate', 'Severe'] as const).map((sev) => {
                 const isSelected = severity === sev;

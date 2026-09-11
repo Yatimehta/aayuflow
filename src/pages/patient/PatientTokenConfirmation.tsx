@@ -8,9 +8,11 @@ import {
   Clock, 
   Hospital as HospitalIcon, 
   ChevronRight,
-  FileText
+  FileText,
+  Volume2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { AudioAloudButton } from '../../components/AudioAloudButton';
 
 export const PatientTokenConfirmation: React.FC = () => {
   const navigate = useNavigate();
@@ -44,9 +46,12 @@ export const PatientTokenConfirmation: React.FC = () => {
             <CheckCircle2 className="w-8 h-8 stroke-[2]" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-              Intake Submitted Successfully
-            </h1>
+            <div className="flex items-center justify-center gap-2">
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                Intake Submitted Successfully
+              </h1>
+              <AudioAloudButton text={`Intake submitted successfully. Your consultation token is ${tokenNumber}.`} />
+            </div>
             <p className="text-xs text-slate-500">
               Your consultation token has been generated.
             </p>
@@ -102,6 +107,36 @@ export const PatientTokenConfirmation: React.FC = () => {
             </button>
           </div>
 
+        </div>
+
+        {/* Bilingual Spoken Audio Confirmation Card (PS Module C requirement) */}
+        <div className="bg-gradient-to-r from-emerald-50/90 to-teal-50/80 border border-teal-200/80 rounded-2xl p-4 sm:p-5 text-left space-y-3 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Volume2 className="w-4 h-4 text-teal-700" />
+              <span className="text-xs font-bold text-teal-950 uppercase tracking-wider">
+                Bilingual Spoken Confirmation (द्विभाषी पुष्टि)
+              </span>
+            </div>
+            <AudioAloudButton 
+              text={`आपकी जानकारी सफलतापूर्वक जमा हो गई है। आपका ओपीडी टोकन नंबर ${tokenNumber} है।`}
+              label="Listen in Hindi"
+              alwaysShow={true}
+            />
+          </div>
+
+          <div className="space-y-2 text-xs">
+            <div className="p-2.5 rounded-xl bg-white/80 border border-teal-100">
+              <p className="text-slate-800 leading-relaxed font-medium">
+                <span className="font-bold text-teal-800">🔊 Confirmation (Hindi):</span> "आपकी जानकारी सफलतापूर्वक जमा हो गई है। आपका ओपीडी टोकन नंबर <strong className="font-mono font-bold text-teal-900">{tokenNumber}</strong> है। कृपया परामर्श के लिए प्रतीक्षा क्षेत्र में बैठें।"
+              </p>
+            </div>
+            <div className="p-2.5 rounded-xl bg-white/50 border border-teal-100/60">
+              <p className="text-slate-600 leading-relaxed">
+                <span className="font-bold text-slate-700">Confirmation (English):</span> "Your intake information has been recorded successfully. Your OPD consultation token is <strong className="font-mono font-bold text-slate-800">{tokenNumber}</strong>. Please proceed to the waiting area."
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Back to Home / View Records Secondary Links */}

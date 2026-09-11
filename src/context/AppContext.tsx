@@ -83,7 +83,16 @@ interface AppContextType {
   markNotificationRead: (id: string) => void;
   clearAllNotifications: () => void;
   unreadCount: number;
+  largeText: boolean;
+  setLargeText: (val: boolean) => void;
+  highContrast: boolean;
+  setHighContrast: (val: boolean) => void;
+  audioGuided: boolean;
+  setAudioGuided: (val: boolean) => void;
+  speakingText: string | null;
+  speakText: (text: string) => void;
 }
+
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -254,6 +263,87 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   ]);
 
+  // Accessibility Mode States (PS Section 3.2)
+  const [largeText, setLargeTextState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ayuflow_large_text') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [highContrast, setHighContrastState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ayuflow_high_contrast') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [audioGuided, setAudioGuidedState] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('ayuflow_audio_guided');
+      return stored !== null ? stored === 'true' : true; // Default ON for accessibility
+    } catch {
+      return true;
+    }
+  });
+  const [speakingText, setSpeakingText] = useState<string | null>(null);
+
+  const setLargeText = (val: boolean) => {
+    setLargeTextState(val);
+    try {
+      localStorage.setItem('ayuflow_large_text', String(val));
+    } catch {}
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('large-text', val);
+    }
+  };
+
+  const setHighContrast = (val: boolean) => {
+    setHighContrastState(val);
+    try {
+      localStorage.setItem('ayuflow_high_contrast', String(val));
+    } catch {}
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('high-contrast', val);
+    }
+  };
+
+  const setAudioGuided = (val: boolean) => {
+    setAudioGuidedState(val);
+    try {
+      localStorage.setItem('ayuflow_audio_guided', String(val));
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (largeText) document.documentElement.classList.add('large-text');
+      else document.documentElement.classList.remove('large-text');
+
+      if (highContrast) document.documentElement.classList.add('high-contrast');
+      else document.documentElement.classList.remove('high-contrast');
+    }
+  }, [largeText, highContrast]);
+
+  const speakText = (text: string) => {
+    setSpeakingText(text);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        utterance.onend = () => setSpeakingText(null);
+        utterance.onerror = () => setSpeakingText(null);
+        window.speechSynthesis.speak(utterance);
+      } catch {
+        // Fallback for environments where Web Speech API is restricted
+      }
+    }
+    setTimeout(() => {
+      setSpeakingText(prev => prev === text ? null : prev);
+    }, 4500);
+  };
+
   // Persist important data to localStorage
   useEffect(() => {
     try {
@@ -275,6 +365,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentRole, currentUser, selectedHospital, patients, consultations, evidenceReports, activePatientId]);
 
   const activePatient = patients.find(p => p.id === activePatientId) || patients[0] || null;
+
 
   const showToast = (toast: Omit<ToastItem, 'id'>) => {
     const id = 'toast-' + Math.random().toString(36).substring(2, 9);
@@ -531,11 +622,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setAuditLogs(prev => [newLog, ...prev]);
 
-    showToast({
-      type: isSevere ? 'warning' : 'success',
-      title: isSevere ? 'Priority Intake Flagged' : 'Intake Completed & Token Issued',
-      message: `Token #${newPat.tokenNumber} [${careSystem}] generated and added to queue.`
-    });
+    if (isSevere) {
+      showToast({
+        type: 'warning',
+        title: '⚠ Priority case detected',
+        message: 'Patient moved to front of queue.'
+      });
+    } else {
+      showToast({
+        type: 'success',
+        title: 'Intake Completed & Token Issued',
+        message: `Token #${newPat.tokenNumber} [${careSystem}] generated and added to queue.`
+      });
+    }
+
 
     return { patient: newPat, report: aiReport };
   };
@@ -714,7 +814,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         notifications,
         markNotificationRead,
         clearAllNotifications,
-        unreadCount
+        unreadCount,
+        largeText,
+        setLargeText,
+        highContrast,
+        setHighContrast,
+        audioGuided,
+        setAudioGuided,
+        speakingText,
+        speakText
       }}
     >
       {children}

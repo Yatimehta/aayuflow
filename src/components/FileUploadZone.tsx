@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, X, Eye, Sparkles } from 'lucide-react';
 import { DocumentItem } from '../types';
 import { StatusBadge } from './StatusBadge';
+import { DocumentLabResults } from './DocumentLabResults';
 
 interface FileUploadZoneProps {
   onFilesUploaded?: (files: DocumentItem[]) => void;
@@ -53,7 +54,24 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         size: (1.2 + Math.random() * 2).toFixed(1) + ' MB',
         uploadDate: new Date().toISOString().split('T')[0],
         status: 'Verified',
-        ocrExtractedSummary: 'AI OCR extracted text successfully. Dosha indicators & previous medication history parsed.'
+        ocrExtractedSummary: 'AI OCR extracted text successfully. Extracted diagnostic values and clinical entities parsed.',
+        labResults: (name.toLowerCase().includes('blood') || name.toLowerCase().includes('lab') || idx % 2 === 0)
+          ? [
+              { parameter: 'Hemoglobin', value: '8.2', unit: 'g/dL', referenceRange: '13.5 - 17.5 g/dL', isAbnormal: true },
+              { parameter: 'Blood Pressure', value: '160/100', unit: 'mmHg', referenceRange: '90-120/60-80', isAbnormal: true },
+              { parameter: 'Blood Sugar (Fasting)', value: '220', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true },
+              { parameter: 'Serum Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: false }
+            ]
+          : undefined,
+        drugInteractions: name.toLowerCase().includes('presc')
+          ? [
+              {
+                drugs: ['Aceclofenac 100mg', 'Telmisartan 40mg'],
+                warning: 'Potential interaction — flag for physician review (risk of reduced BP efficacy and kidney stress)',
+                severity: 'Moderate'
+              }
+            ]
+          : undefined
       }));
 
       const updated = [...documents, ...newDocs];
@@ -191,6 +209,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
                         {doc.ocrExtractedSummary}
                       </p>
                     )}
+                    <DocumentLabResults labResults={doc.labResults} drugInteractions={doc.drugInteractions} className="mt-2" />
                   </div>
                 </div>
 
@@ -261,6 +280,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
                   {previewDoc.ocrExtractedSummary || 'No text extracted.'}
                 </p>
               </div>
+              <DocumentLabResults labResults={previewDoc.labResults} drugInteractions={previewDoc.drugInteractions} className="pt-2 border-t border-brand-border/60" />
             </div>
 
             <div className="flex justify-end">
