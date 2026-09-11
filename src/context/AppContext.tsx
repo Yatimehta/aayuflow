@@ -91,6 +91,8 @@ interface AppContextType {
   setAudioGuided: (val: boolean) => void;
   speakingText: string | null;
   speakText: (text: string) => void;
+  patientLanguage: string;
+  setPatientLanguage: (lang: string) => void;
 }
 
 
@@ -312,6 +314,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAudioGuidedState(val);
     try {
       localStorage.setItem('ayuflow_audio_guided', String(val));
+    } catch {}
+  };
+
+  const [patientLanguage, setPatientLanguageState] = useState<string>(() => {
+    try {
+      return localStorage.getItem('ayucarez_patient_language') || 'hi';
+    } catch {
+      return 'hi';
+    }
+  });
+
+  const setPatientLanguage = (lang: string) => {
+    setPatientLanguageState(lang);
+    try {
+      localStorage.setItem('ayucarez_patient_language', lang);
     } catch {}
   };
 
@@ -553,6 +570,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       chiefComplaint,
       doshaPrimary: aiReport.prakriti,
       preferredLanguage: patientData.preferredLanguage || 'Hindi (हिंदी)',
+      otp: patientData.otp || `${Math.floor(1000 + Math.random() * 9000)}`,
       vitals: {
         bp: '120/80 mmHg',
         pulse: '74 bpm',
@@ -822,7 +840,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         audioGuided,
         setAudioGuided,
         speakingText,
-        speakText
+        speakText,
+        patientLanguage,
+        setPatientLanguage
       }}
     >
       {children}

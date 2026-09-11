@@ -173,6 +173,7 @@ export interface Patient {
   chiefComplaint: string;
   doshaPrimary: string;
   preferredLanguage: string;
+  otp?: string;
   priorityFlag?: boolean;
   vitals: {
     bp: string;

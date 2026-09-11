@@ -336,6 +336,7 @@ export const MOCK_PATIENTS: Patient[] = [
     chiefComplaint: 'Bilateral Knee Joint Pain & Stiffness (Sandhivata) for 8 months',
     doshaPrimary: 'Vata-Kapha',
     preferredLanguage: 'Hindi (हिंदी)',
+    otp: '4829',
     vitals: {
       bp: '132/84 mmHg',
       pulse: '74 bpm',

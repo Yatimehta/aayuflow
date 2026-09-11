@@ -68,6 +68,53 @@ export const Navbar: React.FC = () => {
 
   // Use profile pic for patient named Rameshwar, otherwise initials
   const isRameshwar = currentUser?.name?.toLowerCase().includes('rameshwar');
+  const isPatient = currentRole === 'patient' || location.pathname.startsWith('/patient');
+
+  const hospitalPill = (
+    <div className="relative">
+      <button
+        onClick={() => {
+          setShowHospitalDropdown(!showHospitalDropdown);
+          setShowAccessibility(false);
+          setShowNotifications(false);
+          setShowProfileDropdown(false);
+        }}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#DCEAE7] bg-[#F4FBF9] hover:bg-[#E4EFEC] text-xs font-medium text-[#0D2B3E] transition-colors"
+      >
+        <HospitalIcon className="w-3.5 h-3.5 text-[#146356]" />
+        <span className="max-w-[170px] sm:max-w-[210px] truncate">{selectedHospital.name}</span>
+        <ChevronDown className="w-3 h-3 text-[#8FA3A0]" />
+      </button>
+
+      {showHospitalDropdown && (
+        <div className="absolute right-0 sm:right-auto sm:left-0 mt-2 w-72 rounded-2xl bg-white shadow-lg border border-[#DCEAE7] py-2 z-50">
+          <div className="px-3 py-1.5 border-b border-[#DCEAE7] text-[11px] font-semibold text-[#8FA3A0] uppercase tracking-wider">
+            Select Active Hospital / OPD
+          </div>
+          <div className="max-h-64 overflow-y-auto py-1">
+            {hospitals.map((hosp) => (
+              <button
+                key={hosp.id}
+                onClick={() => {
+                  setSelectedHospital(hosp);
+                  setShowHospitalDropdown(false);
+                }}
+                className="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#E4EFEC] transition-colors cursor-pointer"
+              >
+                <div className="pr-2">
+                  <p className="font-medium text-[#0D2B3E]">{hosp.name}</p>
+                  <p className="text-[11px] text-[#8FA3A0]">{hosp.city} • {hosp.currentWaitMinutes}m wait</p>
+                </div>
+                {selectedHospital.id === hosp.id && (
+                  <Check className="w-4 h-4 text-[#146356] flex-shrink-0" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-[#DCEAE7] shadow-sm transition-all">
@@ -86,8 +133,8 @@ export const Navbar: React.FC = () => {
             />
           </div>
 
-          {/* 2. Search Bar */}
-          <div className="flex-1 max-w-sm hidden sm:block">
+          {/* 2. Search Bar — beside logo */}
+          <div className={isPatient ? "w-64 sm:w-72 hidden sm:block" : "flex-1 max-w-sm hidden sm:block"}>
             <div className="relative">
               <Search className="w-4 h-4 text-[#8FA3A0] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -100,51 +147,24 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* 3. Hospital Selector Pill */}
-          <div className="relative hidden lg:block">
-            <button
-              onClick={() => setShowHospitalDropdown(!showHospitalDropdown)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#DCEAE7] bg-[#F4FBF9] hover:bg-[#E4EFEC] text-xs font-medium text-[#0D2B3E] transition-colors"
-            >
-              <HospitalIcon className="w-3.5 h-3.5 text-[#146356]" />
-              <span className="max-w-[200px] truncate">{selectedHospital.name}</span>
-              <ChevronDown className="w-3 h-3 text-[#8FA3A0]" />
-            </button>
-
-            {showHospitalDropdown && (
-              <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white shadow-lg border border-[#DCEAE7] py-2 z-50">
-                <div className="px-3 py-1.5 border-b border-[#DCEAE7] text-[11px] font-semibold text-[#8FA3A0] uppercase tracking-wider">
-                  Select Active Hospital / OPD
-                </div>
-                <div className="max-h-64 overflow-y-auto py-1">
-                  {hospitals.map((hosp) => (
-                    <button
-                      key={hosp.id}
-                      onClick={() => {
-                        setSelectedHospital(hosp);
-                        setShowHospitalDropdown(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#E4EFEC] transition-colors"
-                    >
-                      <div className="pr-2">
-                        <p className="font-medium text-[#0D2B3E]">{hosp.name}</p>
-                        <p className="text-[11px] text-[#8FA3A0]">{hosp.city} • {hosp.currentWaitMinutes}m wait</p>
-                      </div>
-                      {selectedHospital.id === hosp.id && (
-                        <Check className="w-4 h-4 text-[#146356] flex-shrink-0" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          {/* 3. Hospital Selector Pill for Staff/Doctor (kept left of spacer) */}
+          {!isPatient && (
+            <div className="hidden lg:block">
+              {hospitalPill}
+            </div>
+          )}
 
           {/* Spacer */}
           <div className="flex-1" />
 
           {/* 4. Right Action Stack */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* For Patient: Hospital Pill is in the top-right group */}
+            {isPatient && (
+              <div className="block">
+                {hospitalPill}
+              </div>
+            )}
 
             {/* Accessibility Menu */}
             <div className="relative">

@@ -17,6 +17,7 @@ import { LandingPage } from './pages/LandingPage';
 
 // Patient Portal Pages
 import { PatientDashboard } from './pages/patient/PatientDashboard';
+import { PatientLanguageSelect } from './pages/patient/PatientLanguageSelect';
 import { PatientRegistration } from './pages/patient/PatientRegistration';
 import { PatientConsent } from './pages/patient/PatientConsent';
 import { PatientIntake } from './pages/patient/PatientIntake';
@@ -110,6 +111,7 @@ export const App: React.FC = () => {
 
               {/* Patient Portal */}
               <Route path="/patient" element={<PatientDashboard />} />
+              <Route path="/patient/language" element={<PatientLanguageSelect />} />
               <Route path="/patient/registration" element={<PatientRegistration />} />
               <Route path="/patient/consent" element={<PatientConsent />} />
               <Route path="/patient/dashboard" element={<PatientDashboard />} />
