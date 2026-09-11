@@ -330,6 +330,7 @@ export const MOCK_PATIENTS: Patient[] = [
     appointmentTime: '10:30 AM',
     status: 'Verified',
     careSystem: 'AYURVEDA',
+    intakeType: 'ayurveda',
     priorityFlag: false,
     ayurvedaHistory: [MOCK_CONSULTATIONS[0]],
     allopathyHistory: [MOCK_CONSULTATIONS[1]],
@@ -391,12 +392,12 @@ export const MOCK_PATIENTS: Patient[] = [
         size: '1.2 MB',
         uploadDate: '2026-09-08',
         status: 'Verified',
-        ocrExtractedSummary: 'Aceclofenac 100mg + Paracetamol 325mg BD, Telmisartan 40mg OD. Patient reported gastric irritation with NSAIDs.',
+        ocrExtractedSummary: 'Warfarin 2.5mg OD, Telmisartan 40mg OD. Patient concurrently taking Ayurvedic Yogaraja Guggulu formulation.',
         drugInteractions: [
           {
-            drugs: ['Aceclofenac 100mg', 'Telmisartan 40mg'],
-            warning: 'Concomitant NSAID with ARB antihypertensive may diminish blood pressure reduction and increase acute nephrotoxic risk.',
-            severity: 'Moderate'
+            drugs: ['Allopathic Warfarin / Antiplatelet', 'Ayurvedic Guggulu formulation'],
+            warning: 'Caution: Patient on Allopathic Warfarin / Antiplatelet + Reported Ayurvedic Guggulu formulation — elevated bleeding risk.',
+            severity: 'Severe'
           }
         ]
       },
@@ -423,12 +424,12 @@ export const MOCK_PATIENTS: Patient[] = [
         size: '1.6 MB',
         uploadDate: '2026-09-08',
         status: 'Verified',
-        ocrExtractedSummary: 'Routine metabolic extraction: Hemoglobin 8.2 g/dL, Blood Pressure 160/100 mmHg, Blood Sugar 220 mg/dL, Creatinine 0.9 mg/dL.',
+        ocrExtractedSummary: 'Routine metabolic extraction: HbA1c 8.9%, Serum Creatinine 1.6 mg/dL, Hemoglobin 8.2 g/dL, Blood Sugar 220 mg/dL.',
         labResults: [
+          { parameter: 'HbA1c', value: '8.9', unit: '%', referenceRange: '< 5.7 %', isAbnormal: true },
+          { parameter: 'Serum Creatinine', value: '1.6', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: true },
           { parameter: 'Hemoglobin', value: '8.2', unit: 'g/dL', referenceRange: '13.5 - 17.5 g/dL', isAbnormal: true },
-          { parameter: 'Blood Pressure', value: '160/100', unit: 'mmHg', referenceRange: '90-120/60-80', isAbnormal: true },
-          { parameter: 'Blood Sugar (Fasting)', value: '220', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true },
-          { parameter: 'Serum Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7 - 1.3 mg/dL', isAbnormal: false }
+          { parameter: 'Blood Sugar (Fasting)', value: '220', unit: 'mg/dL', referenceRange: '70 - 99 mg/dL', isAbnormal: true }
         ]
       }
     ],
@@ -502,12 +503,14 @@ export const MOCK_PATIENTS: Patient[] = [
     appointmentTime: '10:50 AM',
     status: 'Processing',
     careSystem: 'ALLOPATHY',
+    intakeType: 'allopathy',
     priorityFlag: false,
     ayurvedaHistory: [MOCK_CONSULTATIONS[3]],
     allopathyHistory: [MOCK_CONSULTATIONS[2]],
     chiefComplaint: 'Severe Acidity, Heartburn (Amlapitta), and Stress-Induced Migraine',
     doshaPrimary: 'Pitta-Vata',
     preferredLanguage: 'English',
+    otp: '5192',
     vitals: {
       bp: '118/76 mmHg',
       pulse: '82 bpm',
@@ -591,10 +594,12 @@ export const MOCK_PATIENTS: Patient[] = [
     appointmentTime: '11:15 AM',
     status: 'Pending',
     careSystem: 'AYURVEDA',
+    intakeType: 'ayurveda',
     priorityFlag: false,
     chiefComplaint: 'Madhumeha (Type 2 Diabetes Support) & Peripheral Neuropathy in feet',
     doshaPrimary: 'Kapha-Vata',
     preferredLanguage: 'Hindi (हिंदी)',
+    otp: '3821',
     vitals: {
       bp: '138/88 mmHg',
       pulse: '76 bpm',
@@ -838,11 +843,13 @@ export const MOCK_PATIENTS: Patient[] = [
     appointmentTime: '12:20 PM',
     status: 'Pending',
     careSystem: 'AYURVEDA',
+    intakeType: 'ayurveda',
     priorityFlag: true,
     ayurvedaHistory: [MOCK_CONSULTATIONS[5]],
     chiefComplaint: 'Chronic Lumbar Spine Pain & Sciatica Radiating Down Left Leg (Gridhrasi)',
     doshaPrimary: 'Vata',
     preferredLanguage: 'Hindi (हिंदी)',
+    otp: '8834',
     vitals: {
       bp: '130/82 mmHg',
       pulse: '72 bpm',
@@ -909,6 +916,7 @@ export const MOCK_PATIENTS: Patient[] = [
     appointmentTime: '12:45 PM',
     status: 'Verified',
     careSystem: 'ALLOPATHY',
+    intakeType: 'allopathy',
     priorityFlag: false,
     chiefComplaint: 'Insomnia, Anxiety, & Digestive Heaviness (Nidranasha & Mano-Klama)',
     doshaPrimary: 'Vata-Pitta',

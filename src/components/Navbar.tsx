@@ -22,7 +22,9 @@ import {
   Accessibility,
   Eye,
   Type,
-  Volume2
+  Volume2,
+  FileText,
+  X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { UserRole } from '../types';
@@ -50,14 +52,15 @@ export const Navbar: React.FC = () => {
     highContrast,
     setHighContrast,
     audioGuided,
-    setAudioGuided
+    setAudioGuided,
+    globalSearchQuery,
+    setGlobalSearchQuery
   } = useApp();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showHospitalDropdown, setShowHospitalDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [localSearch, setLocalSearch] = useState('');
 
   const getInitials = (name?: string) => {
     if (!name) return 'AY';
@@ -69,6 +72,7 @@ export const Navbar: React.FC = () => {
   // Use profile pic for patient named Rameshwar, otherwise initials
   const isRameshwar = currentUser?.name?.toLowerCase().includes('rameshwar');
   const isPatient = currentRole === 'patient' || location.pathname.startsWith('/patient');
+  const isDoctor = currentRole === 'doctor' || location.pathname.startsWith('/doctor');
 
   const hospitalPill = (
     <div className="relative">
@@ -139,11 +143,20 @@ export const Navbar: React.FC = () => {
               <Search className="w-4 h-4 text-[#8FA3A0] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
+                value={globalSearchQuery}
+                onChange={(e) => setGlobalSearchQuery(e.target.value)}
                 placeholder="Search patient, token (AYU-1042)..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-[#DCEAE7] bg-[#F4FBF9] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#146356]/30 transition-all placeholder:text-[#8FA3A0]"
+                className="w-full pl-9 pr-8 py-1.5 text-xs rounded-xl border border-[#DCEAE7] bg-[#F4FBF9] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#146356]/30 transition-all placeholder:text-[#8FA3A0]"
               />
+              {globalSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setGlobalSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
 
@@ -385,75 +398,198 @@ export const Navbar: React.FC = () => {
                   </button>
 
                   {showProfileDropdown && (
-                    <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-lg border border-[#DCEAE7] py-2 z-50">
-                      <div className="px-4 py-3 border-b border-[#DCEAE7]">
-                        <div className="flex items-center gap-2.5">
-                          {isRameshwar ? (
-                            <img
-                              src={rameshwarAvatar}
-                              alt="Rameshwar"
-                              className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="w-9 h-9 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                              {getInitials(currentUser.name)}
+                    <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl bg-white shadow-xl border border-[#DCEAE7] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+                      {isDoctor ? (
+                        <>
+                          {/* Doctor Header Strip */}
+                          <div className="px-4 py-3.5 bg-[#F4FBF9] border-b border-[#DCEAE7]">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-xs">
+                                {getInitials(currentUser.name)}
+                              </div>
+                              <div className="overflow-hidden">
+                                <p className="text-xs font-bold text-[#0D2B3E] truncate">{currentUser.name}</p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E4EFEC] text-[#146356] font-bold border border-[#9FDCD1]">
+                                    Physician · {currentUser.discipline || 'Clinical'}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                          )}
-                          <div className="overflow-hidden">
-                            <p className="text-xs font-bold text-[#0D2B3E] truncate">{currentUser.name}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#E4EFEC] text-[#146356] font-bold uppercase tracking-wider border border-[#9FDCD1]">
-                                {currentRole}
+                            <div className="mt-2.5 pt-2 border-t border-[#DCEAE7] flex items-center justify-between text-[11px] text-[#4A5D63]">
+                              <span className="truncate max-w-[170px]">{selectedHospital.name}</span>
+                              <span className="text-[10px] font-mono text-[#146356] font-bold bg-white px-1.5 py-0.5 rounded border border-[#DCEAE7]">
+                                Active OPD
                               </span>
                             </div>
                           </div>
-                        </div>
-                        {currentUser.department && (
-                          <p className="text-[11px] text-[#4A5D63] mt-1.5">
-                            Dept: <span className="font-semibold text-[#0D2B3E]">{currentUser.department}</span>
-                          </p>
-                        )}
-                      </div>
 
-                      <div className="p-1 space-y-0.5">
-                        <button
-                          onClick={() => {
-                            setShowProfileDropdown(false);
-                            if (currentRole === 'patient') navigate('/patient/dashboard');
-                            else if (currentRole === 'doctor') navigate('/doctor/profile');
-                            else navigate('/doctor');
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
-                        >
-                          <User className="w-4 h-4 text-[#8FA3A0]" />
-                          <span>My Profile & Records</span>
-                        </button>
+                          {/* Full Doctor Navigation Links */}
+                          <div className="p-2 space-y-1">
+                            <div className="px-2.5 py-1 text-[10px] font-bold text-[#8FA3A0] uppercase tracking-wider">
+                              Doctor Navigation
+                            </div>
 
-                        <button
-                          onClick={() => {
-                            setShowProfileDropdown(false);
-                            setShowHospitalDropdown(true);
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
-                        >
-                          <Settings className="w-4 h-4 text-[#8FA3A0]" />
-                          <span>Facility Settings</span>
-                        </button>
-                      </div>
+                            {/* 1. Doctor Profile */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                navigate('/doctor/profile');
+                              }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                                location.pathname === '/doctor/profile'
+                                  ? 'bg-[#146356] text-white shadow-xs'
+                                  : 'text-[#0D2B3E] hover:bg-[#E4EFEC]'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <User className={`w-4 h-4 ${location.pathname === '/doctor/profile' ? 'text-white' : 'text-[#146356]'}`} />
+                                <span>Doctor Profile</span>
+                              </div>
+                              <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                            </button>
 
-                      <div className="border-t border-[#DCEAE7] mt-1 pt-1 p-1">
-                        <button
-                          onClick={() => {
-                            setShowProfileDropdown(false);
-                            logout();
-                            navigate('/login');
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
-                        >
-                          <LogOut className="w-4 h-4 text-rose-500" />
-                          <span>Log Out</span>
-                        </button>
-                      </div>
+                            {/* 2. Consultation Queue */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                navigate('/doctor');
+                              }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                                location.pathname === '/doctor' || location.pathname === '/doctor/queue'
+                                  ? 'bg-[#146356] text-white shadow-xs'
+                                  : 'text-[#0D2B3E] hover:bg-[#E4EFEC]'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <Stethoscope className={`w-4 h-4 ${location.pathname === '/doctor' || location.pathname === '/doctor/queue' ? 'text-white' : 'text-[#146356]'}`} />
+                                <span>Consultation Queue</span>
+                              </div>
+                              <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                            </button>
+
+                            {/* 3. E-Prescriptions / Rx Sign-Off */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                navigate('/doctor/consultation');
+                              }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                                location.pathname === '/doctor/consultation'
+                                  ? 'bg-[#146356] text-white shadow-xs'
+                                  : 'text-[#0D2B3E] hover:bg-[#E4EFEC]'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <FileText className={`w-4 h-4 ${location.pathname === '/doctor/consultation' ? 'text-white' : 'text-[#146356]'}`} />
+                                <span>E-Prescriptions / Rx Sign-Off</span>
+                              </div>
+                              <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+                            </button>
+                          </div>
+
+                          {/* Switch Facility & Logout */}
+                          <div className="border-t border-[#DCEAE7] p-2 space-y-1 bg-[#F4FBF9]/60">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                setShowHospitalDropdown(true);
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#E4EFEC] transition-colors text-left"
+                            >
+                              <HospitalIcon className="w-4 h-4 text-[#146356]" />
+                              <span>Switch Facility</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                logout();
+                                navigate('/login');
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#C23B22] hover:bg-rose-50 transition-colors text-left"
+                            >
+                              <LogOut className="w-4 h-4 text-[#C23B22]" />
+                              <span>Log Out</span>
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="px-4 py-3 border-b border-[#DCEAE7]">
+                            <div className="flex items-center gap-2.5">
+                              {isRameshwar ? (
+                                <img
+                                  src={rameshwarAvatar}
+                                  alt="Rameshwar"
+                                  className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
+                                />
+                              ) : (
+                                <div className="w-9 h-9 rounded-xl bg-[#146356] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                  {getInitials(currentUser.name)}
+                                </div>
+                              )}
+                              <div className="overflow-hidden">
+                                <p className="text-xs font-bold text-[#0D2B3E] truncate">{currentUser.name}</p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#E4EFEC] text-[#146356] font-bold uppercase tracking-wider border border-[#9FDCD1]">
+                                    {currentRole}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {currentUser.department && (
+                              <p className="text-[11px] text-[#4A5D63] mt-1.5">
+                                Dept: <span className="font-semibold text-[#0D2B3E]">{currentUser.department}</span>
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="p-1 space-y-0.5">
+                            <button
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                if (currentRole === 'patient') navigate('/patient/dashboard');
+                                else navigate('/doctor');
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
+                            >
+                              <User className="w-4 h-4 text-[#8FA3A0]" />
+                              <span>My Profile & Records</span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                setShowHospitalDropdown(true);
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
+                            >
+                              <Settings className="w-4 h-4 text-[#8FA3A0]" />
+                              <span>Facility Settings</span>
+                            </button>
+                          </div>
+
+                          <div className="border-t border-[#DCEAE7] mt-1 pt-1 p-1">
+                            <button
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                logout();
+                                navigate('/login');
+                              }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                            >
+                              <LogOut className="w-4 h-4 text-rose-500" />
+                              <span>Log Out</span>
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

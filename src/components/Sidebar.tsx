@@ -41,15 +41,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }
   ];
 
   const doctorNavItems = [
-    { label: 'OPD Dashboard', path: '/doctor', icon: LayoutDashboard, exact: true },
-    { label: 'Patient Queue', path: '/doctor/queue', icon: Users, badge: patients.length },
-    { label: 'Clinical Dossier', path: '/doctor/patient', icon: FileCheck2 },
-    // Only show Ayurvedic Assessment for Ayurveda doctors with an AYUSH patient
-    ...(isAyurvedaDoctor && isAyushPatient ? [
-      { label: 'Ayurvedic Assessment', path: '/doctor/ayurveda-view', icon: Layers }
-    ] : []),
-    { label: 'Verify AI Summary', path: '/doctor/verify', icon: Stethoscope, badge: patients.filter(p => p.status === 'Processing').length },
-    { label: 'Consultation & Rx', path: '/doctor/consultation', icon: FileSpreadsheet },
+    { label: 'Consultation Queue', path: '/doctor', icon: Users, badge: patients.filter(p => p.status !== 'Verified').length || patients.length, exact: true },
+    { label: 'E-Prescriptions / Rx', path: '/doctor/consultation', icon: FileSpreadsheet },
     { label: 'Doctor Profile', path: '/doctor/profile', icon: User }
   ];
 

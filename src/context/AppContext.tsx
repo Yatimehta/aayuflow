@@ -93,6 +93,10 @@ interface AppContextType {
   speakText: (text: string) => void;
   patientLanguage: string;
   setPatientLanguage: (lang: string) => void;
+  globalSearchQuery: string;
+  setGlobalSearchQuery: (q: string) => void;
+  unlockedPatientIds: string[];
+  unlockPatient: (patientId: string) => void;
 }
 
 
@@ -330,6 +334,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       localStorage.setItem('ayucarez_patient_language', lang);
     } catch {}
+  };
+
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [unlockedPatientIds, setUnlockedPatientIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('ayucarez_unlocked_patients');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const unlockPatient = (patientId: string) => {
+    setUnlockedPatientIds(prev => {
+      if (prev.includes(patientId)) return prev;
+      const next = [...prev, patientId];
+      try {
+        localStorage.setItem('ayucarez_unlocked_patients', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
   };
 
   useEffect(() => {
@@ -842,7 +867,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         speakingText,
         speakText,
         patientLanguage,
-        setPatientLanguage
+        setPatientLanguage,
+        globalSearchQuery,
+        setGlobalSearchQuery,
+        unlockedPatientIds,
+        unlockPatient
       }}
     >
       {children}
