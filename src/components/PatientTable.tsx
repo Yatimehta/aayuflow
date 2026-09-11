@@ -172,8 +172,18 @@ export const PatientTable: React.FC<PatientTableProps> = ({
                         <p className="font-semibold text-brand-heading text-xs group-hover:text-brand-teal-dark transition-colors">
                           {patient.name}
                         </p>
-                        <p className="text-[11px] text-brand-muted">
-                          {patient.age} yrs • {patient.gender} • {patient.phone}
+                        <p className="text-[11px] text-brand-muted flex items-center gap-1.5 flex-wrap">
+                          <span>{patient.age} yrs</span>
+                          <span>•</span>
+                          <span>{patient.gender}</span>
+                          {patient.vitals?.weight && (
+                            <>
+                              <span>•</span>
+                              <span className="font-bold text-slate-700 bg-slate-100 px-1 rounded">
+                                {patient.vitals.weight}
+                              </span>
+                            </>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -181,11 +191,13 @@ export const PatientTable: React.FC<PatientTableProps> = ({
 
                   {/* Chief Complaint */}
                   <td className="py-3 px-4 max-w-xs">
-                    <p className="text-xs text-brand-heading font-medium truncate" title={patient.chiefComplaint}>
+                    <p className="text-xs text-brand-heading font-bold truncate" title={patient.chiefComplaint}>
                       {patient.chiefComplaint}
                     </p>
-                    <p className="text-[10px] text-brand-muted">
-                      {patient.documents.length} records attached • {patient.preferredLanguage}
+                    <p className="text-[10px] text-brand-muted mt-0.5 flex items-center gap-1.5">
+                      <span className="text-teal-700 font-semibold">Primary Intake</span>
+                      <span>•</span>
+                      <span>{patient.preferredLanguage}</span>
                     </p>
                   </td>
 

@@ -1,0 +1,210 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  ArrowLeft, 
+  Upload, 
+  FileText, 
+  Check, 
+  FileCheck, 
+  Clock, 
+  X
+} from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { DocumentItem } from '../../types';
+
+export const PatientUploadDocument: React.FC = () => {
+  const navigate = useNavigate();
+  const { 
+    activePatient, 
+    patients, 
+    selectedHospital, 
+    showToast 
+  } = useApp();
+
+  const patient = activePatient || patients[0];
+
+  const [docFile, setDocFile] = useState<File | null>(null);
+  const [docType, setDocType] = useState<DocumentItem['type']>('Lab Report');
+  const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!docFile) {
+      showToast({
+        type: 'error',
+        title: 'File Required',
+        message: 'Please select a document or report to upload.'
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const fileName = docFile.name;
+    const newDoc: DocumentItem = {
+      id: 'doc-' + Date.now(),
+      patientId: patient.id,
+      name: fileName,
+      type: docType,
+      uploadDate: 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      size: `${(docFile.size / (1024 * 1024)).toFixed(1)} MB`,
+      status: 'Verified',
+      ocrExtractedSummary: notes || undefined
+    };
+
+    // Attach to patient documents
+    patient.documents = [newDoc, ...(patient.documents || [])];
+
+    showToast({
+      type: 'success',
+      title: 'Document Uploaded',
+      message: `${fileName} attached to your patient record.`
+    });
+
+    setIsSubmitting(false);
+
+    // Navigate to clean token confirmation
+    navigate('/patient/token', {
+      state: {
+        token: patient.tokenNumber,
+        queueSlot: patient.queueNumber,
+        hospitalName: selectedHospital.name,
+        estimatedWait: '~15 mins'
+      }
+    });
+  };
+
+  return (
+    <div className="min-h-[85vh] py-10 px-4 sm:px-6 relative z-10">
+      <div className="max-w-lg mx-auto space-y-8">
+        
+        {/* Navigation & Header */}
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => navigate('/patient/dashboard')}
+            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 font-medium transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
+          </button>
+
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Upload Document
+            </h1>
+            <p className="text-xs text-slate-500 mt-1">
+              Submit your medical report, prescription, or scan before your consultation.
+            </p>
+          </div>
+        </div>
+
+        {/* Minimalist Upload Card */}
+        <form 
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8 space-y-6"
+        >
+          
+          {/* Document Type Dropdown */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-800">
+              Document Type *
+            </label>
+            <select
+              value={docType}
+              onChange={(e) => setDocType(e.target.value as DocumentItem['type'])}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
+            >
+              <option value="Lab Report">Lab Report (Blood, Urine, Pathology)</option>
+              <option value="Prescription">Prescription / Medication Slip</option>
+              <option value="Diagnostic Scan">Diagnostic Scan / X-Ray / MRI / USG</option>
+              <option value="Discharge Summary">Discharge Summary / Prior Case Note</option>
+            </select>
+          </div>
+
+          {/* File Picker Drop Area */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-800">
+              Choose File (PDF, PNG, JPG) *
+            </label>
+            <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-teal-400 bg-slate-50/50 transition-colors">
+              <input
+                type="file"
+                id="patient-file-upload"
+                accept=".pdf,.png,.jpg,.jpeg"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setDocFile(e.target.files[0]);
+                  }
+                }}
+                className="hidden"
+              />
+              <label htmlFor="patient-file-upload" className="cursor-pointer block space-y-2">
+                <Upload className="w-8 h-8 text-teal-600 mx-auto" />
+                <div>
+                  <p className="text-xs font-bold text-slate-900">
+                    {docFile ? docFile.name : 'Click to select or drop document here'}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {docFile 
+                      ? `${(docFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to submit` 
+                      : 'Supports PDF, JPG, PNG up to 25MB'}
+                  </p>
+                </div>
+              </label>
+
+              {docFile && (
+                <button
+                  type="button"
+                  onClick={() => setDocFile(null)}
+                  className="mt-3 text-xs text-rose-600 font-semibold hover:underline inline-flex items-center gap-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Remove file</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Optional Notes */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-800">
+              Notes or Doctor's Comments (Optional)
+            </label>
+            <textarea
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. Fasting blood sugar report from last week..."
+              className="w-full p-3 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all leading-relaxed placeholder:text-slate-400"
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => navigate('/patient/dashboard')}
+              className="text-xs text-slate-500 hover:text-slate-800 font-medium"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs disabled:opacity-50"
+            >
+              <Check className="w-4 h-4 stroke-[2.5]" />
+              <span>{isSubmitting ? 'Uploading...' : 'Submit Document'}</span>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  );
+};

@@ -25,7 +25,7 @@ export interface DocumentItem {
   patientId: string;
   consultationId?: string;
   name: string;
-  type: 'Prescription' | 'Lab Report' | 'Discharge Summary' | 'Diet Chart' | 'Ayurvedic Case Sheet';
+  type: 'Prescription' | 'Lab Report' | 'Discharge Summary' | 'Diet Chart' | 'Ayurvedic Case Sheet' | 'Diagnostic Scan' | 'Scan';
   size: string;
   uploadDate: string;
   status: PatientStatus;

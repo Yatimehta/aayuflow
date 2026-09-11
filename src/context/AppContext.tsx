@@ -420,12 +420,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       chiefComplaint,
       doshaPrimary: aiReport.prakriti,
       preferredLanguage: patientData.preferredLanguage || 'Hindi (हिंदी)',
-      vitals: patientData.vitals || {
+      vitals: {
         bp: '120/80 mmHg',
         pulse: '74 bpm',
-        weight: '64 kg',
+        weight: '68 kg',
         spo2: '99%',
-        temperature: '98.4 °F'
+        temperature: '98.4 °F',
+        ...(patientData.vitals || {})
       },
       clinicalSummary: {
         patientBanner: {

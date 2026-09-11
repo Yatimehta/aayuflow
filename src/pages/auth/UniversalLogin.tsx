@@ -25,7 +25,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { UserRole, Patient } from '../../types';
 
-type AuthRole = 'patient' | 'worker' | 'doctor' | 'admin' | 'lab';
+type AuthRole = 'patient' | 'doctor' | 'worker';
 
 export const UniversalLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export const UniversalLogin: React.FC = () => {
 
   // Login Form States
   const [loginIdentifier, setLoginIdentifier] = useState('45-9821-4321-7890');
-  const [loginPassword, setLoginPassword] = useState('ayuflow@2026');
+  const [loginPassword, setLoginPassword] = useState('patient2026');
 
   // Patient Sign Up States
   const [patientSignup, setPatientSignup] = useState({
@@ -70,18 +70,12 @@ export const UniversalLogin: React.FC = () => {
   });
 
   // Demo Credentials Map for Quick Fill
-  const demoProfiles: Record<Exclude<UserRole, 'guest'>, { identifier: string; pass: string; title: string; dest: string }> = {
+  const demoProfiles: Record<'patient' | 'doctor' | 'worker', { identifier: string; pass: string; title: string; dest: string }> = {
     patient: {
       identifier: '45-9821-4321-7890',
       pass: 'patient2026',
       title: 'Rameshwar Sharma (Patient)',
-      dest: '/patient/dashboard'
-    },
-    worker: {
-      identifier: 'worker.desk@aiia.gov.in',
-      pass: 'worker2026',
-      title: 'Priya Narayanan (OPD Assistant)',
-      dest: '/worker'
+      dest: '/patient/registration'
     },
     doctor: {
       identifier: 'dr.alok.verma@aiia.gov.in',
@@ -89,17 +83,11 @@ export const UniversalLogin: React.FC = () => {
       title: 'Dr. Alok Verma, MD (Ayu)',
       dest: '/doctor'
     },
-    admin: {
-      identifier: 'admin.director@aiia.gov.in',
-      pass: 'admin2026',
-      title: 'Col. Rajesh Bakshi (Medical Sup.)',
-      dest: '/admin'
-    },
-    lab: {
-      identifier: 'lab.staff@aiia.gov.in',
-      pass: 'ayushlab2026',
-      title: 'Ananya Deshmukh (Lab Staff)',
-      dest: '/lab'
+    worker: {
+      identifier: 'worker.desk@aiia.gov.in',
+      pass: 'worker2026',
+      title: 'Priya Narayanan (OPD Assistant)',
+      dest: '/worker'
     }
   };
 
@@ -128,10 +116,10 @@ export const UniversalLogin: React.FC = () => {
         loginAsPatient(matched);
         showToast({
           type: 'success',
-          title: 'Welcome Back',
-          message: `Signed in as ${matched.name}. Navigating to Patient Dashboard.`
+          title: 'ABHA Login Successful',
+          message: `Signed in as ${matched.name}. Proceeding to Patient Identification.`
         });
-        navigate('/patient/dashboard');
+        navigate('/patient/registration');
       } else {
         const demo = demoProfiles[activeTab];
         loginAsStaff(activeTab, demo.title, selectedHospital.name);
@@ -172,7 +160,7 @@ export const UniversalLogin: React.FC = () => {
         title: 'Account Created',
         message: `Welcome, ${newPat.name}! Your patient profile is ready.`
       });
-      navigate('/patient/dashboard');
+      navigate('/patient/registration');
     }, 700);
   };
 
@@ -226,14 +214,12 @@ export const UniversalLogin: React.FC = () => {
           </p>
         </div>
 
-        {/* 5-Role Segmented Control */}
-        <div className="grid grid-cols-5 rounded-2xl bg-white/70 backdrop-blur-md p-1 border border-slate-200/80 gap-1">
+        {/* Role Segmented Control */}
+        <div className="grid grid-cols-3 rounded-2xl bg-white/70 backdrop-blur-md p-1 border border-slate-200/80 gap-1">
           {[
             { role: 'patient' as AuthRole, label: 'Patient', icon: HeartHandshake },
-            { role: 'worker' as AuthRole, label: 'Worker', icon: Users },
-            { role: 'doctor' as AuthRole, label: 'Doctor', icon: Stethoscope },
-            { role: 'admin' as AuthRole, label: 'Admin', icon: ShieldAlert },
-            { role: 'lab' as AuthRole, label: 'Lab', icon: FlaskConical }
+            { role: 'doctor' as AuthRole, label: 'Doctor / Vaidya', icon: Stethoscope },
+            { role: 'worker' as AuthRole, label: 'OPD Worker', icon: Users }
           ].map(({ role, label, icon: Icon }) => {
             const isActive = activeTab === role;
             return (

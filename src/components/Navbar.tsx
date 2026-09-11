@@ -42,7 +42,6 @@ export const Navbar: React.FC = () => {
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHospitalDropdown, setShowHospitalDropdown] = useState(false);
-  const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
 
@@ -52,36 +51,6 @@ export const Navbar: React.FC = () => {
     if (parts.length >= 2) return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
     return name.slice(0, 2).toUpperCase();
   };
-
-  const handleRoleChange = (newRole: UserRole) => {
-    setRole(newRole);
-    setShowRoleMenu(false);
-    if (newRole === 'patient') {
-      navigate('/patient/dashboard');
-    } else if (newRole === 'worker') {
-      navigate('/worker');
-    } else if (newRole === 'doctor') {
-      navigate('/doctor');
-    } else if (newRole === 'admin') {
-      navigate('/admin');
-    } else if (newRole === 'lab') {
-      navigate('/lab');
-    } else {
-      navigate('/');
-    }
-  };
-
-  const getRoleLabel = () => {
-    if (location.pathname.startsWith('/patient')) return { title: 'Patient View', role: 'patient', icon: HeartHandshake };
-    if (location.pathname.startsWith('/worker')) return { title: 'AYUSH Worker', role: 'worker', icon: Users };
-    if (location.pathname.startsWith('/doctor')) return { title: 'Doctor / Vaidya', role: 'doctor', icon: Stethoscope };
-    if (location.pathname.startsWith('/admin')) return { title: 'Admin Suite', role: 'admin', icon: ShieldAlert };
-    if (location.pathname.startsWith('/lab')) return { title: 'Lab Diagnostics', role: 'lab', icon: FlaskConical };
-    return { title: 'Select Portal', role: 'guest', icon: Sparkles };
-  };
-
-  const currentActiveRole = getRoleLabel();
-  const CurrentRoleIcon = currentActiveRole.icon;
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60 shadow-xs transition-all">
@@ -160,132 +129,8 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Action Stack: Role Switcher Pill + Notifications + Profile */}
+          {/* Right Action Stack: Notifications + Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
-            
-            {/* Quick Role Switcher Pill (Critical for live user demo) */}
-            <div className="relative">
-              <button
-                onClick={() => setShowRoleMenu(!showRoleMenu)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-brand-teal/50 bg-brand-teal-light text-brand-teal-dark hover:bg-brand-teal/20 text-xs font-semibold shadow-xs transition-all"
-                title="Switch role for demo"
-              >
-                <CurrentRoleIcon className="w-3.5 h-3.5 text-brand-teal-dark" />
-                <span className="hidden xs:inline">{currentActiveRole.title}</span>
-                <span className="xs:hidden">Switch</span>
-                <ChevronDown className="w-3 h-3 ml-0.5 opacity-70" />
-              </button>
-
-              {showRoleMenu && (
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-soft-lg border border-brand-border py-2 z-50">
-                  <div className="px-3.5 py-2 border-b border-brand-border">
-                    <p className="text-xs font-bold text-brand-heading">Switch Perspective</p>
-                    <p className="text-[11px] text-brand-muted">Instant role simulation for demo</p>
-                  </div>
-                  
-                  <div className="p-1 space-y-1">
-                    <button
-                      onClick={() => handleRoleChange('patient')}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs transition-colors ${
-                        location.pathname.startsWith('/patient') ? 'bg-brand-teal-light text-brand-teal-dark font-medium' : 'hover:bg-brand-bg text-brand-heading'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-brand-teal/20 flex items-center justify-center text-brand-teal-dark">
-                        <HeartHandshake className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Patient Portal</p>
-                        <p className="text-[10px] text-brand-muted">Self-service 8-step intake wizard</p>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => handleRoleChange('worker')}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs transition-colors ${
-                        location.pathname.startsWith('/worker') ? 'bg-brand-blue-light text-brand-blue-dark font-medium' : 'hover:bg-brand-bg text-brand-heading'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-brand-blue/20 flex items-center justify-center text-brand-blue-dark">
-                        <Users className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">AYUSH Worker</p>
-                        <p className="text-[10px] text-brand-muted">Hospital assistant desk & split-view</p>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => handleRoleChange('doctor')}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs transition-colors ${
-                        location.pathname.startsWith('/doctor') ? 'bg-brand-mint text-[#2E7D32] font-medium' : 'hover:bg-brand-bg text-brand-heading'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-brand-mint-dark/20 flex items-center justify-center text-[#2E7D32]">
-                        <Stethoscope className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Doctor / Vaidya</p>
-                        <p className="text-[10px] text-brand-muted">Clinical review, verify AI & EMR sync</p>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => handleRoleChange('admin')}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs transition-colors ${
-                        location.pathname.startsWith('/admin') ? 'bg-slate-100 text-brand-heading font-medium' : 'hover:bg-brand-bg text-brand-heading'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center text-brand-heading">
-                        <ShieldAlert className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Hospital Admin</p>
-                        <p className="text-[10px] text-brand-muted">Directorate analytics, staff & ABDM audit</p>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => handleRoleChange('lab')}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left text-xs transition-colors ${
-                        location.pathname.startsWith('/lab') ? 'bg-amber-50 text-amber-900 font-medium' : 'hover:bg-brand-bg text-brand-heading'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700">
-                        <FlaskConical className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Lab Staff / Diagnostics</p>
-                        <p className="text-[10px] text-brand-muted">Upload & link lab tests to consultation tokens</p>
-                      </div>
-                    </button>
-
-                    <div className="border-t border-brand-border mt-1 pt-1 space-y-1">
-                      <button
-                        onClick={() => {
-                          setShowRoleMenu(false);
-                          navigate('/login');
-                        }}
-                        className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] font-semibold text-brand-teal-dark hover:bg-brand-teal-light"
-                      >
-                        <span className="flex items-center gap-1.5">
-                          <LogIn className="w-3.5 h-3.5" />
-                          <span>Universal Login (All Roles)</span>
-                        </span>
-                        <ChevronRight className="w-3 h-3" />
-                      </button>
-
-                      <button
-                        onClick={() => handleRoleChange('guest')}
-                        className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] text-brand-muted hover:text-brand-heading hover:bg-brand-bg"
-                      >
-                        <span>Return to Landing Page</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
 
             {/* Notification Bell */}
             <div className="relative">
@@ -402,10 +247,7 @@ export const Navbar: React.FC = () => {
                           onClick={() => {
                             setShowProfileDropdown(false);
                             if (currentRole === 'patient') navigate('/patient/dashboard');
-                            else if (currentRole === 'doctor') navigate('/doctor');
-                            else if (currentRole === 'worker') navigate('/worker');
-                            else if (currentRole === 'admin') navigate('/admin');
-                            else if (currentRole === 'lab') navigate('/lab');
+                            else navigate('/doctor');
                           }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors text-left"
                         >

@@ -12,6 +12,11 @@ import { LandingPage } from './pages/LandingPage';
 
 // Patient Portal Pages
 import { PatientDashboard } from './pages/patient/PatientDashboard';
+import { PatientRegistration } from './pages/patient/PatientRegistration';
+import { PatientIntake } from './pages/patient/PatientIntake';
+import { PatientUploadDocument } from './pages/patient/PatientUploadDocument';
+import { PatientRecords } from './pages/patient/PatientRecords';
+import { PatientTokenConfirmation } from './pages/patient/PatientTokenConfirmation';
 import { PatientPortal } from './pages/patient/PatientPortal';
 
 // Worker Portal Pages
@@ -33,13 +38,6 @@ import { DoctorVerify } from './pages/doctor/DoctorVerify';
 import { DoctorConsultation } from './pages/doctor/DoctorConsultation';
 import { DoctorSettings } from './pages/doctor/DoctorSettings';
 import { AyurvedicDashboard } from './pages/doctor/AyurvedicDashboard';
-
-// Admin Portal Pages
-import { AdminLayout } from './pages/admin/AdminLayout';
-import { AdminDashboard } from './pages/admin/AdminDashboard';
-
-// Lab Staff Portal
-import { LabStaffPortal } from './pages/lab/LabStaffPortal';
 
 export const App: React.FC = () => {
   return (
@@ -85,9 +83,13 @@ export const App: React.FC = () => {
               <Route path="/about" element={<LandingPage />} />
 
               {/* Patient Portal */}
-              <Route path="/patient" element={<PatientPortal />} />
+              <Route path="/patient" element={<PatientDashboard />} />
+              <Route path="/patient/registration" element={<PatientRegistration />} />
               <Route path="/patient/dashboard" element={<PatientDashboard />} />
-              <Route path="/patient/intake" element={<PatientPortal />} />
+              <Route path="/patient/intake" element={<PatientIntake />} />
+              <Route path="/patient/upload" element={<PatientUploadDocument />} />
+              <Route path="/patient/records" element={<PatientRecords />} />
+              <Route path="/patient/token" element={<PatientTokenConfirmation />} />
 
               {/* AYUSH Worker Portal */}
               <Route path="/worker" element={<WorkerLayout />}>
@@ -112,16 +114,9 @@ export const App: React.FC = () => {
                 <Route path="settings" element={<DoctorSettings />} />
               </Route>
 
-              {/* Lab Staff Portal */}
-              <Route path="/lab" element={<LabStaffPortal />} />
-
-              {/* Admin Portal */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="staff" element={<AdminDashboard />} />
-                <Route path="audit" element={<AdminDashboard />} />
-                <Route path="settings" element={<DoctorSettings />} />
-              </Route>
+              {/* Role-restricted redirects */}
+              <Route path="/lab/*" element={<Navigate to="/doctor" replace />} />
+              <Route path="/admin/*" element={<Navigate to="/doctor" replace />} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
