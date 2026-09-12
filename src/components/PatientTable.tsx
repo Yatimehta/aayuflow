@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Patient, PatientStatus } from '../types';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../utils/translations';
 import { isAyurvedicRecord, isAllopathicRecord } from '../utils/streamClassification';
 
 interface PatientTableProps {
@@ -21,9 +22,6 @@ interface PatientTableProps {
   onNewPatient?: () => void;
   title?: string;
   subtitle?: string;
-  /** Front-desk staff benefit from seeing a patient's language before they walk up to
-   * assist them; a doctor reviewing the queue doesn't need it, so DoctorDashboard turns
-   * this off. */
   showLanguage?: boolean;
 }
 
@@ -37,6 +35,7 @@ export const PatientTable: React.FC<PatientTableProps> = ({
   showLanguage = true
 }) => {
   const { globalSearchQuery, unlockedPatientIds } = useApp();
+  const { t } = useTranslation();
 
   // 1. Department / Stream Filter: 'All' | 'Allopathic' | 'Ayurvedic'
   const [streamFilter, setStreamFilter] = useState<'All' | 'Allopathic' | 'Ayurvedic'>('All');
@@ -263,12 +262,12 @@ export const PatientTable: React.FC<PatientTableProps> = ({
         <table className="w-full text-left text-xs">
           <thead className="bg-[#F4FBF9] text-slate-500 uppercase font-semibold text-[10px] tracking-wider border-b border-[#DCEAE7]">
             <tr>
-              <th className="py-3 px-4">TOKEN #</th>
-              <th className="py-3 px-4">PATIENT DETAILS</th>
-              <th className="py-3 px-4">STREAM</th>
-              <th className="py-3 px-4">CHIEF COMPLAINT</th>
-              <th className="py-3 px-4">SAFETY FLAGS</th>
-              <th className="py-3 px-4 text-right">ACTION</th>
+              <th className="py-3 px-4">{t('tbl_token')} #</th>
+              <th className="py-3 px-4">{t('tbl_patient')}</th>
+              <th className="py-3 px-4">{t('st4')}</th>
+              <th className="py-3 px-4">{t('tbl_chief_complaint')}</th>
+              <th className="py-3 px-4">{t('tbl_status')}</th>
+              <th className="py-3 px-4 text-right">{t('tbl_action')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#DCEAE7]">

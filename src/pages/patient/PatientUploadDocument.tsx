@@ -15,6 +15,7 @@ import { useApp } from '../../context/AppContext';
 import { DocumentLabResults } from '../../components/DocumentLabResults';
 import { DocumentItem } from '../../types';
 import { extractDocument, ExtractionResult } from '../../utils/ocrExtraction';
+import { uploadPatientDocument } from '../../utils/dbApiClient';
 
 export const PatientUploadDocument: React.FC = () => {
   const navigate = useNavigate();
@@ -95,6 +96,15 @@ export const PatientUploadDocument: React.FC = () => {
 
     // Attach to patient documents
     patient.documents = [newDoc, ...(patient.documents || [])];
+
+    // Persist the actual file bytes to the encrypted database — best-effort,
+    // the local record above is already the source of truth for this UI.
+    uploadPatientDocument(
+      patient.tokenNumber,
+      docFile,
+      docType,
+      notes || extraction?.ocrExtractedSummary || null
+    ).catch(() => {});
 
     showToast({
       type: 'success',

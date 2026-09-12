@@ -29,6 +29,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { UserRole } from '../types';
 import { useClickOutside } from '../hooks/useClickOutside';
+import { useTranslation } from '../utils/translations';
 
 import ayucarezLogo from '../assets/images/logo-ayucarez.png';
 import rameshwarAvatar from '../assets/images/rameshwar-avatar.jpg';
@@ -58,6 +59,7 @@ export const Navbar: React.FC = () => {
     globalSearchQuery,
     setGlobalSearchQuery
   } = useApp();
+  const { t } = useTranslation();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccessibility, setShowAccessibility] = useState(false);
@@ -112,7 +114,7 @@ export const Navbar: React.FC = () => {
       {showHospitalDropdown && (
         <div className="absolute right-0 sm:right-auto sm:left-0 mt-2 w-72 rounded-2xl bg-white shadow-lg border border-[#DCEAE7] py-2 z-50">
           <div className="px-3 py-1.5 border-b border-[#DCEAE7] text-[11px] font-semibold text-[#8FA3A0] uppercase tracking-wider">
-            Select Active Hospital / OPD
+            {t('nav_select_hospital')}
           </div>
           <div className="max-h-64 overflow-y-auto py-1">
             {hospitals.map((hosp) => (
@@ -168,7 +170,7 @@ export const Navbar: React.FC = () => {
                 type="text"
                 value={globalSearchQuery}
                 onChange={(e) => setGlobalSearchQuery(e.target.value)}
-                placeholder="Search patient, token (AYU-1042)..."
+                placeholder={t('nav_search_placeholder')}
                 className="w-full pl-9 pr-8 py-1.5 text-xs rounded-xl border border-[#DCEAE7] bg-[#F4FBF9] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#146356]/30 transition-all placeholder:text-[#8FA3A0]"
               />
               {globalSearchQuery && (
@@ -217,8 +219,8 @@ export const Navbar: React.FC = () => {
                     ? 'border-[#146356] bg-[#E4EFEC] text-[#146356] font-bold shadow-xs'
                     : 'border-[#DCEAE7] bg-[#F4FBF9] hover:bg-[#E4EFEC] text-[#4A5D63]'
                 }`}
-                title="Accessibility Settings"
-                aria-label="Accessibility Settings"
+                title={t('nav_accessibility_settings')}
+                aria-label={t('nav_accessibility_settings')}
               >
                 <Accessibility className="w-4 h-4" />
                 {(largeText || highContrast || audioGuided) && (
@@ -232,8 +234,8 @@ export const Navbar: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <Accessibility className="w-4 h-4 text-teal-600" />
                       <div>
-                        <p className="text-xs font-bold text-slate-900">Accessibility Mode</p>
-                        <p className="text-[10px] text-slate-500">PS 26047 · Inclusive OPD Access</p>
+                        <p className="text-xs font-bold text-slate-900">{t('nav_accessibility_mode')}</p>
+                        <p className="text-[10px] text-slate-500">{t('nav_accessibility_subtitle')}</p>
                       </div>
                     </div>
                     {(largeText || highContrast || audioGuided) && (
@@ -246,7 +248,7 @@ export const Navbar: React.FC = () => {
                         }}
                         className="text-[10px] text-rose-600 hover:underline font-semibold"
                       >
-                        Reset all
+                        {t('nav_reset_all')}
                       </button>
                     )}
                   </div>
@@ -257,8 +259,8 @@ export const Navbar: React.FC = () => {
                       <div className="flex items-start gap-2.5">
                         <Eye className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="font-semibold text-slate-800">High-Contrast Mode</p>
-                          <p className="text-[11px] text-slate-500">Darker text, starker borders & high-contrast buttons</p>
+                          <p className="font-semibold text-slate-800">{t('nav_high_contrast')}</p>
+                          <p className="text-[11px] text-slate-500">{t('nav_high_contrast_desc')}</p>
                         </div>
                       </div>
                       <button
@@ -282,8 +284,8 @@ export const Navbar: React.FC = () => {
                       <div className="flex items-start gap-2.5">
                         <Type className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="font-semibold text-slate-800">Large-Text & Touch Targets</p>
-                          <p className="text-[11px] text-slate-500">+20-25% font scaling & larger interactive touch buttons</p>
+                          <p className="font-semibold text-slate-800">{t('nav_large_text')}</p>
+                          <p className="text-[11px] text-slate-500">{t('nav_large_text_desc')}</p>
                         </div>
                       </div>
                       <button
@@ -307,8 +309,8 @@ export const Navbar: React.FC = () => {
                       <div className="flex items-start gap-2.5">
                         <Volume2 className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="font-semibold text-slate-800">Audio-Guided Assistance</p>
-                          <p className="text-[11px] text-slate-500">Enables "Read this aloud" audio guidance buttons across intake</p>
+                          <p className="font-semibold text-slate-800">{t('nav_audio_guided')}</p>
+                          <p className="text-[11px] text-slate-500">{t('nav_audio_guided_desc')}</p>
                         </div>
                       </div>
                       <button
@@ -337,7 +339,7 @@ export const Navbar: React.FC = () => {
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="relative p-2 rounded-xl border border-brand-border bg-brand-bg hover:bg-brand-teal-light/50 text-brand-body transition-colors"
-                aria-label="Notifications"
+                aria-label={t('nav_notifications')}
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
@@ -351,21 +353,21 @@ export const Navbar: React.FC = () => {
                 <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-soft-lg border border-brand-border py-2 z-50">
                   <div className="px-4 py-2 border-b border-brand-border flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-brand-heading">Notifications</p>
-                      <p className="text-[10px] text-brand-muted">Hospital & Intake Updates</p>
+                      <p className="text-xs font-bold text-brand-heading">{t('nav_notifications')}</p>
+                      <p className="text-[10px] text-brand-muted">{t('nav_notifications_subtitle')}</p>
                     </div>
                     {unreadCount > 0 && (
                       <button
                         onClick={clearAllNotifications}
                         className="text-[10px] text-brand-teal-dark hover:underline"
                       >
-                        Clear all
+                        {t('nav_clear_all')}
                       </button>
                     )}
                   </div>
                   <div className="max-h-64 overflow-y-auto divide-y divide-brand-border/40">
                     {notifications.length === 0 ? (
-                      <p className="p-4 text-center text-xs text-brand-muted">No new alerts</p>
+                      <p className="p-4 text-center text-xs text-brand-muted">{t('nav_no_alerts')}</p>
                     ) : (
                       notifications.map((n) => (
                         <div
@@ -411,7 +413,7 @@ export const Navbar: React.FC = () => {
                     )}
                     <div className="hidden sm:block text-left">
                       <p className="text-xs font-bold text-[#0D2B3E] leading-tight truncate max-w-[100px]">
-                        {currentUser?.name ? currentUser.name.split(' ')[0] : 'User'}
+                        {currentUser?.name ? currentUser.name.split(' ')[0] : t('nav_user_fallback')}
                       </p>
                       <p className="text-[10px] text-[#146356] font-extrabold uppercase leading-tight tracking-wider">
                         {currentRole}
@@ -434,7 +436,7 @@ export const Navbar: React.FC = () => {
                                 <p className="text-xs font-bold text-[#0D2B3E] truncate">{currentUser.name}</p>
                                 <div className="flex items-center gap-1.5 mt-0.5">
                                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E4EFEC] text-[#146356] font-bold border border-[#9FDCD1]">
-                                    Physician · {currentUser.discipline || 'Clinical'}
+                                    {t('nav_physician')} · {currentUser.discipline || 'Clinical'}
                                   </span>
                                 </div>
                               </div>
@@ -442,7 +444,7 @@ export const Navbar: React.FC = () => {
                             <div className="mt-2.5 pt-2 border-t border-[#DCEAE7] flex items-center justify-between text-[11px] text-[#4A5D63]">
                               <span className="truncate max-w-[170px]">{selectedHospital.name}</span>
                               <span className="text-[10px] font-mono text-[#146356] font-bold bg-white px-1.5 py-0.5 rounded border border-[#DCEAE7]">
-                                Active OPD
+                                {t('nav_active')}
                               </span>
                             </div>
                           </div>
@@ -450,7 +452,7 @@ export const Navbar: React.FC = () => {
                           {/* Full Doctor Navigation Links */}
                           <div className="p-2 space-y-1">
                             <div className="px-2.5 py-1 text-[10px] font-bold text-[#8FA3A0] uppercase tracking-wider">
-                              Doctor Navigation
+                              {t('nav_doctor_navigation')}
                             </div>
 
                             {/* 1. Doctor Profile */}
@@ -468,7 +470,7 @@ export const Navbar: React.FC = () => {
                             >
                               <div className="flex items-center gap-2.5">
                                 <User className={`w-4 h-4 ${location.pathname === '/doctor/profile' ? 'text-white' : 'text-[#146356]'}`} />
-                                <span>Doctor Profile</span>
+                                <span>{t('nav_doctor_profile')}</span>
                               </div>
                               <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                             </button>
@@ -488,7 +490,7 @@ export const Navbar: React.FC = () => {
                             >
                               <div className="flex items-center gap-2.5">
                                 <Stethoscope className={`w-4 h-4 ${location.pathname === '/doctor' || location.pathname === '/doctor/queue' ? 'text-white' : 'text-[#146356]'}`} />
-                                <span>Consultation Queue</span>
+                                <span>{t('nav_consultation_queue')}</span>
                               </div>
                               <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                             </button>
@@ -508,7 +510,7 @@ export const Navbar: React.FC = () => {
                             >
                               <div className="flex items-center gap-2.5">
                                 <FileText className={`w-4 h-4 ${location.pathname === '/doctor/consultation' ? 'text-white' : 'text-[#146356]'}`} />
-                                <span>E-Prescriptions / Rx Sign-Off</span>
+                                <span>{t('nav_eprescriptions')}</span>
                               </div>
                               <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                             </button>
@@ -525,7 +527,7 @@ export const Navbar: React.FC = () => {
                               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#E4EFEC] transition-colors text-left"
                             >
                               <HospitalIcon className="w-4 h-4 text-[#146356]" />
-                              <span>Switch Facility</span>
+                              <span>{t('nav_switch_facility')}</span>
                             </button>
 
                             <button
@@ -538,7 +540,7 @@ export const Navbar: React.FC = () => {
                               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#C23B22] hover:bg-rose-50 transition-colors text-left"
                             >
                               <LogOut className="w-4 h-4 text-[#C23B22]" />
-                              <span>Log Out</span>
+                              <span>{t('nav_logout')}</span>
                             </button>
                           </div>
                         </>
@@ -568,7 +570,7 @@ export const Navbar: React.FC = () => {
                             </div>
                             {currentUser.department && (
                               <p className="text-[11px] text-[#4A5D63] mt-1.5">
-                                Dept: <span className="font-semibold text-[#0D2B3E]">{currentUser.department}</span>
+                                {t('nav_dept')} <span className="font-semibold text-[#0D2B3E]">{currentUser.department}</span>
                               </p>
                             )}
                           </div>
@@ -583,7 +585,7 @@ export const Navbar: React.FC = () => {
                               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
                             >
                               <User className="w-4 h-4 text-[#8FA3A0]" />
-                              <span>My Profile & Records</span>
+                              <span>{t('nav_my_profile')}</span>
                             </button>
 
                             <button
@@ -594,7 +596,7 @@ export const Navbar: React.FC = () => {
                               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#0D2B3E] hover:bg-[#F4FBF9] transition-colors text-left"
                             >
                               <Settings className="w-4 h-4 text-[#8FA3A0]" />
-                              <span>Facility Settings</span>
+                              <span>{t('nav_facility_settings')}</span>
                             </button>
                           </div>
 
@@ -608,7 +610,7 @@ export const Navbar: React.FC = () => {
                               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
                             >
                               <LogOut className="w-4 h-4 text-rose-500" />
-                              <span>Log Out</span>
+                              <span>{t('nav_logout')}</span>
                             </button>
                           </div>
                         </>
@@ -620,10 +622,10 @@ export const Navbar: React.FC = () => {
                 <button
                   onClick={() => navigate('/login')}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#DCEAE7] bg-white hover:bg-[#F4FBF9] text-xs font-semibold text-[#0D2B3E] transition-colors"
-                  title="Login"
+                  title={t('nav_login')}
                 >
                   <LogIn className="w-3.5 h-3.5 text-[#146356]" />
-                  <span>Login</span>
+                  <span>{t('nav_login')}</span>
                 </button>
               )}
             </div>

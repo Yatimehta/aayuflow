@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { KeyRound, X, AlertCircle, Lock } from 'lucide-react';
 import { Patient } from '../types';
 import { isAyurvedicRecord } from '../utils/streamClassification';
+import { useTranslation } from '../utils/translations';
 
 interface DoctorOtpModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export const DoctorOtpModal: React.FC<DoctorOtpModalProps> = ({
   onClose,
   onSuccess
 }) => {
+  const { t } = useTranslation();
   const [otpValue, setOtpValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -38,34 +40,42 @@ export const DoctorOtpModal: React.FC<DoctorOtpModalProps> = ({
   const expectedOtp = patient.otp || '4829';
   const isAyush = isAyurvedicRecord(patient);
 
-  const handleVerify = (e?: React.FormEvent) => {
+  const handleVerify = (otpToVerify?: string | React.FormEvent, e?: React.FormEvent) => {
+    if (typeof otpToVerify !== 'string' && otpToVerify?.preventDefault) {
+      otpToVerify.preventDefault();
+    }
     if (e) e.preventDefault();
     setErrorMessage('');
 
-    if (otpValue.trim().length !== 4) {
+    const code = typeof otpToVerify === 'string' ? otpToVerify : otpValue;
+
+    if (code.trim().length !== 4) {
       setErrorMessage('Please enter the complete 4-digit numeric access OTP.');
       inputRef.current?.focus();
       return;
     }
 
-    setIsVerifying(true);
-
-    setTimeout(() => {
-      if (otpValue.trim() === expectedOtp) {
-        setIsVerifying(false);
-        onSuccess(patient);
-      } else {
-        setIsVerifying(false);
-        setErrorMessage("Invalid OTP. Please verify the code displayed on the patient's token screen.");
-        inputRef.current?.focus();
-      }
-    }, 200);
+    if (code.trim() === expectedOtp) {
+      onSuccess(patient);
+    } else {
+      setErrorMessage("Invalid OTP. Please verify the code displayed on the patient's token screen.");
+      inputRef.current?.focus();
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, '').slice(0, 4);
     setOtpValue(val);
     if (errorMessage) setErrorMessage('');
+    if (val.length === 4) {
+      handleVerify(val);
+    }
+  };
+
+  const handleQuickFillDemo = () => {
+    setOtpValue(expectedOtp);
+    setErrorMessage('');
+    handleVerify(expectedOtp);
   };
 
   return (
@@ -155,7 +165,16 @@ export const DoctorOtpModal: React.FC<DoctorOtpModalProps> = ({
             
             {/* Quick Demo Hint */}
             <p className="text-[11px] text-center text-slate-400">
-              Demo access code: <span className="font-mono font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">{expectedOtp}</span>
+              Demo access code:{' '}
+              <button
+                type="button"
+                onClick={handleQuickFillDemo}
+                className="font-mono font-semibold text-[#146356] bg-[#E4EFEC] hover:bg-[#CEF3ED] border border-[#9FDCD1] px-2 py-0.5 rounded-lg cursor-pointer transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-1"
+                title="Click to instant fill & verify"
+              >
+                <span>{expectedOtp}</span>
+                <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-[#146356]/80">(Instant Click)</span>
+              </button>
             </p>
           </div>
 
@@ -178,15 +197,15 @@ export const DoctorOtpModal: React.FC<DoctorOtpModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={isVerifying || otpValue.length !== 4}
+              disabled={otpValue.length !== 4}
               className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 ${
-                otpValue.length === 4 && !isVerifying
+                otpValue.length === 4
                   ? 'bg-[#146356] hover:bg-[#0F4A40] text-white cursor-pointer hover:scale-[1.01] active:scale-98'
                   : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
               <KeyRound className="w-3.5 h-3.5" />
-              <span>{isVerifying ? 'Verifying...' : 'Unlock Dossier & Start'}</span>
+              <span>Unlock Dossier & Start</span>
             </button>
           </div>
         </form>

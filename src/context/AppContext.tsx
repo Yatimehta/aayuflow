@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Hospital, Patient, UserRole, PatientStatus, StaffMember, AuditLog, AdminStats, EvidenceReport, CareSystem, Consultation, DocumentItem, Doctor, DoctorDiscipline } from '../types';
 import { MOCK_HOSPITALS, MOCK_PATIENTS, MOCK_STAFF, MOCK_AUDIT_LOGS, MOCK_ADMIN_STATS, MOCK_CONSULTATIONS, MOCK_DOCTORS } from '../data/mockData';
-import { generateAIClinicalReport } from '../utils/aiReportGenerator';
+import { generateAIClinicalReport, generateAIClinicalReportRemote } from '../utils/aiReportGenerator';
+import { registerPatientRecord } from '../utils/dbApiClient';
 
 export interface ToastItem {
   id: string;
@@ -660,6 +661,76 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEvidenceReports(prev => [aiReport, ...prev]);
     setConsultations(prev => [newConsultation, ...prev]);
     setActivePatientId(newPat.id);
+
+    // The template report above renders instantly; now ask Gemini for a real
+    // draft in the background and patch it in when it lands. Best-effort —
+    // ocr-service is optional, so a failure here just leaves the template.
+    generateAIClinicalReportRemote({
+      patientId: patId,
+      patientName: name,
+      tokenNumber: token,
+      chiefComplaint,
+      age,
+      gender,
+      careSystem,
+      answers
+    }).then((draft) => {
+      setEvidenceReports(prev => prev.map(r => r.id === aiReport.id ? {
+        ...r,
+        title: draft.title,
+        prakriti: draft.prakriti,
+        vikriti: draft.vikriti,
+        agni: draft.agni,
+        koshtha: draft.koshtha,
+        findings: draft.findings,
+        redFlags: draft.redFlags,
+        therapies: draft.therapies,
+        diet: draft.diet,
+        status: 'Verified'
+      } : r));
+      setPatients(prev => prev.map(p => p.id === patId ? {
+        ...p,
+        doshaPrimary: draft.prakriti || p.doshaPrimary,
+        clinicalSummary: {
+          ...p.clinicalSummary,
+          prakriti: draft.prakriti,
+          vikriti: draft.vikriti,
+          agni: draft.agni,
+          koshtha: draft.koshtha,
+          aiGeneratedNotes: draft.findings,
+          recommendedTherapies: draft.therapies,
+          lifestyleAdvice: draft.diet
+        }
+      } : p));
+    }).catch(() => {
+      // Keep the local template draft — mirrors how ocrExtraction.ts and
+      // registerPatientRecord below treat their backends as optional.
+    });
+
+    // Persist the real PII/PHI to the encrypted database. Best-effort and
+    // non-blocking — the app's own state above is already the source of truth
+    // for the UI, so a missing database-api service (it's an optional local
+    // service) never blocks a patient's intake from completing.
+    registerPatientRecord({
+      token_number: newPat.tokenNumber,
+      name: newPat.name,
+      phone: newPat.phone,
+      email: newPat.email ?? null,
+      abha_id: newPat.abhaId ?? null,
+      address: newPat.address,
+      blood_group: newPat.bloodGroup,
+      age: newPat.age,
+      gender: newPat.gender,
+      chief_complaint: newPat.chiefComplaint,
+      care_system: newPat.careSystem ?? null,
+      dosha_primary: newPat.doshaPrimary ?? null,
+      preferred_language: newPat.preferredLanguage,
+      hospital_name: selectedHospital.name,
+      hospital_city: selectedHospital.city,
+    }).catch(() => {
+      // Swallow — this mirrors how ocrExtraction.ts treats its backend as
+      // optional; there's no user-facing action to take if it's unreachable.
+    });
 
     // Notification for doctor & hospital
     const notif: NotificationItem = {

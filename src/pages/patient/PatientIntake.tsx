@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -17,7 +17,12 @@ import { AudioAloudButton } from '../../components/AudioAloudButton';
 
 export const PatientIntake: React.FC = () => {
   const navigate = useNavigate();
-  const { 
+  const [searchParams] = useSearchParams();
+  // This screen serves the Allopathic intake path (PatientIntakePath links here with
+  // ?type=allopathy); a dedicated Ayurveda form exists separately at /patient/intake-ayurveda.
+  const careSystem = searchParams.get('type') === 'ayurveda' ? 'AYURVEDA' : 'ALLOPATHY';
+  const tokenPrefix = careSystem === 'AYURVEDA' ? 'AYU' : 'ALLO';
+  const {
     activePatient, 
     patients, 
     selectedHospital, 
@@ -117,7 +122,7 @@ export const PatientIntake: React.FC = () => {
     const yy = String(now.getFullYear()).slice(-2);
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
-    const token = `AYU-${yy}${mm}${dd}-${String(nextQueue).padStart(3, '0')}`;
+    const token = `${tokenPrefix}-${yy}${mm}${dd}-${String(nextQueue).padStart(3, '0')}`;
 
     // Submit intake without celebration animation / confetti
     const result = completeIntake(
@@ -131,7 +136,7 @@ export const PatientIntake: React.FC = () => {
         bloodGroup: bloodGroup,
         tokenNumber: token,
         chiefComplaint: symptoms.trim(),
-        careSystem: 'AYURVEDA',
+        careSystem,
         vitals: {
           bp: '120/80 mmHg',
           pulse: '74 bpm',
@@ -147,7 +152,7 @@ export const PatientIntake: React.FC = () => {
         'q-4': severity
       },
       `Intake: Weight ${weight} kg, Blood Group ${bloodGroup}, Duration ${duration}, Severity ${severity}.`,
-      'AYURVEDA'
+      careSystem
     );
 
     setActivePatientId(result.patient.id);

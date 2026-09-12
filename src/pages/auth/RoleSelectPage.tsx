@@ -2,13 +2,14 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HeartHandshake, Stethoscope, Leaf } from 'lucide-react';
 import consultationIllustration from '../../assets/images/consultation-illustration.png';
+import { useTranslation } from '../../utils/translations';
 
 type SelectableRole = 'patient' | 'doctor' | 'worker';
 
 /* ─── Role data — uses Lucide icons, consistent stroke style ─────────────── */
 interface RoleOption {
   role: SelectableRole;
-  label: string;
+  labelKey: 'role_patient' | 'role_doctor' | 'role_worker';
   pastelbg: string;   // pastel circle background
   iconColor: string;  // saturated icon fill/stroke color
   Icon: React.FC<{ size?: number; color?: string; strokeWidth?: number }>;
@@ -17,21 +18,21 @@ interface RoleOption {
 const ROLES: RoleOption[] = [
   {
     role: 'patient',
-    label: 'Patient',
+    labelKey: 'role_patient',
     pastelbg: '#cef3ed',
     iconColor: '#0d9488',   // teal-600
     Icon: HeartHandshake,
   },
   {
     role: 'doctor',
-    label: 'Doctor',
+    labelKey: 'role_doctor',
     pastelbg: '#dbeafe',
     iconColor: '#2563eb',   // blue-600
     Icon: Stethoscope,
   },
   {
     role: 'worker',
-    label: 'AYUSH Worker',
+    labelKey: 'role_worker',
     pastelbg: '#d1fae5',
     iconColor: '#059669',   // emerald-600
     Icon: Leaf,
@@ -119,6 +120,7 @@ const OrganicBlob = () => (
 /* ─── Component ─────────────────────────────────────────────────────────── */
 export const RoleSelectPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -198,7 +200,7 @@ export const RoleSelectPage: React.FC = () => {
             hover:text-slate-800 transition-colors mb-6 tracking-wide
           "
         >
-          ← Back
+          ← {t('rs_back')}
         </button>
 
         {/* Two-tone heading — larger, bolder hero sizing */}
@@ -207,17 +209,17 @@ export const RoleSelectPage: React.FC = () => {
             className="font-bold leading-[1.1]"
             style={{ fontSize: 'clamp(2.6rem, 5vw, 4rem)' }}
           >
-            <span style={{ color: '#0f172a', display: 'block' }}>Who's</span>
-            <span style={{ color: '#0d9488', display: 'block' }}>Signing In?</span>
+            <span style={{ color: '#0f172a', display: 'block' }}>{t('rs_title_1')}</span>
+            <span style={{ color: '#0d9488', display: 'block' }}>{t('rs_title_2')}</span>
           </h1>
           <p className="mt-2 text-slate-500 text-base leading-relaxed max-w-sm">
-            Choose your role to access your personalised dashboard.
+            {t('rs_subtitle')}
           </p>
         </div>
 
         {/* ── 3 Pastel circle role buttons ── */}
         <div className="flex flex-row flex-wrap gap-10 sm:gap-14 mt-5">
-          {ROLES.map(({ role, label, pastelbg, iconColor, Icon }) => (
+          {ROLES.map(({ role, labelKey, pastelbg, iconColor, Icon }) => (
             <button
               key={role}
               id={`role-btn-${role}`}
@@ -248,7 +250,7 @@ export const RoleSelectPage: React.FC = () => {
                 className="font-bold text-base tracking-wide transition-opacity group-hover:opacity-75"
                 style={{ color: '#0f172a' }}
               >
-                {label}
+                {t(labelKey)}
               </span>
             </button>
           ))}

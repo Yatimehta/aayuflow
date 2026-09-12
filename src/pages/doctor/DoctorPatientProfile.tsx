@@ -32,6 +32,7 @@ import {
   X
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 import { StatusBadge } from '../../components/StatusBadge';
 import { AISafetyBanner } from '../../components/AISafetyBanner';
 import { PriorityFlag } from '../../components/PriorityFlag';
@@ -42,6 +43,7 @@ import { isAyurvedicRecord } from '../../utils/streamClassification';
 export const DoctorPatientProfile: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const { patients, activePatient, setActivePatientId, updatePatientClinicalSummary, showToast, currentUser } = useApp();
 
   const paramPatientId = searchParams.get('id');
@@ -273,7 +275,7 @@ export const DoctorPatientProfile: React.FC = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Clinical Summary (AI)</span>
+            <span>{t('doc_clinical_summary')}</span>
           </button>
 
           <button
@@ -285,7 +287,7 @@ export const DoctorPatientProfile: React.FC = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Ayurveda History ({patient.ayurvedaHistory?.length || 1})</span>
+            <span>{t('doc_ayurveda_history')} ({patient.ayurvedaHistory?.length || 1})</span>
           </button>
 
           <button
@@ -297,7 +299,7 @@ export const DoctorPatientProfile: React.FC = () => {
             }`}
           >
             <Stethoscope className="w-3.5 h-3.5" />
-            <span>Allopathy History ({patient.allopathyHistory?.length || (patient.careSystem === 'ALLOPATHY' ? 1 : 0)})</span>
+            <span>{t('doc_allopathy_history')} ({patient.allopathyHistory?.length || (patient.careSystem === 'ALLOPATHY' ? 1 : 0)})</span>
           </button>
 
           <button
@@ -309,7 +311,7 @@ export const DoctorPatientProfile: React.FC = () => {
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Reports & Scans ({patient.documents.length})</span>
+            <span>{t('doc_reports_scans')} ({patient.documents.length})</span>
           </button>
 
           <button
@@ -321,7 +323,7 @@ export const DoctorPatientProfile: React.FC = () => {
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>Prescription History ({patient.prescriptions.length})</span>
+            <span>{t('doc_prescription_history')} ({patient.prescriptions.length})</span>
           </button>
         </div>
       </div>
@@ -538,7 +540,7 @@ export const DoctorPatientProfile: React.FC = () => {
           </div>
 
           {/* CONDITIONAL SECTION 2: 10-Point Dashavidha Pariksha for AYUSH vs SOCRATES for Allopathy */}
-          {patient.intakeType === 'ayurveda' || patient.careSystem === 'AYURVEDA' ? (
+          {currentUser?.discipline !== 'Allopathy' && (patient.intakeType === 'ayurveda' || patient.careSystem === 'AYURVEDA') ? (
             /* 10-POINT DASHAVIDHA PARIKSHA CARD - DISTINCT VISUAL WEIGHT & BRAND-LIGHT CONTAINER */
             <div className="bg-[#E4EFEC]/60 rounded-3xl p-6 border border-[#9FDCD1] shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#9FDCD1]/60 pb-3">

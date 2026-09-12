@@ -14,10 +14,12 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 import { Patient } from '../../types';
 
 export const WorkerDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { patients, selectedHospital, setActivePatientId, showToast } = useApp();
 
   // Search state for finding existing patients

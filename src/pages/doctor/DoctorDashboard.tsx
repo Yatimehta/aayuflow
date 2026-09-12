@@ -7,6 +7,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 import { StatCard } from '../../components/StatCard';
 import { PatientTable } from '../../components/PatientTable';
 import { DoctorOtpModal } from '../../components/DoctorOtpModal';
@@ -14,6 +15,7 @@ import { Patient } from '../../types';
 
 export const DoctorDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { 
     patients, 
     selectedHospital, 
@@ -87,7 +89,7 @@ export const DoctorDashboard: React.FC = () => {
         patients={patients}
         onSelectPatient={handleStartConsultation}
         onStartConsultation={handleStartConsultation}
-        title="Consultation Queue"
+        title={t('nav_queue')}
         showLanguage={false}
       />
 

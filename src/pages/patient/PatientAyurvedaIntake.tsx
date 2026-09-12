@@ -20,11 +20,13 @@ import {
   HeartPulse
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 import { AudioAloudButton } from '../../components/AudioAloudButton';
 import { AyurvedaIntakeData } from '../../types';
 
 export const PatientAyurvedaIntake: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { 
     activePatient, 
     patients, 

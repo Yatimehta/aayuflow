@@ -10,12 +10,14 @@ import {
   Filter
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 import { StatCard } from '../../components/StatCard';
 import { StaffMember } from '../../types';
 
 export const AdminDashboard: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { 
     selectedHospital, 
     adminStats, 

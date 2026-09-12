@@ -18,6 +18,7 @@ import {
   User
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../utils/translations';
 
 interface SidebarProps {
   role: 'worker' | 'doctor' | 'admin';
@@ -27,31 +28,32 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ role, isOpen = true, onClose }) => {
   const { selectedHospital, patients, staff, auditLogs, currentUser, activePatient } = useApp();
+  const { t } = useTranslation();
 
   const isAyurvedaDoctor = (currentUser?.discipline || 'Ayurveda') === 'Ayurveda';
   const isAyushPatient = (activePatient?.careSystem || 'AYURVEDA') === 'AYURVEDA';
 
   const workerNavItems = [
-    { label: 'Assistant Desk', path: '/worker', icon: LayoutDashboard, exact: true },
-    { label: 'Registered Patients', path: '/worker/patients', icon: Users, badge: patients.length },
-    { label: 'Assist Intake', path: '/worker/assist', icon: FileSpreadsheet },
-    { label: 'Scan Papers', path: '/worker/documents', icon: FileText },
-    { label: 'Waiting Queue', path: '/worker/queue', icon: Clock, badge: patients.filter(p => p.status === 'Pending').length },
-    { label: 'Desk Settings', path: '/worker/settings', icon: Settings }
+    { label: t('nav_dashboard'), path: '/worker', icon: LayoutDashboard, exact: true },
+    { label: t('nav_patients'), path: '/worker/patients', icon: Users, badge: patients.length },
+    { label: t('step7_title'), path: '/worker/assist', icon: FileSpreadsheet },
+    { label: t('step4_title'), path: '/worker/documents', icon: FileText },
+    { label: t('nav_queue'), path: '/worker/queue', icon: Clock, badge: patients.filter(p => p.status === 'Pending').length },
+    { label: t('nav_settings'), path: '/worker/settings', icon: Settings }
   ];
 
   const doctorNavItems = [
-    { label: 'Consultation Queue', path: '/doctor', icon: Users, badge: patients.filter(p => p.status !== 'Verified').length || patients.length, exact: true },
-    { label: 'E-Prescriptions / Rx', path: '/doctor/consultation', icon: FileSpreadsheet },
-    { label: 'Doctor Profile', path: '/doctor/profile', icon: User }
+    { label: t('nav_queue'), path: '/doctor', icon: Users, badge: patients.filter(p => p.status !== 'Verified').length || patients.length, exact: true },
+    { label: t('nav_consultation'), path: '/doctor/consultation', icon: FileSpreadsheet },
+    { label: t('nav_profile'), path: '/doctor/profile', icon: User }
   ];
 
 
   const adminNavItems = [
-    { label: 'Directorate Overview', path: '/admin', icon: LayoutDashboard, exact: true },
-    { label: 'Staff & Counters', path: '/admin/staff', icon: Users, badge: staff.length },
-    { label: 'System & ABDM Audit', path: '/admin/audit', icon: Activity, badge: auditLogs.length },
-    { label: 'Hospital Facility', path: '/admin/settings', icon: Settings }
+    { label: t('nav_dashboard'), path: '/admin', icon: LayoutDashboard, exact: true },
+    { label: t('admin_title'), path: '/admin/staff', icon: Users, badge: staff.length },
+    { label: t('admin_abdm_sync'), path: '/admin/audit', icon: Activity, badge: auditLogs.length },
+    { label: t('nav_settings'), path: '/admin/settings', icon: Settings }
   ];
 
   const items = role === 'worker' ? workerNavItems : role === 'doctor' ? doctorNavItems : adminNavItems;

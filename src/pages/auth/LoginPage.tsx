@@ -23,6 +23,8 @@ import {
 import { useApp } from '../../context/AppContext';
 import { UserRole, DoctorDiscipline } from '../../types';
 import consultationIllustration from '../../assets/images/consultation-illustration.png';
+import { registerDoctorRecord } from '../../utils/dbApiClient';
+import { useTranslation } from '../../utils/translations';
 
 type AuthRole = 'patient' | 'worker' | 'doctor' | 'admin' | 'lab';
 
@@ -133,6 +135,7 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { patients, hospitals, selectedHospital, setSelectedHospital, loginAsPatient, loginAsStaff, showToast } = useApp();
+  const { t } = useTranslation();
 
   const rawRole = searchParams.get('role') as AuthRole | null;
   const activeTab: AuthRole = (rawRole && ROLE_META[rawRole]) ? rawRole : 'patient';
@@ -170,7 +173,7 @@ export const LoginPage: React.FC = () => {
     loginPassword.trim().length > 0;
 
   /* ── Auth handlers (logic unchanged from UniversalLogin, extended for doctor) ── */
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (activeTab === 'doctor' && !doctorFormValid) {
@@ -183,6 +186,36 @@ export const LoginPage: React.FC = () => {
     }
 
     setLoading(true);
+
+    if (activeTab === 'doctor') {
+      // Persist the verified credentials to the encrypted database. Best-effort:
+      // the local demo login below still proceeds even if this fails (e.g. the
+      // database-api service isn't running), so a missing backend never blocks
+      // exploring the app.
+      try {
+        await registerDoctorRecord({
+          name: doctorName,
+          contact_number: '+91 90000 00000',
+          email: `${doctorName.toLowerCase().replace(/[^a-z]/g, '.')}@aiia.gov.in`,
+          license_id: loginIdentifier,
+          aadhaar_number: doctorAadhaar.replace(/\s+/g, ''),
+          discipline: doctorDiscipline,
+          qualification: doctorDegree,
+          department: doctorDepartment,
+          hospital_name: selectedHospital.name,
+          hospital_city: selectedHospital.city,
+          degree_certificate_ref: doctorDegreeFile?.name ?? null,
+          registration_proof_ref: doctorRegProofFile?.name ?? null,
+        });
+      } catch (err) {
+        showToast({
+          type: 'info',
+          title: 'Saved locally only',
+          message: 'Could not reach the records database, so this session is demo-only for now.'
+        });
+      }
+    }
+
     setTimeout(() => {
       setLoading(false);
       if (activeTab === 'patient') {
@@ -290,7 +323,7 @@ export const LoginPage: React.FC = () => {
             hover:text-slate-800 transition-colors mb-6 tracking-wide
           "
         >
-          ← Back
+          ← {t('rs_back')}
         </button>
 
         {/* Two-tone heading */}
@@ -299,15 +332,15 @@ export const LoginPage: React.FC = () => {
             className="font-bold leading-[1.1]"
             style={{ fontSize: 'clamp(2.6rem, 5vw, 4rem)' }}
           >
-            <span style={{ color: '#0f172a', display: 'block' }}>Welcome</span>
-            <span style={{ color: '#0d9488', display: 'block' }}>Back!</span>
+            <span style={{ color: '#0f172a', display: 'block' }}>{t('lp_welcome')}</span>
+            <span style={{ color: '#0d9488', display: 'block' }}>{t('lp_back_exclaim')}</span>
           </h1>
           <p className="mt-2 text-slate-500 text-base leading-relaxed max-w-sm">
             {activeTab === 'patient'
-              ? 'Sign in with your ABHA Number, Mobile, or Token ID.'
+              ? t('lp_subtitle_patient')
               : activeTab === 'doctor'
-              ? "We verify every doctor's registration before granting access to patient records."
-              : 'Sign in with your institutional credentials.'}
+              ? t('lp_subtitle_doctor')
+              : t('lp_subtitle_staff')}
           </p>
         </div>
 
@@ -317,7 +350,7 @@ export const LoginPage: React.FC = () => {
           style={{ backgroundColor: meta.badgeBg, color: meta.badgeText }}
         >
           <RoleIcon className="w-4 h-4" />
-          Signing in as {meta.label}
+          {t('lp_signing_in_as')} {t(`role_${activeTab}` as any)}
         </div>
 
         {/* Login form — max-width relaxes for the doctor role, which asks for more */}
@@ -327,7 +360,7 @@ export const LoginPage: React.FC = () => {
           {showHospitalPicker && (
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                Hospital / Institute (Location)
+                {t('lp_hospital_label')}
               </label>
               <div className="relative">
                 <HospitalIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -354,7 +387,7 @@ export const LoginPage: React.FC = () => {
             <>
               {/* Full Name */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('lp_full_name')}</label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -373,7 +406,7 @@ export const LoginPage: React.FC = () => {
 
               {/* System of medicine practised */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">What do you practise?</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('lp_practice_question')}</label>
                 <div className="grid grid-cols-2 gap-2.5">
                   {(['Ayurveda', 'Allopathy'] as DoctorDiscipline[]).map(d => (
                     <button
@@ -400,7 +433,7 @@ export const LoginPage: React.FC = () => {
 
               {/* Department */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Department / OPD</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('lp_department')}</label>
                 <select
                   id="doctor-department"
                   value={doctorDepartment}
@@ -417,7 +450,7 @@ export const LoginPage: React.FC = () => {
 
               {/* Degree / Qualification */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Medical Degree / Qualification</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('lp_degree')}</label>
                 <div className="relative">
                   <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -437,14 +470,14 @@ export const LoginPage: React.FC = () => {
               {/* Degree Certificate upload */}
               <FileField
                 id="doctor-degree-file"
-                label="Degree Certificate"
+                label={t('lp_degree_certificate')}
                 file={doctorDegreeFile}
                 onChange={setDoctorDegreeFile}
               />
 
               {/* Aadhaar */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Aadhaar Number</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('lp_aadhaar')}</label>
                 <div className="relative">
                   <CreditCard className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -455,7 +488,7 @@ export const LoginPage: React.FC = () => {
                     maxLength={14}
                     value={doctorAadhaar}
                     onChange={e => setDoctorAadhaar(e.target.value.replace(/[^\d\s]/g, ''))}
-                    placeholder="12-digit Aadhaar number"
+                    placeholder={t('lp_aadhaar_placeholder')}
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
                                focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
                                text-sm text-slate-800 shadow-sm"
@@ -466,7 +499,7 @@ export const LoginPage: React.FC = () => {
               {/* Registration / Council proof upload */}
               <FileField
                 id="doctor-regproof-file"
-                label="Medical Council / AYUSH Registration Proof"
+                label={t('lp_reg_proof')}
                 file={doctorRegProofFile}
                 onChange={setDoctorRegProofFile}
               />
@@ -477,10 +510,10 @@ export const LoginPage: React.FC = () => {
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
               {activeTab === 'patient'
-                ? 'ABHA Number, Mobile, or Token ID'
+                ? t('lp_identifier_patient')
                 : activeTab === 'doctor'
-                ? 'National Medical / AYUSH Registration No.'
-                : 'Official Email / Employee ID'}
+                ? t('lp_identifier_doctor')
+                : t('lp_identifier_staff')}
             </label>
             <div className="relative">
               {activeTab === 'patient'
@@ -506,13 +539,13 @@ export const LoginPage: React.FC = () => {
           {/* Password */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-sm font-semibold text-slate-700">Password</label>
+              <label className="text-sm font-semibold text-slate-700">{t('lp_password')}</label>
               <button
                 type="button"
                 onClick={() => showToast({ type: 'info', title: 'Password Reset', message: 'Recovery instructions sent to registered mobile/email.' })}
                 className="text-xs text-teal-600 font-semibold hover:underline"
               >
-                Forgot password?
+                {t('lp_forgot_password')}
               </button>
             </div>
             <div className="relative">
@@ -523,7 +556,7 @@ export const LoginPage: React.FC = () => {
                 required
                 value={loginPassword}
                 onChange={e => setLoginPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t('lp_password_placeholder')}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white
                            focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400
                            text-sm text-slate-800 shadow-sm"
@@ -546,29 +579,29 @@ export const LoginPage: React.FC = () => {
               boxShadow: '0 4px 18px rgba(13,148,136,0.30)',
             }}
           >
-            <span>{loading ? 'Authenticating…' : 'Sign In'}</span>
+            <span>{loading ? t('lp_authenticating') : t('lp_sign_in')}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* ABDM trust note */}
+        {/* Trust note */}
         <div className="flex items-center gap-2 mt-5 max-w-sm">
           <ShieldCheck className="w-4 h-4 flex-shrink-0 text-teal-500" />
           <span className="text-xs text-slate-400 leading-snug">
-            Secured by ABDM FHIR Gateway — all data encrypted end-to-end.
+            {t('lp_trust_note')}
           </span>
         </div>
 
         {/* Demo shortcut */}
         <div className="mt-4 max-w-sm flex items-center justify-between text-xs text-slate-400 border-t border-slate-200 pt-4">
-          <span>Testing the prototype?</span>
+          <span>{t('lp_testing_prototype')}</span>
           <button
             type="button"
             id="demo-fill-btn"
             onClick={handleQuickDemoFill}
             className="text-teal-600 font-semibold hover:underline"
           >
-            Try demo account →
+            {t('lp_try_demo')} →
           </button>
         </div>
       </div>
