@@ -1,7 +1,5 @@
 import { EvidenceReport, PatientStatus, CareSystem } from '../types';
 
-const OCR_SERVICE_URL = import.meta.env.VITE_OCR_SERVICE_URL || 'http://localhost:8000';
-
 export interface GenerateReportParams {
   patientId: string;
   patientName: string;
@@ -11,73 +9,6 @@ export interface GenerateReportParams {
   gender: string;
   careSystem?: CareSystem;
   answers?: Record<string, string>;
-}
-
-interface ClinicalReportDraftResponse {
-  title: string;
-  prakriti: string | null;
-  vikriti: string | null;
-  agni: string | null;
-  koshtha: string | null;
-  findings: string;
-  red_flags: string[];
-  therapies: string[];
-  diet: string[];
-}
-
-export interface RemoteClinicalReportDraft {
-  title: string;
-  prakriti: string;
-  vikriti: string;
-  agni: string;
-  koshtha: string;
-  findings: string;
-  redFlags: string[];
-  therapies: string[];
-  diet: string[];
-}
-
-/** Calls the real Gemini-backed clinical-report draft on ocr-service — this is
- * what actually generates the "AI-Generated Draft" doctors see, instead of the
- * hardcoded keyword-matched templates below. Callers should treat this as
- * best-effort: generateAIClinicalReport()'s synchronous local template is what
- * renders instantly, and should stay in place if this call fails (e.g.
- * ocr-service isn't running). Correctly returns empty Ayurveda-specific
- * fields (prakriti/vikriti/agni/koshtha) for an Allopathy patient, unlike the
- * local templates, which always used Ayurvedic terminology. */
-export async function generateAIClinicalReportRemote(params: GenerateReportParams): Promise<RemoteClinicalReportDraft> {
-  const { patientName, age, gender, chiefComplaint, careSystem = 'AYURVEDA', answers = {} } = params;
-
-  const response = await fetch(`${OCR_SERVICE_URL}/generate-clinical-report`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      patient_name: patientName,
-      age,
-      gender,
-      chief_complaint: chiefComplaint,
-      care_system: careSystem,
-      answers
-    })
-  });
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    throw new Error(`Clinical report generation failed (${response.status}): ${detail || response.statusText}`);
-  }
-
-  const data: ClinicalReportDraftResponse = await response.json();
-  return {
-    title: data.title,
-    prakriti: data.prakriti ?? '',
-    vikriti: data.vikriti ?? '',
-    agni: data.agni ?? '',
-    koshtha: data.koshtha ?? '',
-    findings: data.findings,
-    redFlags: data.red_flags,
-    therapies: data.therapies,
-    diet: data.diet
-  };
 }
 
 export const generateAIClinicalReport = ({

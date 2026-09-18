@@ -23,7 +23,6 @@ import {
 import { useApp } from '../../context/AppContext';
 import { UserRole, DoctorDiscipline } from '../../types';
 import consultationIllustration from '../../assets/images/consultation-illustration.png';
-import { registerDoctorRecord } from '../../utils/dbApiClient';
 import { useTranslation } from '../../utils/translations';
 
 type AuthRole = 'patient' | 'worker' | 'doctor' | 'admin' | 'lab';
@@ -173,7 +172,7 @@ export const LoginPage: React.FC = () => {
     loginPassword.trim().length > 0;
 
   /* ── Auth handlers (logic unchanged from UniversalLogin, extended for doctor) ── */
-  const handleLoginSubmit = async (e: React.FormEvent) => {
+  const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (activeTab === 'doctor' && !doctorFormValid) {
@@ -186,35 +185,6 @@ export const LoginPage: React.FC = () => {
     }
 
     setLoading(true);
-
-    if (activeTab === 'doctor') {
-      // Persist the verified credentials to the encrypted database. Best-effort:
-      // the local demo login below still proceeds even if this fails (e.g. the
-      // database-api service isn't running), so a missing backend never blocks
-      // exploring the app.
-      try {
-        await registerDoctorRecord({
-          name: doctorName,
-          contact_number: '+91 90000 00000',
-          email: `${doctorName.toLowerCase().replace(/[^a-z]/g, '.')}@aiia.gov.in`,
-          license_id: loginIdentifier,
-          aadhaar_number: doctorAadhaar.replace(/\s+/g, ''),
-          discipline: doctorDiscipline,
-          qualification: doctorDegree,
-          department: doctorDepartment,
-          hospital_name: selectedHospital.name,
-          hospital_city: selectedHospital.city,
-          degree_certificate_ref: doctorDegreeFile?.name ?? null,
-          registration_proof_ref: doctorRegProofFile?.name ?? null,
-        });
-      } catch (err) {
-        showToast({
-          type: 'info',
-          title: 'Saved locally only',
-          message: 'Could not reach the records database, so this session is demo-only for now.'
-        });
-      }
-    }
 
     setTimeout(() => {
       setLoading(false);
