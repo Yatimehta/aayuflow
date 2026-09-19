@@ -17,10 +17,12 @@ import {
 import { useApp } from '../../context/AppContext';
 import { PrescriptionItem } from '../../types';
 import { Modal } from '../../components/Modal';
+import { useTranslation } from '../../utils/translations';
 
 export const DoctorConsultation: React.FC = () => {
   const navigate = useNavigate();
-  const { 
+  const { t } = useTranslation();
+  const {
     patients, 
     activePatient, 
     selectedHospital, 
@@ -138,18 +140,18 @@ export const DoctorConsultation: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-muted hover:text-brand-heading mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Patient Dossier</span>
+            <span>{t('dc_back')}</span>
           </button>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-bold text-brand-heading">
-              Prescription & Clinical Consultation
+              {t('dc_title')}
             </h1>
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-brand-teal-light text-brand-teal-dark border border-brand-teal/30">
-              Active Encounter
+              {t('dc_active_encounter')}
             </span>
           </div>
           <p className="text-xs text-brand-muted mt-1">
-            Formulate classical Ayurvedic medications, dietary Pathya, and sync with hospital HIS / ABDM.
+            {t('dc_subtitle')}
           </p>
         </div>
 
@@ -159,7 +161,7 @@ export const DoctorConsultation: React.FC = () => {
           className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-brand-teal hover:bg-brand-teal-dark text-white text-xs font-bold shadow-soft-lg hover:scale-[1.02] transition-all"
         >
           <Database className="w-4 h-4" />
-          <span>Send to Hospital HIS / EMR</span>
+          <span>{t('dc_send_emr')}</span>
         </button>
       </div>
 
@@ -183,7 +185,7 @@ export const DoctorConsultation: React.FC = () => {
         </div>
 
         <div className="text-right hidden sm:block">
-          <span className="text-brand-muted">OPD Department:</span>
+          <span className="text-brand-muted">{t('dc_opd_dept')}</span>
           <p className="font-semibold text-brand-heading">Kayachikitsa • {selectedHospital.name}</p>
         </div>
       </div>
@@ -197,7 +199,7 @@ export const DoctorConsultation: React.FC = () => {
             <div className="flex items-center gap-2">
               <Stethoscope className="w-5 h-5 text-brand-teal-dark" />
               <h3 className="text-base font-bold text-brand-heading">
-                AYUSH Formulation Builder
+                {t('dc_formulation_builder')}
               </h3>
             </div>
             <span className="text-xs text-brand-muted">
@@ -323,7 +325,7 @@ export const DoctorConsultation: React.FC = () => {
                 className="px-4 py-2 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white font-bold shadow-soft flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Formulation</span>
+                <span>{t('dc_add_formulation')}</span>
               </button>
             </div>
           </div>
@@ -331,7 +333,7 @@ export const DoctorConsultation: React.FC = () => {
           {/* Current Prescriptions List */}
           <div className="space-y-2.5">
             <h4 className="text-xs font-bold text-brand-heading uppercase tracking-wider">
-              Active Prescriptions ({prescriptions.length}):
+              {t('dc_active_rx')} ({prescriptions.length}):
             </h4>
 
             {prescriptions.map((rx) => (
@@ -372,7 +374,7 @@ export const DoctorConsultation: React.FC = () => {
           
           <div className="bg-white rounded-3xl p-6 border border-brand-border shadow-soft space-y-4 text-xs">
             <h3 className="text-base font-bold text-brand-heading">
-              Final Clinical Diagnosis & Advice
+              {t('dc_final_diagnosis')}
             </h3>
 
             <div>
@@ -422,7 +424,7 @@ export const DoctorConsultation: React.FC = () => {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-brand-border hover:bg-brand-bg text-brand-heading font-semibold"
               >
                 <Printer className="w-4 h-4" />
-                <span>Print Rx</span>
+                <span>{t('dc_print_rx')}</span>
               </button>
 
               <button
@@ -430,7 +432,7 @@ export const DoctorConsultation: React.FC = () => {
                 onClick={() => setIsEmrModalOpen(true)}
                 className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white font-bold shadow-soft"
               >
-                <span>Send to HIS / EMR</span>
+                <span>{t('dc_send_his_emr')}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -447,7 +449,7 @@ export const DoctorConsultation: React.FC = () => {
           setIsEmrModalOpen(false);
           setSyncSuccess(false);
         }}
-        title="Send Encounter to Hospital HIS / ABDM"
+        title={t('dc_modal_title')}
         subtitle={`Encrypted dispatch for ${patient.name} (${patient.tokenNumber})`}
         maxWidth="lg"
       >
@@ -489,14 +491,14 @@ export const DoctorConsultation: React.FC = () => {
                   onClick={() => setIsEmrModalOpen(false)}
                   className="px-4 py-2 rounded-xl border border-brand-border font-semibold text-brand-heading hover:bg-brand-bg"
                 >
-                  Cancel
+                  {t('pi_cancel')}
                 </button>
                 <button
                   onClick={handleSendToEmr}
                   disabled={syncingEmr}
                   className="px-6 py-2 rounded-xl bg-brand-teal hover:bg-brand-teal-dark text-white font-bold shadow-soft flex items-center gap-2"
                 >
-                  {syncingEmr ? 'Syncing with EMR...' : 'Confirm & Sync to EMR'}
+                  {syncingEmr ? t('dc_syncing') : t('dc_confirm_sync')}
                   <Send className="w-4 h-4" />
                 </button>
               </div>
@@ -521,7 +523,7 @@ export const DoctorConsultation: React.FC = () => {
                   }}
                   className="px-6 py-2.5 rounded-xl bg-brand-teal text-white font-bold shadow-soft"
                 >
-                  Return to OPD Queue
+                  {t('dc_return_queue')}
                 </button>
               </div>
             </div>

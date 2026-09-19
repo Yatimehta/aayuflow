@@ -3,10 +3,12 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../../components/Sidebar';
 import { Menu, Hospital, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 
 export const WorkerLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { selectedHospital } = useApp();
+  const { t } = useTranslation();
   const location = useLocation();
 
   const isAssistIntakeFlow = location.pathname === '/worker' || location.pathname === '/worker/' || location.pathname.startsWith('/worker/assist');
@@ -47,7 +49,7 @@ export const WorkerLayout: React.FC = () => {
             <span className="truncate">{selectedHospital.name}</span>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E4EFEC] text-[#146356] border border-[#146356]/20">
-            Assistant Desk
+            {t('wl_assistant_desk')}
           </span>
         </div>
 

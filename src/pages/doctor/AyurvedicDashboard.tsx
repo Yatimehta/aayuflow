@@ -23,9 +23,11 @@ import {
 import { useApp } from '../../context/AppContext';
 import { StatusBadge } from '../../components/StatusBadge';
 import { Patient } from '../../types';
+import { useTranslation } from '../../utils/translations';
 
 export const AyurvedicDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { patients, activePatient, updatePatientStatus, showToast } = useApp();
 
   const selectedPatient: Patient = activePatient || patients[0];
@@ -56,14 +58,14 @@ export const AyurvedicDashboard: React.FC = () => {
             className="hover:underline flex items-center gap-1 text-white hover:text-white/80 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Doctor Workstation</span>
+            <span>{t('ayd_workstation')}</span>
           </button>
           <span className="opacity-60">/</span>
-          <span className="text-white/70">Clinical Dossier</span>
+          <span className="text-white/70">{t('ayd_dossier')}</span>
           <span className="opacity-60">/</span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400 text-amber-950 font-extrabold text-[10px] uppercase tracking-wider shadow-sm border border-amber-300">
             <Sparkles className="w-3 h-3 text-amber-950" />
-            AYURVEDA MODE · EXTENDED ASSESSMENT
+            {t('ayd_mode_badge')}
           </span>
         </div>
 
@@ -73,12 +75,12 @@ export const AyurvedicDashboard: React.FC = () => {
             className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-semibold backdrop-blur-md border border-white/30 transition-all flex items-center gap-1.5"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Print Report</span>
+            <span>{t('ayd_print')}</span>
           </button>
           {isVerified ? (
             <span className="px-3 py-1.5 rounded-xl bg-emerald-500/90 text-white text-xs font-bold shadow-sm flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Vaidya Verified</span>
+              <span>{t('ayd_vaidya_verified')}</span>
             </span>
           ) : (
             <button
@@ -86,7 +88,7 @@ export const AyurvedicDashboard: React.FC = () => {
               className="btn-brand-primary px-4 py-1.5 text-xs font-bold flex items-center gap-1.5"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Verify & Sign Off</span>
+              <span>{t('ayd_verify_signoff')}</span>
             </button>
           )}
         </div>

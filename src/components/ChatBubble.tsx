@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sprout, User, Volume2 } from 'lucide-react';
 import { IntakeChatMessage } from '../types';
+import { useTranslation } from '../utils/translations';
 
 interface ChatBubbleProps {
   message: IntakeChatMessage;
@@ -13,6 +14,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
   onOptionClick,
   onSpeak
 }) => {
+  const { t } = useTranslation();
   const isAi = message.sender === 'ai';
 
   return (
@@ -42,7 +44,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
               <button
                 onClick={() => onSpeak(message.text)}
                 className="text-brand-muted hover:text-brand-teal-dark p-0.5 rounded transition-colors"
-                title="Read aloud in regional dialect"
+                title={t('cb_read_aloud')}
               >
                 <Volume2 className="w-3.5 h-3.5" />
               </button>

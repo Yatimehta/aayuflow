@@ -14,9 +14,11 @@ import {
   History
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientRecords: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { activePatient, patients, selectedHospital } = useApp();
 
   const patient = activePatient || patients[0];
@@ -65,16 +67,16 @@ export const PatientRecords: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Dashboard</span>
+            <span>{t('back_to_dashboard')}</span>
           </button>
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                My Records
+                {t('pr_title')}
               </h1>
               <p className="text-xs text-slate-500 mt-1">
-                Your consultation history, past intake summaries, and uploaded documents.
+                {t('pr_subtitle')}
               </p>
             </div>
 
@@ -87,7 +89,7 @@ export const PatientRecords: React.FC = () => {
                   filter === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                All ({pastVisits.length + documents.length})
+                {t('pr_tab_all')} ({pastVisits.length + documents.length})
               </button>
               <button
                 type="button"
@@ -96,7 +98,7 @@ export const PatientRecords: React.FC = () => {
                   filter === 'visits' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Visits ({pastVisits.length})
+                {t('pr_tab_visits')} ({pastVisits.length})
               </button>
               <button
                 type="button"
@@ -105,7 +107,7 @@ export const PatientRecords: React.FC = () => {
                   filter === 'documents' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Documents ({documents.length})
+                {t('pr_tab_documents')} ({documents.length})
               </button>
             </div>
           </div>
@@ -120,7 +122,7 @@ export const PatientRecords: React.FC = () => {
             </p>
           </div>
           <span className="text-[11px] font-semibold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200">
-            {patient?.vitals?.weight ? `Weight: ${patient.vitals.weight}` : 'ABHA Verified'}
+            {patient?.vitals?.weight ? `${t('pr_weight_label')}: ${patient.vitals.weight}` : t('pr_abha_verified')}
           </span>
         </div>
 
@@ -131,7 +133,7 @@ export const PatientRecords: React.FC = () => {
           {(filter === 'all' || filter === 'visits') && (
             <div className="space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                OPD Visits & Encounters
+                {t('pr_visits_heading')}
               </h2>
 
               <div className="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
@@ -166,13 +168,13 @@ export const PatientRecords: React.FC = () => {
           {(filter === 'all' || filter === 'documents') && (
             <div className="space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Uploaded Reports & Documents
+                {t('pr_documents_heading')}
               </h2>
 
               <div className="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
                 {documents.length === 0 ? (
                   <div className="p-8 text-center text-slate-400 text-xs">
-                    No documents uploaded yet.
+                    {t('pr_no_documents')}
                   </div>
                 ) : (
                   documents.map((doc) => (
@@ -190,7 +192,7 @@ export const PatientRecords: React.FC = () => {
                       </div>
 
                       <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                        Verified
+                        {t('pr_verified')}
                       </span>
                     </div>
                   ))

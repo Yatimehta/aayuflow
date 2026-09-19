@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { LabResultItem, DrugInteractionItem } from '../types';
+import { useTranslation } from '../utils/translations';
 
 interface DocumentLabResultsProps {
   labResults?: LabResultItem[];
@@ -13,6 +14,7 @@ export const DocumentLabResults: React.FC<DocumentLabResultsProps> = ({
   drugInteractions = [],
   className = ''
 }) => {
+  const { t } = useTranslation();
   if (labResults.length === 0 && drugInteractions.length === 0) {
     return null;
   }
@@ -23,11 +25,11 @@ export const DocumentLabResults: React.FC<DocumentLabResultsProps> = ({
       {labResults.length > 0 && (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            <span>Extracted Diagnostic Values</span>
+            <span>{t('dlr_extracted_values')}</span>
             {labResults.some(r => r.isAbnormal) && (
               <span className="text-rose-600 font-bold normal-case text-[10px] flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
-                <span>Abnormal values detected</span>
+                <span>{t('dlr_abnormal_detected')}</span>
               </span>
             )}
           </div>
@@ -45,7 +47,7 @@ export const DocumentLabResults: React.FC<DocumentLabResultsProps> = ({
                     </span>
                     <span className="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-100/90 px-1.5 py-0.5 rounded text-[10px] border border-rose-200">
                       <AlertCircle className="w-2.5 h-2.5 text-rose-600" />
-                      <span>⚠ Out of range (Normal: {res.referenceRange})</span>
+                      <span>{t('dlr_out_of_range', { range: res.referenceRange })}</span>
                     </span>
                   </div>
                 );
@@ -60,7 +62,7 @@ export const DocumentLabResults: React.FC<DocumentLabResultsProps> = ({
                     {res.parameter}: {res.value} {res.unit || ''}
                   </span>
                   <span className="text-[10px] text-slate-400">
-                    (Normal: {res.referenceRange})
+                    {t('dlr_normal_range', { range: res.referenceRange })}
                   </span>
                 </div>
               );
@@ -79,12 +81,12 @@ export const DocumentLabResults: React.FC<DocumentLabResultsProps> = ({
             >
               <div className="flex items-center gap-1.5 font-bold text-amber-800 text-[11px]">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                <span>⚠ Potential Drug Interaction — Flag for Physician Review</span>
+                <span>{t('dlr_interaction_warning')}</span>
               </div>
               <p className="text-[11px] text-amber-900 leading-snug">
                 <span className="font-semibold text-amber-950">{item.drugs.join(' + ')}:</span> {item.warning}
                 <span className="ml-1 text-[10px] font-bold text-amber-700 uppercase bg-amber-100 px-1 py-0.2 rounded border border-amber-200">
-                  {item.severity} Risk
+                  {item.severity} {t('dlr_risk_suffix')}
                 </span>
               </p>
             </div>

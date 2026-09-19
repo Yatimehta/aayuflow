@@ -15,9 +15,11 @@ import { useApp } from '../../context/AppContext';
 import { DocumentLabResults } from '../../components/DocumentLabResults';
 import { DocumentItem } from '../../types';
 import { extractDocument, ExtractionResult } from '../../utils/ocrExtraction';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientUploadDocument: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     activePatient,
     patients,
@@ -127,15 +129,15 @@ export const PatientUploadDocument: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Dashboard</span>
+            <span>{t('back_to_dashboard')}</span>
           </button>
 
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Upload Document
+              {t('pud_title')}
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Submit your medical report, prescription, or scan before your consultation.
+              {t('pud_subtitle')}
             </p>
           </div>
         </div>
@@ -149,24 +151,24 @@ export const PatientUploadDocument: React.FC = () => {
           {/* Document Type Dropdown */}
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-slate-800">
-              Document Type *
+              {t('pud_doc_type_label')}
             </label>
             <select
               value={docType}
               onChange={(e) => setDocType(e.target.value as DocumentItem['type'])}
               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all"
             >
-              <option value="Lab Report">Lab Report (Blood, Urine, Pathology)</option>
-              <option value="Prescription">Prescription / Medication Slip</option>
-              <option value="Diagnostic Scan">Diagnostic Scan / X-Ray / MRI / USG</option>
-              <option value="Discharge Summary">Discharge Summary / Prior Case Note</option>
+              <option value="Lab Report">{t('pud_doc_type_lab')}</option>
+              <option value="Prescription">{t('pud_doc_type_prescription')}</option>
+              <option value="Diagnostic Scan">{t('pud_doc_type_scan')}</option>
+              <option value="Discharge Summary">{t('pud_doc_type_discharge')}</option>
             </select>
           </div>
 
           {/* File Picker Drop Area */}
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-slate-800">
-              Choose File (PDF, PNG, JPG) *
+              {t('pud_choose_file_label')}
             </label>
             <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-teal-400 bg-slate-50/50 transition-colors">
               <input
@@ -184,12 +186,12 @@ export const PatientUploadDocument: React.FC = () => {
                 <Upload className="w-8 h-8 text-teal-600 mx-auto" />
                 <div>
                   <p className="text-xs font-bold text-slate-900">
-                    {docFile ? docFile.name : 'Click to select or drop document here'}
+                    {docFile ? docFile.name : t('pud_drop_here')}
                   </p>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    {docFile 
-                      ? `${(docFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to submit` 
-                      : 'Supports PDF, JPG, PNG up to 25MB'}
+                    {docFile
+                      ? `${(docFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to submit`
+                      : t('pud_supports')}
                   </p>
                 </div>
               </label>
@@ -201,28 +203,23 @@ export const PatientUploadDocument: React.FC = () => {
                   className="mt-3 text-xs text-rose-600 font-semibold hover:underline inline-flex items-center gap-1"
                 >
                   <X className="w-3.5 h-3.5" />
-                  <span>Remove file</span>
+                  <span>{t('pud_remove_file')}</span>
                 </button>
               )}
             </div>
 
-            {/* Extracted Values Live Preview — reads the actual document via the
-                character-recognition backend (ocr-service/); nothing here is fabricated. */}
+            {/* Prototype-only placeholder — no OCR backend is wired up, so this
+                never claims to have actually read the file. */}
             {docFile && (
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-800">AI Extraction Preview:</span>
-                  {!isExtracting && !extractionError && (
-                    <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full font-bold border border-teal-200">
-                      Read from your document
-                    </span>
-                  )}
+                  <span className="font-bold text-slate-800">{t('pud_preview_title')}</span>
                 </div>
 
                 {isExtracting && (
                   <div className="flex items-center gap-2 text-slate-500 py-2">
                     <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-                    <span>Reading document with AI...</span>
+                    <span>{t('pud_processing')}</span>
                   </div>
                 )}
 
@@ -247,13 +244,13 @@ export const PatientUploadDocument: React.FC = () => {
           {/* Optional Notes */}
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-slate-800">
-              Notes or Doctor's Comments (Optional)
+              {t('pud_notes_label')}
             </label>
             <textarea
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. Fasting blood sugar report from last week..."
+              placeholder={t('pud_notes_placeholder')}
               className="w-full p-3 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all leading-relaxed placeholder:text-slate-400"
             />
           </div>
@@ -265,7 +262,7 @@ export const PatientUploadDocument: React.FC = () => {
               onClick={() => navigate('/patient/dashboard')}
               className="text-xs text-slate-500 hover:text-slate-800 font-medium"
             >
-              Cancel
+              {t('pi_cancel')}
             </button>
 
             <button
@@ -274,7 +271,7 @@ export const PatientUploadDocument: React.FC = () => {
               className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs disabled:opacity-50"
             >
               <Check className="w-4 h-4 stroke-[2.5]" />
-              <span>{isSubmitting ? 'Uploading...' : isExtracting ? 'Reading document...' : 'Submit Document'}</span>
+              <span>{isSubmitting ? t('pud_uploading') : isExtracting ? t('pud_reading') : t('pud_submit')}</span>
             </button>
           </div>
 

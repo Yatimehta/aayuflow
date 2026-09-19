@@ -145,7 +145,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
           <div className="mt-4 flex items-center gap-2 text-[11px] text-brand-teal-dark font-medium bg-brand-teal-light px-3 py-1 rounded-full">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>AI OCR automatically parses Sanskrit & Ayurvedic drug terms</span>
+            <span>Documents are attached to your record for staff review</span>
           </div>
         </div>
       </div>
@@ -156,7 +156,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
           <div className="flex items-center justify-between text-xs font-semibold text-brand-heading">
             <span className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-brand-teal-dark" />
-              Scanning & parsing document with AI OCR...
+              Processing document...
             </span>
             <span>{uploadProgress}%</span>
           </div>
@@ -273,7 +273,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
                 <StatusBadge status={previewDoc.status} size="sm" />
               </div>
               <div className="pt-2 border-t border-brand-border/60">
-                <p className="font-semibold text-brand-heading mb-1">Extracted Clinical Entities (OCR):</p>
+                <p className="font-semibold text-brand-heading mb-1">Notes:</p>
                 <p className="text-brand-body leading-relaxed">
                   {previewDoc.ocrExtractedSummary || 'No text extracted.'}
                 </p>

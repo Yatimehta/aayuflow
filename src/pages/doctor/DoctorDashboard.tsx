@@ -12,25 +12,37 @@ import { StatCard } from '../../components/StatCard';
 import { PatientTable } from '../../components/PatientTable';
 import { DoctorOtpModal } from '../../components/DoctorOtpModal';
 import { Patient } from '../../types';
+import { isAyurvedicRecord, isAllopathicRecord } from '../../utils/streamClassification';
 
 export const DoctorDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { 
-    patients, 
-    selectedHospital, 
-    setActivePatientId, 
+  const {
+    patients,
+    selectedHospital,
+    setActivePatientId,
     unlockPatient,
-    unreadReportCount, 
-    showToast 
+    unreadReportCount,
+    showToast,
+    currentUser
   } = useApp();
 
   // Selected Patient for OTP Consultation Access
   const [selectedOtpPatient, setSelectedOtpPatient] = useState<Patient | null>(null);
 
-  const waitingPatients = patients.filter(p => p.status === 'Processing' || p.status === 'Pending');
-  const completedPatients = patients.filter(p => p.status === 'Verified');
-  const aiReadyPatients = patients.filter(p => p.clinicalSummary?.aiGeneratedNotes && p.status !== 'Rejected');
+  // A doctor's queue only ever contains their own stream — an Allopathy
+  // doctor has no business seeing (or being counted against) Ayurvedic
+  // intakes, and vice versa. Only actually restrict once we know the
+  // doctor's discipline; leave unfiltered otherwise (e.g. still loading).
+  const myPatients = currentUser?.discipline === 'Ayurveda'
+    ? patients.filter(isAyurvedicRecord)
+    : currentUser?.discipline === 'Allopathy'
+    ? patients.filter(isAllopathicRecord)
+    : patients;
+
+  const waitingPatients = myPatients.filter(p => p.status === 'Processing' || p.status === 'Pending');
+  const completedPatients = myPatients.filter(p => p.status === 'Verified');
+  const aiReadyPatients = myPatients.filter(p => p.clinicalSummary?.aiGeneratedNotes && p.status !== 'Rejected');
   const waitMinutes = selectedHospital.currentWaitMinutes || 18;
 
   const handleStartConsultation = (p: Patient) => {
@@ -86,7 +98,7 @@ export const DoctorDashboard: React.FC = () => {
 
       {/* 2. STREAMLINED OPD CONSULTATION QUEUE */}
       <PatientTable
-        patients={patients}
+        patients={myPatients}
         onSelectPatient={handleStartConsultation}
         onStartConsultation={handleStartConsultation}
         title={t('nav_queue')}

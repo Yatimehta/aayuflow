@@ -1,5 +1,6 @@
 import React from 'react';
 import { PatientStatus } from '../types';
+import { useTranslation } from '../utils/translations';
 
 interface StatusBadgeProps {
   status: PatientStatus | string;
@@ -11,6 +12,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   status,
   size = 'md',
 }) => {
+  const { t } = useTranslation();
   // Map statuses to dot colors:
   // Green dot for Verified / Optimal / Completed / Low
   // Amber dot for Pending / Suboptimal / In Progress / Medium
@@ -44,13 +46,13 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const getLabel = () => {
     switch (status) {
       case 'Verified':
-        return 'Verified';
+        return t('sb_verified');
       case 'Pending':
-        return 'Pending Review';
+        return t('sb_pending');
       case 'Processing':
-        return 'AI Processing';
+        return t('sb_processing');
       case 'Rejected':
-        return 'Changes Needed';
+        return t('sb_rejected');
       default:
         return status;
     }

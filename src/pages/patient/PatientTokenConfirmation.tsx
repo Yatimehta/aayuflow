@@ -11,10 +11,12 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { AudioAloudButton } from '../../components/AudioAloudButton';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientTokenConfirmation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { activePatient, patients, selectedHospital, showToast } = useApp();
 
   const patient = activePatient || patients[0];
@@ -45,12 +47,12 @@ export const PatientTokenConfirmation: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center justify-center gap-2">
               <h1 className="text-2xl font-bold text-[#0D2B3E] tracking-tight">
-                Intake Submitted Successfully
+                {t('ptc_title')}
               </h1>
               <AudioAloudButton text={`Intake submitted successfully. Your consultation token is ${tokenNumber} and access OTP is ${otp}.`} />
             </div>
             <p className="text-xs text-slate-500">
-              Your consultation credentials have been generated for {hospitalName}.
+              {t('ptc_subtitle', { hospital: hospitalName })}
             </p>
           </div>
         </div>
@@ -63,7 +65,7 @@ export const PatientTokenConfirmation: React.FC = () => {
             {/* Token Block */}
             <div className="space-y-1 sm:pr-4">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-                OPD Token ID
+                {t('ptc_token_label')}
               </span>
               <div className="text-3xl sm:text-4xl font-mono font-black text-[#146356] tracking-tight py-1">
                 {tokenNumber}
@@ -74,7 +76,7 @@ export const PatientTokenConfirmation: React.FC = () => {
             <div className="space-y-1 pt-3 sm:pt-0 sm:pl-4">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-1">
                 <KeyRound className="w-3.5 h-3.5 text-[#146356]" />
-                <span>Doctor Access OTP</span>
+                <span>{t('ptc_otp_label')}</span>
               </span>
               <div className="text-3xl sm:text-4xl font-mono font-black text-[#0D2B3E] tracking-widest py-1">
                 {otp}
@@ -87,17 +89,17 @@ export const PatientTokenConfirmation: React.FC = () => {
           <div className="p-3.5 rounded-2xl bg-[#F4FBF9] border border-[#DCEAE7] text-xs text-slate-600 text-left space-y-1">
             <p className="font-bold text-[#0D2B3E] flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-[#146356]" />
-              <span>Share this OTP with your doctor</span>
+              <span>{t('ptc_otp_note_title')}</span>
             </p>
             <p className="text-[11px] text-slate-500 leading-relaxed">
-              When you enter the consultation room, the doctor will ask for this OTP to securely decrypt and open your clinical dossier on their dashboard.
+              {t('ptc_otp_note_body')}
             </p>
           </div>
 
           {/* OPD Center Information (Queue slot and wait time removed) */}
           <div className="border-t border-b border-slate-100 py-3.5 text-xs">
             <div className="flex items-center justify-between text-slate-600">
-              <span className="text-slate-400">Hospital / Facility:</span>
+              <span className="text-slate-400">{t('ptc_hospital_label')}</span>
               <span className="font-semibold text-[#0D2B3E] truncate max-w-[240px]">{hospitalName}</span>
             </div>
           </div>
@@ -110,7 +112,7 @@ export const PatientTokenConfirmation: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
             >
               <Copy className="w-3.5 h-3.5" />
-              <span>Copy Token & OTP</span>
+              <span>{t('ptc_copy_btn')}</span>
             </button>
             <button
               type="button"
@@ -118,7 +120,7 @@ export const PatientTokenConfirmation: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print Slip</span>
+              <span>{t('ptc_print_btn')}</span>
             </button>
           </div>
 
@@ -132,7 +134,7 @@ export const PatientTokenConfirmation: React.FC = () => {
             className="text-slate-600 hover:text-slate-900 font-medium inline-flex items-center gap-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Patient Home</span>
+            <span>{t('ptc_back_home')}</span>
           </button>
 
           <span className="hidden sm:inline text-slate-300">•</span>
@@ -142,7 +144,7 @@ export const PatientTokenConfirmation: React.FC = () => {
             onClick={() => navigate('/patient/records')}
             className="text-[#146356] hover:underline font-semibold inline-flex items-center gap-1"
           >
-            <span>View My Records</span>
+            <span>{t('ptc_view_records')}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>

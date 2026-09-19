@@ -1213,16 +1213,16 @@ export const MOCK_CLINICAL_QUESTIONS: ClinicalQuestion[] = [
 ];
 
 export const MOCK_LANGUAGES = [
-  { code: 'hi', name: 'Hindi', native: 'हिंदी', popular: true },
-  { code: 'en', name: 'English', native: 'English', popular: true },
-  { code: 'sa', name: 'Sanskrit', native: 'संस्कृतम्', popular: false },
-  { code: 'mr', name: 'Marathi', native: 'मराठी', popular: true },
-  { code: 'ta', name: 'Tamil', native: 'தமிழ்', popular: true },
-  { code: 'te', name: 'Telugu', native: 'తెలుగు', popular: false },
-  { code: 'bn', name: 'Bengali', native: 'বাংলা', popular: true },
-  { code: 'gu', name: 'Gujarati', native: 'ગુજરાતી', popular: false },
-  { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ', popular: false },
-  { code: 'ml', name: 'Malayalam', native: 'മലയാളം', popular: false }
+  { code: 'hi', name: 'Hindi', native: 'हिंदी' },
+  { code: 'en', name: 'English', native: 'English' },
+  { code: 'sa', name: 'Sanskrit', native: 'संस्कृतम्' },
+  { code: 'mr', name: 'Marathi', native: 'मराठी' },
+  { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
+  { code: 'te', name: 'Telugu', native: 'తెలుగు' },
+  { code: 'bn', name: 'Bengali', native: 'বাংলা' },
+  { code: 'gu', name: 'Gujarati', native: 'ગુજરાતી' },
+  { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ' },
+  { code: 'ml', name: 'Malayalam', native: 'മലയാളം' }
 ];
 
 export const INITIAL_CHAT_MESSAGES = [

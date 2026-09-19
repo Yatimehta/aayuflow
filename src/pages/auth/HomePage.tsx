@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import ayucarezLogo from '../../assets/images/logo.png';
 import ministryOfAyushEmblem from '../../assets/images/ministry-of-ayush-emblem.jpg';
+import { useTranslation } from '../../utils/translations';
 
 /* ─── Decorative corner leaf cluster (shared with RoleSelectPage) ─────────── */
 const LeafCluster = ({
@@ -78,33 +79,19 @@ const BackgroundBlobs = () => (
 interface WalkthroughStep {
   step: string;
   icon: React.FC<{ size?: number; className?: string; strokeWidth?: number }>;
-  title: string;
-  description: string;
+  titleKey: string;
+  descKey: string;
 }
 
 const STEPS: WalkthroughStep[] = [
-  {
-    step: '01',
-    icon: Mic,
-    title: 'Share Your History',
-    description: 'Speak or type your symptoms and medical history — no forms to fill.',
-  },
-  {
-    step: '02',
-    icon: FileText,
-    title: 'Instant Digitization',
-    description: 'Upload past prescriptions or reports — we digitize and organize them automatically.',
-  },
-  {
-    step: '03',
-    icon: Sparkles,
-    title: 'AI-Ready for Your Doctor',
-    description: 'Your doctor gets a clear, structured summary before you even walk in.',
-  },
+  { step: '01', icon: Mic, titleKey: 'home_step1_title', descKey: 'home_step1_desc' },
+  { step: '02', icon: FileText, titleKey: 'home_step2_title', descKey: 'home_step2_desc' },
+  { step: '03', icon: Sparkles, titleKey: 'home_step3_title', descKey: 'home_step3_desc' },
 ];
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -150,7 +137,7 @@ export const HomePage: React.FC = () => {
           onClick={() => navigate('/role-select')}
           className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-teal-800 hover:text-teal-950 px-4 py-2 rounded-full border border-teal-200/80 bg-white/80 shadow-sm hover:shadow transition-all"
         >
-          <span>Portal Login</span>
+          <span>{t('home_portal_login')}</span>
           <ArrowRight className="w-3.5 h-3.5 text-teal-600" />
         </button>
       </header>
@@ -167,13 +154,13 @@ export const HomePage: React.FC = () => {
             className="font-bold leading-[1.08] tracking-tight text-center"
             style={{ fontSize: 'clamp(2.6rem, 5.5vw, 4.2rem)' }}
           >
-            <span style={{ color: '#0f172a', display: 'block' }}>Accessible Care</span>
-            <span style={{ color: '#0d9488', display: 'block' }}>Made for Everyone</span>
+            <span style={{ color: '#0f172a', display: 'block' }}>{t('home_hero_1')}</span>
+            <span style={{ color: '#0d9488', display: 'block' }}>{t('home_hero_2')}</span>
           </h1>
 
           {/* Subtext */}
           <p className="mt-4 sm:mt-5 text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto font-normal">
-            Ayurveda and modern medicine, together in one simple health app.
+            {t('home_subtext')}
           </p>
 
           {/* Primary CTA Button */}
@@ -187,7 +174,7 @@ export const HomePage: React.FC = () => {
                 boxShadow: '0 8px 26px rgba(13,148,136,0.35)',
               }}
             >
-              <span>Login to Portal</span>
+              <span>{t('home_login_cta')}</span>
               <ArrowRight className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </div>
@@ -196,15 +183,15 @@ export const HomePage: React.FC = () => {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 border border-teal-200/70 text-teal-800 shadow-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-              Works with Ayushman Bharat
+              {t('home_badge_abha')}
             </span>
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 border border-teal-200/70 text-teal-800 shadow-sm">
               <Leaf className="w-3.5 h-3.5 text-teal-600" />
-              AYUSH Certified
+              {t('home_badge_ayush')}
             </span>
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 border border-teal-200/70 text-teal-800 shadow-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-              Your Data Stays Safe
+              {t('home_badge_safe')}
             </span>
           </div>
         </section>
@@ -219,16 +206,16 @@ export const HomePage: React.FC = () => {
               className="font-bold tracking-tight text-slate-900"
               style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)' }}
             >
-              How Ayucarez Works
+              {t('home_how_it_works')}
             </h2>
             <p className="mt-2 text-slate-500 text-sm sm:text-base max-w-md mx-auto">
-              A gentle, streamlined intake designed to make your doctor visits effortless.
+              {t('home_how_it_works_sub')}
             </p>
           </div>
 
           {/* 3 Step Cards */}
           <div className="relative w-full grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
-            {STEPS.map(({ step, icon: StepIcon, title, description }, index) => (
+            {STEPS.map(({ step, icon: StepIcon, titleKey, descKey }, index) => (
               <div key={step} className="relative flex flex-col">
                 <div
                   className="
@@ -244,7 +231,7 @@ export const HomePage: React.FC = () => {
                 >
                   {/* Step indicator tag */}
                   <span className="text-[11px] font-bold tracking-widest text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full mb-5 border border-teal-100 uppercase">
-                    Step {step}
+                    {t('home_step_label', { step })}
                   </span>
 
                   {/* Pale mint circular icon badge (RoleSelect style, ~76px) */}
@@ -266,12 +253,12 @@ export const HomePage: React.FC = () => {
 
                   {/* Title */}
                   <h3 className="font-bold text-lg text-slate-900 mb-2">
-                    {title}
+                    {t(titleKey)}
                   </h3>
 
                   {/* Description */}
                   <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
-                    {description}
+                    {t(descKey)}
                   </p>
                 </div>
 
@@ -296,7 +283,7 @@ export const HomePage: React.FC = () => {
               onClick={() => navigate('/role-select')}
               className="inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-900 transition-colors"
             >
-              <span>Ready to begin? Choose your role</span>
+              <span>{t('home_ready_cta')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -304,7 +291,7 @@ export const HomePage: React.FC = () => {
 
         {/* ── Footer note ─────────────────────────────────────────────────── */}
         <footer className="mt-20 text-center text-xs text-slate-400">
-          <p>© 2026 Ayucarez. Making AYUSH healthcare simple for everyone.</p>
+          <p>{t('home_footer')}</p>
         </footer>
       </main>
 

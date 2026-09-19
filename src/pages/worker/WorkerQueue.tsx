@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Clock, Users, ArrowRight, CheckCircle2, AlertCircle, Bell, Stethoscope, UserPlus } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { StatusBadge } from '../../components/StatusBadge';
+import { useTranslation } from '../../utils/translations';
 
 export const WorkerQueue: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { patients, selectedHospital, setActivePatientId, showToast } = useApp();
 
   const handleCallToken = (token: string, name: string) => {
@@ -29,10 +31,10 @@ export const WorkerQueue: React.FC = () => {
       <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#DCEAE7] shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#0D2B3E]">
-            OPD Waiting Queue & Tokens
+            {t('wq_title')}
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Current patient queue list and token status at {selectedHospital.name}.
+            {t('wq_subtitle', { hospital: selectedHospital.name })}
           </p>
         </div>
 
@@ -42,7 +44,7 @@ export const WorkerQueue: React.FC = () => {
             className="px-4 py-2.5 rounded-xl bg-[#146356] hover:bg-[#0f4d43] text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors"
           >
             <UserPlus className="w-4 h-4" />
-            <span>+ Assist Next Patient</span>
+            <span>{t('wq_assist_next')}</span>
           </button>
         </div>
       </div>
@@ -84,7 +86,7 @@ export const WorkerQueue: React.FC = () => {
                 </div>
 
                 <div className="mt-3 p-3 bg-[#F4FBF9] rounded-xl border border-[#DCEAE7] text-xs">
-                  <p className="text-slate-400 text-[11px] font-semibold">Reported Issue:</p>
+                  <p className="text-slate-400 text-[11px] font-semibold">{t('wq_reported_issue')}</p>
                   <p className="font-medium text-[#0D2B3E] truncate mt-0.5" title={patient.chiefComplaint}>
                     {patient.chiefComplaint}
                   </p>
@@ -93,7 +95,7 @@ export const WorkerQueue: React.FC = () => {
 
               <div className="space-y-2 pt-3 border-t border-[#DCEAE7]">
                 <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-                  <span>Slot: #{patient.queueNumber}</span>
+                  <span>{t('wq_slot')} #{patient.queueNumber}</span>
                   <span className="text-[#146356] font-bold font-mono">OTP: {patient.otp || '4829'}</span>
                 </div>
 
@@ -103,7 +105,7 @@ export const WorkerQueue: React.FC = () => {
                     className="flex-1 py-2 rounded-xl border border-[#DCEAE7] hover:bg-slate-50 text-[#0D2B3E] text-xs font-bold flex items-center justify-center gap-1 transition-colors"
                   >
                     <Bell className="w-3.5 h-3.5 text-[#146356]" />
-                    <span>Call Token</span>
+                    <span>{t('wq_call_token')}</span>
                   </button>
                   <button
                     onClick={() => {
@@ -112,7 +114,7 @@ export const WorkerQueue: React.FC = () => {
                     }}
                     className="px-3.5 py-2 rounded-xl bg-[#E4EFEC] hover:bg-[#146356] text-[#146356] hover:text-white text-xs font-bold transition-all"
                   >
-                    Details
+                    {t('wq_details')}
                   </button>
                 </div>
               </div>

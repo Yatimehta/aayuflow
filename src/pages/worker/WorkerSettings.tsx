@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Hospital, Bell, Volume2, ShieldCheck, Save } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 
 export const WorkerSettings: React.FC = () => {
+  const { t } = useTranslation();
   const { selectedHospital, showToast } = useApp();
   const [audioAnnounce, setAudioAnnounce] = useState(true);
   const [autoOcr, setAutoOcr] = useState(true);
@@ -19,8 +21,8 @@ export const WorkerSettings: React.FC = () => {
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="bg-white p-5 sm:p-6 rounded-3xl border border-brand-border shadow-soft">
-        <h1 className="text-xl sm:text-2xl font-bold text-brand-heading">Hospital Desk Settings</h1>
-        <p className="text-xs text-brand-muted mt-1">Configure OPD queue audio alerts, OCR transcription and local facility defaults.</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-brand-heading">{t('ws_title')}</h1>
+        <p className="text-xs text-brand-muted mt-1">{t('ws_subtitle')}</p>
       </div>
 
       <div className="bg-white p-6 rounded-3xl border border-brand-border shadow-soft space-y-6 text-xs">
@@ -31,8 +33,8 @@ export const WorkerSettings: React.FC = () => {
                 <Volume2 className="w-4 h-4" />
               </div>
               <div>
-                <p className="font-bold text-brand-heading">Audio Token Announcements</p>
-                <p className="text-brand-muted">Announce called token numbers through waiting room loudspeaker</p>
+                <p className="font-bold text-brand-heading">{t('ws_audio_announce')}</p>
+                <p className="text-brand-muted">{t('ws_audio_announce_desc')}</p>
               </div>
             </div>
             <input
@@ -49,8 +51,8 @@ export const WorkerSettings: React.FC = () => {
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <div>
-                <p className="font-bold text-brand-heading">Automatic AI OCR Document Parsing</p>
-                <p className="text-brand-muted">Extract botanical drugs and dosage timings from camera phone photos</p>
+                <p className="font-bold text-brand-heading">{t('ws_auto_ocr')}</p>
+                <p className="text-brand-muted">{t('ws_auto_ocr_desc')}</p>
               </div>
             </div>
             <input
@@ -62,7 +64,7 @@ export const WorkerSettings: React.FC = () => {
           </div>
 
           <div className="p-3 rounded-2xl bg-brand-bg border border-brand-border space-y-1.5">
-            <label className="block font-bold text-brand-heading">Default Audio Speech Dialect</label>
+            <label className="block font-bold text-brand-heading">{t('ws_dialect_label')}</label>
             <select
               value={regionalDialect}
               onChange={(e) => setRegionalDialect(e.target.value)}
@@ -83,7 +85,7 @@ export const WorkerSettings: React.FC = () => {
             className="px-6 py-2.5 rounded-xl bg-brand-teal text-white font-bold shadow-soft flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
-            <span>Save Preferences</span>
+            <span>{t('ws_save')}</span>
           </button>
         </div>
       </div>

@@ -52,11 +52,11 @@ export const PatientConsent: React.FC = () => {
         <div className="space-y-3">
           <button
             type="button"
-            onClick={() => navigate('/patient/language')}
+            onClick={() => navigate('/patient/dashboard')}
             className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#0D2B3E] font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{t('pc_back_lang')}</span>
+            <span>{t('back_to_dashboard')}</span>
           </button>
 
           <div className="flex items-start justify-between gap-4">

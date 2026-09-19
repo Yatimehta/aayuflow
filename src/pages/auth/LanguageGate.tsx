@@ -82,11 +82,6 @@ export const LanguageGate: React.FC = () => {
                   <span className="text-xs text-slate-500 font-medium">
                     {lang.name}
                   </span>
-                  {lang.popular && (
-                    <span className="text-[10px] font-semibold text-[#146356] bg-white/80 px-1.5 py-0.5 rounded border border-[#DCEAE7]">
-                      Popular
-                    </span>
-                  )}
                 </div>
               </button>
             );

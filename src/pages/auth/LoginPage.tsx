@@ -207,7 +207,7 @@ export const LoginPage: React.FC = () => {
         });
         showToast({
           type: 'success',
-          title: 'Credentials Verified',
+          title: 'Signed In',
           message: `Welcome, Dr. ${doctorName} — signed in as a ${doctorDiscipline} practitioner at ${selectedHospital.name}.`
         });
         navigate('/doctor');
@@ -512,7 +512,7 @@ export const LoginPage: React.FC = () => {
               <label className="text-sm font-semibold text-slate-700">{t('lp_password')}</label>
               <button
                 type="button"
-                onClick={() => showToast({ type: 'info', title: 'Password Reset', message: 'Recovery instructions sent to registered mobile/email.' })}
+                onClick={() => showToast({ type: 'info', title: 'Not Available in Demo', message: "Password recovery isn't wired up in this prototype." })}
                 className="text-xs text-teal-600 font-semibold hover:underline"
               >
                 {t('lp_forgot_password')}

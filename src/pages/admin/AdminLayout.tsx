@@ -3,10 +3,12 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../../components/Sidebar';
 import { Menu, ShieldAlert, Hospital } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 
 export const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { selectedHospital } = useApp();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen flex bg-transparent relative z-10">
@@ -33,7 +35,7 @@ export const AdminLayout: React.FC = () => {
             <span className="truncate">{selectedHospital.name}</span>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-brand-heading border border-brand-border">
-            Admin Suite
+            {t('al_admin_suite')}
           </span>
         </div>
 

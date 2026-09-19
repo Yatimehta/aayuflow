@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
+import { useTranslation } from '../utils/translations';
 
 interface AISafetyBannerProps {
   className?: string;
@@ -12,7 +13,8 @@ export const AISafetyBanner: React.FC<AISafetyBannerProps> = ({
   variant = 'prominent',
   customText
 }) => {
-  const defaultText = 'AI-generated information — doctor verification required. This is not a diagnosis.';
+  const { t } = useTranslation();
+  const defaultText = t('asb_default_text');
 
   if (variant === 'compact') {
     return (
@@ -35,11 +37,11 @@ export const AISafetyBanner: React.FC<AISafetyBannerProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
-              Clinical Safety Notice
+              {t('asb_notice_title')}
             </span>
             <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
               <ShieldCheck className="w-3 h-3" />
-              Doctor-in-the-Loop
+              {t('asb_doctor_loop')}
             </span>
           </div>
           <p className="text-xs text-amber-900/80 dark:text-amber-200/90 font-medium mt-0.5">

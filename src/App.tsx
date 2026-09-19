@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/Navbar';
@@ -15,7 +15,6 @@ import { LandingPage } from './pages/LandingPage';
 
 // Patient Portal Pages
 import { PatientDashboard } from './pages/patient/PatientDashboard';
-import { PatientLanguageSelect } from './pages/patient/PatientLanguageSelect';
 import { PatientRegistration } from './pages/patient/PatientRegistration';
 import { PatientConsent } from './pages/patient/PatientConsent';
 import { PatientIntakePath } from './pages/patient/PatientIntakePath';
@@ -92,8 +91,20 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 const AppRoutes: React.FC = () => {
-  const { languageConfirmed } = useApp();
+  const { languageConfirmed, setLanguageConfirmed } = useApp();
   const location = useLocation();
+
+  // Landing back on Home always resets the gate, so the very next navigation —
+  // whatever the visitor clicks — walks back through /language first, even if a
+  // language was already confirmed earlier in this browser/tab. Only the actual
+  // language choice (patientLanguage) stays remembered; "have I confirmed it for
+  // this pass through the funnel" does not, so language selection is reliably the
+  // second page after landing every time, not just on a visitor's very first visit.
+  useEffect(() => {
+    if (location.pathname === '/' && languageConfirmed) {
+      setLanguageConfirmed(false);
+    }
+  }, [location.pathname]);
 
   // Home is viewable without picking a language first, but any other destination —
   // role select, login, or a direct deep link — redirects to /language first. That
@@ -118,7 +129,6 @@ const AppRoutes: React.FC = () => {
 
               {/* Patient Portal */}
               <Route path="/patient" element={<PatientDashboard />} />
-              <Route path="/patient/language" element={<PatientLanguageSelect />} />
               <Route path="/patient/registration" element={<PatientRegistration />} />
               <Route path="/patient/consent" element={<PatientConsent />} />
               <Route path="/patient/intake-path" element={<PatientIntakePath />} />

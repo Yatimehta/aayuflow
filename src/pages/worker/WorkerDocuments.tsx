@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { FileUploadZone } from '../../components/FileUploadZone';
 import { useApp } from '../../context/AppContext';
 import { FileText, Camera, CheckCircle2, User, Search } from 'lucide-react';
+import { useTranslation } from '../../utils/translations';
 
 export const WorkerDocuments: React.FC = () => {
+  const { t } = useTranslation();
   const { patients, activePatient, setActivePatientId, showToast } = useApp();
   const [selectedPatId, setSelectedPatId] = useState(activePatient?.id || patients[0]?.id || '');
 
@@ -14,16 +16,16 @@ export const WorkerDocuments: React.FC = () => {
       <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#DCEAE7] shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#0D2B3E]">
-            Scan & Attach Patient Papers
+            {t('wd_title')}
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Attach clear photos of doctor slips, previous prescriptions, and lab test papers.
+            {t('wd_subtitle')}
           </p>
         </div>
 
         {/* Patient selector */}
         <div className="flex items-center gap-2">
-          <label className="text-xs font-bold text-slate-500">Patient:</label>
+          <label className="text-xs font-bold text-slate-500">{t('wd_patient_label')}</label>
           <select
             value={selectedPatId}
             onChange={(e) => {
@@ -54,7 +56,7 @@ export const WorkerDocuments: React.FC = () => {
             </div>
           </div>
           <span className="text-[11px] font-bold text-[#146356] bg-white px-2.5 py-1 rounded-lg border border-[#146356]/20">
-            {currentPatient.documents.length} paper(s) attached
+            {currentPatient.documents.length} {t('wd_papers_attached')}
           </span>
         </div>
       )}
@@ -62,8 +64,8 @@ export const WorkerDocuments: React.FC = () => {
       {/* File Upload Zone */}
       <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#DCEAE7] shadow-sm space-y-6">
         <FileUploadZone
-          title="Scan or Take Photos of Patient Papers"
-          subtitle="Supports photos (JPG, PNG) and PDF documents brought by the patient"
+          title={t('wd_upload_title')}
+          subtitle={t('wd_upload_subtitle')}
           initialDocuments={currentPatient?.documents || []}
           onFilesUploaded={(docs) => {
             showToast({

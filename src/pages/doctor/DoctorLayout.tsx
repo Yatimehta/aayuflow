@@ -3,10 +3,12 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../../components/Sidebar';
 import { Menu, Stethoscope, Hospital } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../utils/translations';
 
 export const DoctorLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { selectedHospital } = useApp();
+  const { t } = useTranslation();
   const location = useLocation();
 
   // Remove left sidebar entirely for Doctor OPD Queue, Medical Dossier, and in-flow doctor views
@@ -53,7 +55,7 @@ export const DoctorLayout: React.FC = () => {
             <span className="truncate">{selectedHospital.name}</span>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#CEF3ED] text-[#146356] border border-[#9FDCD1]">
-            Physician Suite
+            {t('dl_physician_suite')}
           </span>
         </div>
 

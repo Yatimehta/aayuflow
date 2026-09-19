@@ -14,8 +14,10 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { AudioAloudButton } from '../../components/AudioAloudButton';
+import { useTranslation } from '../../utils/translations';
 
 export const PatientIntake: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   // This screen serves the Allopathic intake path (PatientIntakePath links here with
@@ -62,6 +64,13 @@ export const PatientIntake: React.FC = () => {
     '1 to 6 months ago',
     'More than 6 months ago'
   ];
+
+  const durationLabelKeys: Record<string, string> = {
+    'Less than 1 week ago': 'pi_duration_opt1',
+    '1 to 4 weeks ago': 'pi_duration_opt2',
+    '1 to 6 months ago': 'pi_duration_opt3',
+    'More than 6 months ago': 'pi_duration_opt4'
+  };
 
   // Voice speech dictation
   const toggleVoiceInput = () => {
@@ -192,15 +201,15 @@ export const PatientIntake: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Dashboard</span>
+            <span>{t('back_to_dashboard')}</span>
           </button>
 
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Clinical Intake
+              {t('pi_title')}
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Please answer a few simple questions for your OPD visit today.
+              {t('pi_subtitle')}
             </p>
           </div>
         </div>
@@ -216,7 +225,7 @@ export const PatientIntake: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
                 <Scale className="w-3.5 h-3.5 text-teal-600" />
-                <span>Weight (in kg) *</span>
+                <span>{t('pi_weight_label')}</span>
               </label>
               <AudioAloudButton text="Question 1: Please enter your weight in kilograms." />
             </div>
@@ -259,7 +268,7 @@ export const PatientIntake: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-teal-600" />
-                <span>Age (in years) *</span>
+                <span>{t('pi_age_label')}</span>
               </label>
               <AudioAloudButton text="Question 2: Please enter your age in completed years." />
             </div>
@@ -281,7 +290,7 @@ export const PatientIntake: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
                 <Droplet className="w-3.5 h-3.5 text-teal-600" />
-                <span>Blood Group *</span>
+                <span>{t('pi_blood_group_label')}</span>
               </label>
               <AudioAloudButton text="Question 3: Please select your blood group." />
             </div>
@@ -303,7 +312,7 @@ export const PatientIntake: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-teal-600" />
-                <span>Describe your symptoms *</span>
+                <span>{t('pi_symptoms_label')}</span>
               </label>
 
               <div className="flex items-center gap-2">
@@ -320,7 +329,7 @@ export const PatientIntake: React.FC = () => {
                   }`}
                 >
                   {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                  <span>{isListening ? 'Listening...' : 'Voice Dictate'}</span>
+                  <span>{isListening ? t('pi_listening') : t('pi_voice_dictate')}</span>
                 </button>
               </div>
             </div>
@@ -330,7 +339,7 @@ export const PatientIntake: React.FC = () => {
               rows={4}
               value={symptoms}
               onChange={(e) => setSymptoms(e.target.value)}
-              placeholder="Type your symptoms in your own words (e.g. knee pain, persistent cough, digestive trouble, stiffness in the morning)..."
+              placeholder={t('pi_symptoms_placeholder')}
               className="w-full p-3.5 text-xs rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition-all leading-relaxed placeholder:text-slate-400"
             />
           </div>
@@ -340,7 +349,7 @@ export const PatientIntake: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-teal-600" />
-                <span>When did the problem start? *</span>
+                <span>{t('pi_duration_label')}</span>
               </label>
               <AudioAloudButton text="Question 5: When did your health problem start? Please select one option." />
             </div>
@@ -358,7 +367,7 @@ export const PatientIntake: React.FC = () => {
                         : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                   >
-                    {opt}
+                    {t(durationLabelKeys[opt])}
                   </button>
                 );
               })}
@@ -369,7 +378,7 @@ export const PatientIntake: React.FC = () => {
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-800">
-                Severity *
+                {t('pi_severity_label')}
               </label>
               <AudioAloudButton text="Question 6: How severe is your condition? Please select Mild, Moderate, or Severe." />
             </div>
@@ -394,9 +403,11 @@ export const PatientIntake: React.FC = () => {
                         : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                     }`}
                   >
-                    <span className="text-sm font-bold">{sev}</span>
+                    <span className="text-sm font-bold">
+                      {sev === 'Mild' ? t('pi_severity_mild') : sev === 'Moderate' ? t('pi_severity_moderate') : t('pi_severity_severe')}
+                    </span>
                     <span className="text-[10px] text-slate-500">
-                      {sev === 'Mild' ? 'Manageable' : sev === 'Moderate' ? 'Interferes daily' : 'Intense pain'}
+                      {sev === 'Mild' ? t('pi_severity_mild_desc') : sev === 'Moderate' ? t('pi_severity_moderate_desc') : t('pi_severity_severe_desc')}
                     </span>
                   </button>
                 );
@@ -411,14 +422,14 @@ export const PatientIntake: React.FC = () => {
               onClick={() => navigate('/patient/dashboard')}
               className="text-xs text-slate-500 hover:text-slate-800 font-medium"
             >
-              Cancel
+              {t('pi_cancel')}
             </button>
 
             <button
               type="submit"
               className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs"
             >
-              <span>Submit Intake</span>
+              <span>{t('pi_submit')}</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
